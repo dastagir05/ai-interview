@@ -1,6 +1,10 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
+import { db } from "@/drizzle/db";
+import { UserTable } from "@/drizzle/schema/user";
+import { eq } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -17,87 +21,52 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token._id = user._id;
-        token.role = user.role || "user";
-        token.adminId = user.adminId;
-        token.permissions = user.permissions;
-        token.isAdmin = user.isAdmin;
+        token.id = user.id;
+        // token.role = user.role || "user";
+        // token.adminId = user.adminId;
+        // token.permissions = user.permissions;
+        // token.isAdmin = user.isAdmin;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user._id = token._id as string;
-        session.user.role = token.role as string;
-        session.user.adminId = token.adminId as string;
-        session.user.permissions = token.permissions as string[];
-        session.user.isAdmin = token.isAdmin as boolean;
+        session.user.id = token.id as string;
+        // session.user.role = token.role as string;
+        // session.user.adminId = token.adminId as string;
+        // session.user.permissions = token.permissions as string[];
+        // session.user.isAdmin = token.isAdmin as boolean;
       }
       return session;
     },
     async signIn({ user, account }) {
-      // const isAdminAccess =
-      //   typeof account?.redirect_uri === "string" &&
-      //   account.redirect_uri.includes("/admin");
-
-      // if (isAdminAccess && user.email !== "pinjaridastageer@gmail.com") {
-      //   return false; // Deny access
-      // }
-
       try {
-        //   if (user.email === "pinjaridastageer@gmail.com") {
-        //     // Use admin authentication endpoint
-        //     const adminRes = await fetch(
-        //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/login`,
-        //       {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify({
-        //           name: user.name,
-        //           email: user.email,
-        //           image: user.image,
-        //           provider: account?.provider || "google",
-        //           providerId: user.id,
-        //         }),
-        //       }
-        //     );
+        const existing = await db
+          .select()
+          .from(UserTable)
+          .where(eq(UserTable.email, user.email!));
 
-        //     if (adminRes.ok) {
-        //       const adminResult = await adminRes.json();
-        //       user._id = adminResult.admin._id;
-        //       user.adminId = adminResult.admin.adminId;
-        //       user.role = "admin";
-        //       user.permissions = adminResult.admin.permissions;
-        //       user.isAdmin = true;
-        //     } else {
-        //       console.error("Admin login failed:", await adminRes.text());
-        //       return false;
-        //     }
-        //   } else {
-        // Regular user login
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/login`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: user.name,
-              email: user.email || "unknown",
-              image: user.image,
-              provider: account?.provider || "unknown",
-              providerId: user.id,
-            }),
-          }
-        );
-        const result = await res.json();
-        console.log("result", result);
-        user._id = result._id || result.user._id;
-        user.role = result.role || result.user.role || "user";
-        // }
-      } catch (error) {
-        console.error("Error posting user to backend", error);
-        // at time of github email is undefined so check if any field is undefined then return a box image is not important if email or name is undefined then return a box then ask to user to fill the details
+        if (existing.length === 0) {
+          // Create new user
+          const created = await db
+            .insert(UserTable)
+            .values({
+              id: randomUUID(),
+              name: user.name!,
+              email: user.email!,
+              imageUrl: user.image!,
+            })
+            .returning();
+
+          user.id = created[0].id;
+        } else {
+          user.id = existing[0].id;
+        }
+      } catch (err) {
+        console.error("CREATE USER ERROR:", err);
+        return false;
       }
+
       return true;
     },
   },
