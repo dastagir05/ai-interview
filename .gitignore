@@ -14,9 +14,7 @@
 /coverage
 /src/drizzle/migrations/
 /src/features1
-/src/app/(after)/job-infos/[jobInfoId]/interviews
-/src/app/(after)/job-infos/[jobInfoId]/questions
-/src/app/(after)/job-infos/[jobInfoId]/resume
+/src/services/Oauth
 
 
 

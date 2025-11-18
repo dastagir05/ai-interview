@@ -2,7 +2,11 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import z from "zod";
 
 export const env = createEnv({
-  client: {},
+  client: {
+    NEXT_PUBLIC_HUME_CONFIG_ID: z.string().min(1),
+  },
   emptyStringAsUndefined: true,
-  experimental__runtimeEnv: process.env,
+  experimental__runtimeEnv: {
+    NEXT_PUBLIC_HUME_CONFIG_ID: process.env.NEXT_PUBLIC_HUME_CONFIG_ID,
+  },
 });

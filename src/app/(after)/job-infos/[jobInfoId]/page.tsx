@@ -11,12 +11,9 @@ import {
 } from "@/components/ui/card";
 import { db } from "@/drizzle/db";
 import { JobInfoTable } from "@/drizzle/schema";
-import { getJobInfoIdTag } from "@/features/jobInfos/dbCache";
 import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters";
 import { and, eq } from "drizzle-orm";
 import { ArrowRightIcon } from "lucide-react";
-// import { useSession } from "next-auth/react";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { requireUserId } from "@/lib/auth";
@@ -52,15 +49,9 @@ export default async function JobInfoPage({
   params: Promise<{ jobInfoId: string }>;
 }) {
   const { jobInfoId } = await params;
-  // const { data: session } = useSession();
-  // const userId = session?.user?.id as string;
 
-  // if (!session?.user?.id) {
-  //     return redirect("/"); // user not logged in
-  //   }
   const userId = await requireUserId();
   const jobInfo = await getJobInfo(jobInfoId, userId);
-  // const jobInfo = await jobInfoPromise;
 
   if (!jobInfo) return notFound();
   // const jobInfo = getCurrentUser().then(
@@ -76,7 +67,7 @@ export default async function JobInfoPage({
 
   return (
     <div className="container my-4 space-y-4">
-      <BackLink href="/app">Dashboard</BackLink>
+      <BackLink href="/dashboard">Dashboard</BackLink>
 
       <div className="space-y-6">
         <header className="space-y-4">
@@ -122,7 +113,7 @@ export default async function JobInfoPage({
           {options.map((option) => (
             <Link
               className="hover:scale-[1.02] transition-[transform_opacity]"
-              href={`/app/job-infos/${jobInfoId}/${option.href}`}
+              href={`/job-infos/${jobInfoId}/${option.href}`}
               key={option.href}
             >
               <Card className="h-full flex items-start justify-between flex-row">

@@ -4,19 +4,17 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
 
-// 1️⃣ Basic wrapper for cleaner imports
+// Basic wrapper for cleaner imports
 export async function getAuthSession() {
   return await getServerSession(authOptions);
 }
 
-// 2️⃣ Get userId safely
+//  Get userId safely
 export async function getCurrentUserId() {
   const session = await getServerSession(authOptions);
   return session?.user?.id ?? "";
 }
-
-// 3️⃣ Enforce login (auto redirect)
-// Use this in protected pages
+// Require userId (redirect to sign-in if not logged in)
 export async function requireUserId() {
   const session = await getServerSession(authOptions);
 
@@ -27,7 +25,7 @@ export async function requireUserId() {
   return session.user.id;
 }
 
-// 4️⃣ Optional: get full user session (but require login)
+// Optional: get full user session (but require login)
 export async function requireUser() {
   const session = await getServerSession(authOptions);
 
