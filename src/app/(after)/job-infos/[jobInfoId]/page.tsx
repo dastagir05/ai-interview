@@ -13,13 +13,13 @@ import { db } from "@/drizzle/db";
 import { JobInfoTable } from "@/drizzle/schema";
 import { getJobInfoIdTag } from "@/features/jobInfos/dbCache";
 import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters";
-import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser";
 import { and, eq } from "drizzle-orm";
 import { ArrowRightIcon } from "lucide-react";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
+import { requireUserId } from "@/lib/auth";
 
 const options = [
   {
@@ -52,14 +52,15 @@ export default async function JobInfoPage({
   params: Promise<{ jobInfoId: string }>;
 }) {
   const { jobInfoId } = await params;
-  const { data: session } = useSession();
-  const userId = session?.user?.id as string;
+  // const { data: session } = useSession();
+  // const userId = session?.user?.id as string;
 
   // if (!session?.user?.id) {
   //     return redirect("/"); // user not logged in
   //   }
-
+  const userId = await requireUserId();
   const jobInfo = await getJobInfo(jobInfoId, userId);
+  // const jobInfo = await jobInfoPromise;
 
   if (!jobInfo) return notFound();
   // const jobInfo = getCurrentUser().then(
@@ -82,14 +83,14 @@ export default async function JobInfoPage({
           <div className="space-y-2">
             <h1 className="text-3xl md:text-4xl">
               <SuspendedItem
-                item={jobInfo}
+                item={Promise.resolve(jobInfo)}
                 fallback={<Skeleton className="w-48" />}
                 result={(j) => j.name}
               />
             </h1>
             <div className="flex gap-2">
               <SuspendedItem
-                item={jobInfo}
+                item={Promise.resolve(jobInfo)}
                 fallback={<Skeleton className="w-12" />}
                 result={(j) => (
                   <Badge variant="secondary">
@@ -98,7 +99,7 @@ export default async function JobInfoPage({
                 )}
               />
               <SuspendedItem
-                item={jobInfo}
+                item={Promise.resolve(jobInfo)}
                 fallback={null}
                 result={(j) => {
                   return (
@@ -110,7 +111,7 @@ export default async function JobInfoPage({
           </div>
           <p className="text-muted-foreground line-clamp-3">
             <SuspendedItem
-              item={jobInfo}
+              item={Promise.resolve(jobInfo)}
               fallback={<Skeleton className="w-96" />}
               result={(j) => j.description}
             />
@@ -142,9 +143,6 @@ export default async function JobInfoPage({
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache";
-  cacheTag(getJobInfoIdTag(id));
-
   return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
   });

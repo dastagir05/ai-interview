@@ -7,13 +7,12 @@ import { redirect } from "next/navigation";
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
 import { JobInfoTable } from "@/drizzle/schema";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { getJobInfoIdTag } from "./dbCache";
+
 import { useSession } from "next-auth/react";
+import { getCurrentUserId } from "@/lib/auth";
 
 export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
-  const { data: session } = useSession();
-  const userId = session?.user?.id as string;
+  const userId = await getCurrentUserId();
   if (userId == null) {
     return {
       error: true,
@@ -29,9 +28,9 @@ export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
     };
   }
 
-  const jobInfo = await insertJobInfo({ ...data, userId });
+  const jobInfo = await insertJobInfo({ ...data, userId: userId });
 
-  redirect(`/app/job-infos/${jobInfo.id}`);
+  redirect(`/job-infos/${jobInfo.id}`);
 }
 
 export async function updateJobInfo(
@@ -69,8 +68,8 @@ export async function updateJobInfo(
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache";
-  cacheTag(getJobInfoIdTag(id));
+  // "use cache";
+  // cacheTag(getJobInfoIdTag(id));
 
   return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
