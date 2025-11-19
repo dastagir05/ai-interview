@@ -111,7 +111,7 @@ async function Messages({
   return (
     <CondensedMessages
       messages={condensedMessages}
-      user={user}
+      user={{ name: user.name ?? "", imageUrl: user.imageUrl ?? "" }}
       className="max-w-5xl mx-auto"
     />
   );

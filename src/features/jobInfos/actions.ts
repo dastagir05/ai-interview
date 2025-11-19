@@ -64,7 +64,7 @@ export async function updateJobInfo(
 
   const jobInfo = await updateJobInfoDb(id, data);
 
-  redirect(`/app/job-infos/${jobInfo.id}`);
+  redirect(`/job-infos/${jobInfo.id}`);
 }
 
 async function getJobInfo(id: string, userId: string) {

@@ -38,7 +38,7 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
   const userId = await requireUserId();
   const user = await requireUser();
 
-  if (!(await canCreateInterview())) return redirect("/app/upgrade");
+  if (!(await canCreateInterview())) return redirect("/upgrade");
 
   const jobInfo = await getJobInfo(jobInfoId, userId);
   if (jobInfo == null) return notFound();
@@ -50,7 +50,11 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
 
   return (
     <VoiceProvider>
-      <StartCall jobInfo={jobInfo} user={user} accessToken={accessToken} />
+      <StartCall
+        jobInfo={jobInfo}
+        user={{ name: user.name ?? "", imageUrl: user.imageUrl ?? "" }}
+        accessToken={accessToken}
+      />
     </VoiceProvider>
   );
 }

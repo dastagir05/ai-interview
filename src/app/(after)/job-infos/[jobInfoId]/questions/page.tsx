@@ -1,21 +1,19 @@
-import { db } from "@/drizzle/db"
-import { JobInfoTable } from "@/drizzle/schema"
-import { getJobInfoIdTag } from "@/features/jobInfos/dbCache"
-import { canCreateQuestion } from "@/features/questions/permissions"
-import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
-import { and, eq } from "drizzle-orm"
-import { Loader2Icon } from "lucide-react"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
-import { notFound, redirect } from "next/navigation"
-import { Suspense } from "react"
-import { NewQuestionClientPage } from "./_NewQuestionClientPage"
+import { db } from "@/drizzle/db";
+import { JobInfoTable } from "@/drizzle/schema";
+import { canCreateQuestion } from "@/features/questions/permissions";
+import { and, eq } from "drizzle-orm";
+import { Loader2Icon } from "lucide-react";
+import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
+import { NewQuestionClientPage } from "./_NewQuestionClientPage";
+import { requireUserId } from "@/lib/auth";
 
 export default async function QuestionsPage({
   params,
 }: {
-  params: Promise<{ jobInfoId: string }>
+  params: Promise<{ jobInfoId: string }>;
 }) {
-  const { jobInfoId } = await params
+  const { jobInfoId } = await params;
 
   return (
     <Suspense
@@ -27,26 +25,25 @@ export default async function QuestionsPage({
     >
       <SuspendedComponent jobInfoId={jobInfoId} />
     </Suspense>
-  )
+  );
 }
 
 async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
-  const { userId, redirectToSignIn } = await getCurrentUser()
-  if (userId == null) return redirectToSignIn()
+  const userId = await requireUserId();
 
-  if (!(await canCreateQuestion())) return redirect("/app/upgrade")
+  if (!(await canCreateQuestion())) return redirect("/upgrade");
 
-  const jobInfo = await getJobInfo(jobInfoId, userId)
-  if (jobInfo == null) return notFound()
+  const jobInfo = await getJobInfo(jobInfoId, userId);
+  if (jobInfo == null) return notFound();
 
-  return <NewQuestionClientPage jobInfo={jobInfo} />
+  return <NewQuestionClientPage jobInfo={jobInfo} />;
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache"
-  cacheTag(getJobInfoIdTag(id))
+  // "use cache"
+  // cacheTag(getJobInfoIdTag(id))
 
   return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  })
+  });
 }

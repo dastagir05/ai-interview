@@ -1,4 +1,4 @@
-import { pgTable, varchar } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, varchar } from "drizzle-orm/pg-core";
 import { createdAt, updatedAt } from "../schemaHelpers";
 import { relations } from "drizzle-orm/relations";
 import { JobInfoTable } from "./jobInfo";
@@ -8,6 +8,9 @@ export const UserTable = pgTable("users", {
   name: varchar().notNull(),
   email: varchar().notNull().unique(),
   imageUrl: varchar().notNull(),
+
+  permissions: jsonb("permissions").$type<string[]>().default([]),
+
   createdAt,
   updatedAt,
 });

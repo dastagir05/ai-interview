@@ -9,6 +9,7 @@ export const env = createEnv({
     DATABASE_URL: z.string().min(1),
     HUME_API_KEY: z.string().min(1),
     HUME_SECRET_KEY: z.string().min(1),
+    GEMINI_API_KEY: z.string().min(1),
   },
   emptyStringAsUndefined: true,
   experimental__runtimeEnv: process.env,

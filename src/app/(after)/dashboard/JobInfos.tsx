@@ -34,7 +34,7 @@ export default async function JobInfos() {
           Select a job description
         </h1>
         <Button asChild>
-          <Link href="/app/job-infos/new">
+          <Link href="/job-infos/new">
             <PlusIcon />
             Create Job Description
           </Link>
@@ -44,7 +44,7 @@ export default async function JobInfos() {
         {jobInfos.map((jobInfo) => (
           <Link
             className="hover:scale-[1.02] transition-[transform_opacity]"
-            href={`/app/job-infos/${jobInfo.id}`}
+            href={`/job-infos/${jobInfo.id}`}
             key={jobInfo.id}
           >
             <Card className="h-full">
@@ -72,7 +72,7 @@ export default async function JobInfos() {
             </Card>
           </Link>
         ))}
-        <Link className="transition-opacity" href="/app/job-infos/new">
+        <Link className="transition-opacity" href="/job-infos/new">
           <Card className="h-full flex items-center justify-center border-dashed border-3 bg-transparent hover:border-primary/50 transition-colors shadow-none">
             <div className="text-lg flex items-center gap-2">
               <PlusIcon className="size-6" />

@@ -2,7 +2,6 @@
 
 import { db } from "@/drizzle/db";
 import { ExperienceLevel, JobInfoTable } from "@/drizzle/schema";
-import { getJobInfoUserTag } from "@/features/jobInfos/dbCache";
 import { desc, eq } from "drizzle-orm";
 
 export async function getJobInfos(userId: string) {

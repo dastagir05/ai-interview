@@ -71,17 +71,6 @@ function Navbar() {
             <BrainCircuitIcon className="size-8 text-primary" />
             <h1 className="text-2xl font-bold text-foreground">Landr</h1>
           </div>
-          {/* <Suspense
-            fallback={
-              // <SignInButton forceRedirectUrl="/app">
-              //   <Button variant="outline">Sign In</Button>
-              // </SignInButton>
-              <Button variant="outline" onClick={() => setOpenDialog(true)}>
-                Sign In
-              </Button>
-            }
-          > */}
-          {/* <NavButton /> */}
 
           <div>
             <Button variant="outline" onClick={() => setOpenDialog(true)}>

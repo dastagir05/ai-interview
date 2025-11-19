@@ -42,14 +42,14 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
 
   const interviews = await getInterviews(jobInfoId, userId);
   if (interviews.length === 0) {
-    return redirect(`/app/job-infos/${jobInfoId}/interviews/new`);
+    return redirect(`/job-infos/${jobInfoId}/interviews/new`);
   }
   return (
     <div className="space-y-6 w-full">
       <div className="flex gap-2 justify-between">
         <h1 className="text-3xl md:text-4xl lg:text-5xl">Interviews</h1>
         <Button asChild>
-          <Link href={`/app/job-infos/${jobInfoId}/interviews/new`}>
+          <Link href={`/job-infos/${jobInfoId}/interviews/new`}>
             <PlusIcon />
             New Interview
           </Link>
@@ -59,7 +59,7 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 has-hover:*:not-hover:opacity-70">
         <Link
           className="transition-opacity"
-          href={`/app/job-infos/${jobInfoId}/interviews/new`}
+          href={`/job-infos/${jobInfoId}/interviews/new`}
         >
           <Card className="h-full flex items-center justify-center border-dashed border-3 bg-transparent hover:border-primary/50 transition-colors shadow-none">
             <div className="text-lg flex items-center gap-2">
@@ -71,7 +71,7 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
         {interviews.map((interview) => (
           <Link
             className="hover:scale-[1.02] transition-[transform_opacity]"
-            href={`/app/job-infos/${jobInfoId}/interviews/${interview.id}`}
+            href={`/job-infos/${jobInfoId}/interviews/${interview.id}`}
             key={interview.id}
           >
             <Card className="h-full">

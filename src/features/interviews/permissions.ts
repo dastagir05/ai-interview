@@ -1,10 +1,11 @@
 import { db } from "@/drizzle/db";
 import { InterviewTable, JobInfoTable } from "@/drizzle/schema";
 import { requireUserId } from "@/lib/auth";
-import { hasPermission } from "@/services/clerk/lib/hasPermission";
+import { hasPermission } from "@/services/Oauth/lib/hasPermission";
 import { and, count, eq, isNotNull } from "drizzle-orm";
 
 export async function canCreateInterview() {
+  console.log("Checking canCreateInterview");
   return await Promise.any([
     hasPermission("unlimited_interviews").then(
       (bool) => bool || Promise.reject()
@@ -12,6 +13,7 @@ export async function canCreateInterview() {
     Promise.all([hasPermission("1_interview"), getUserInterviewCount()]).then(
       ([has, c]) => {
         if (has && c < 1) return true;
+        console.log("Failed 1 interview check");
         return Promise.reject();
       }
     ),

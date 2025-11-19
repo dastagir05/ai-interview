@@ -13,10 +13,6 @@
 # testing
 /coverage
 /src/drizzle/migrations/
-/src/features1
-/src/services/Oauth
-
-
 
 # next.js
 /.next/

@@ -22,19 +22,26 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // token.role = user.role || "user";
-        // token.adminId = user.adminId;
-        // token.permissions = user.permissions;
-        // token.isAdmin = user.isAdmin;
+        // token.role = (user as any).role || "user";
+        // token.adminId = (user as any).adminId;
+        token.permissions = (user as any).permissions || [];
+        // token.isAdmin = (user as any).isAdmin || false;
       }
+      const dbUser = await db.query.UserTable.findFirst({
+        where: eq(UserTable.id, token.id as string),
+      });
+
+      // If found, sync permissions from DB
+      token.permissions = dbUser?.permissions ?? [];
       return token;
     },
+
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
         // session.user.role = token.role as string;
         // session.user.adminId = token.adminId as string;
-        // session.user.permissions = token.permissions as string[];
+        session.user.permissions = token.permissions as string[];
         // session.user.isAdmin = token.isAdmin as boolean;
       }
       return session;
@@ -55,6 +62,7 @@ export const authOptions: NextAuthOptions = {
               name: user.name!,
               email: user.email!,
               imageUrl: user.image!,
+              permissions: ["1_interview"],
             })
             .returning();
 
