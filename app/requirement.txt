@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+
+# Whisper STT
+openai-whisper
+torch
+
+# Coqui TTS
+TTS
+
+# For audio handling
+pydub
+soundfile
+numpy
