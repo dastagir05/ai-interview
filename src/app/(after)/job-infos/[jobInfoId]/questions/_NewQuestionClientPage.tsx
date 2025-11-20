@@ -73,9 +73,9 @@ export function NewQuestionClientPage({
   }, [data]);
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full mx-w-[2000px] mx-auto flex-grow h-screen-header">
+    <div className="flex flex-col items-center gap-4 w-full mx-w-[2000px] mx-auto h-full">
       <div className="container flex gap-4 mt-4 items-center justify-between">
-        <div className="flex-grow basis-0">
+        <div className="flex basis-0">
           <BackLink href={`/job-infos/${jobInfo.id}`}>{jobInfo.name}</BackLink>
         </div>
         <Controls
@@ -103,7 +103,7 @@ export function NewQuestionClientPage({
             generateQuestion(difficulty, { body: { jobInfoId: jobInfo.id } });
           }}
         />
-        <div className="flex-grow hidden md:block" />
+        <div className="flex md:block" />
       </div>
       <QuestionContainer
         question={question}
@@ -132,7 +132,10 @@ function QuestionContainer({
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow border-t">
       <ResizablePanel id="question-and-feedback" defaultSize={50} minSize={5}>
-        <ResizablePanelGroup direction="vertical" className="flex-grow">
+        <ResizablePanelGroup
+          direction="vertical"
+          className="flex-grow min-h-screen"
+        >
           <ResizablePanel id="question" defaultSize={25} minSize={5}>
             <ScrollArea className="h-full min-w-48 *:h-full">
               {status === "init" && question == null ? (

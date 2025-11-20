@@ -62,6 +62,7 @@ export async function POST(req: Request) {
           dataStream.writeData({ questionId: id });
         },
       });
+      // console.log("generated question", res);
       res.mergeIntoDataStream(dataStream, { sendUsage: false });
     },
   });

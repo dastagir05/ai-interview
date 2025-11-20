@@ -3,11 +3,9 @@ import { db } from "@/drizzle/db";
 import { JobInfoTable } from "@/drizzle/schema";
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
 import { JobInfoForm } from "@/features/jobInfos/components/JobInfoForm";
-import { getJobInfoIdTag } from "@/features/jobInfos/dbCache";
+import { getCurrentUserId } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
 import { Loader2 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -38,8 +36,7 @@ export default async function JobInfoNewPage({
 }
 
 async function SuspendedForm({ jobInfoId }: { jobInfoId: string }) {
-  const { data: session } = useSession();
-  const userId = session?.user?.id as string;
+  const userId = await getCurrentUserId();
 
   // if (userId == null) return redirectToSignIn()
 
@@ -50,9 +47,6 @@ async function SuspendedForm({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache";
-  cacheTag(getJobInfoIdTag(id));
-
   return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
   });
