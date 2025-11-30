@@ -6,35 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BookOpenCheckIcon,
   Brain,
-  BrainCircuitIcon,
   FileSlidersIcon,
   SpeechIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
 import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { ThemeToggle } from "./ThemeToggle";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
-// const LandingPage = () => {
-//   const [openDialog, setOpenDialog] = useState(false);
-
-//   return (
-//     <>
-//       <div>LandingPage</div>
-//       <button onClick={() => setOpenDialog(true)}>Login</button>
-//       <Login openDialog={openDialog} closeDialog={() => setOpenDialog(false)} />
-//     </>
-//   );
-// };
-
-// export default LandingPage;
-
-// import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
-// import { SignInButton } from "@clerk/nextjs"
-
-// import { PricingTable } from "@/services/clerk/components/PricingTable"
 
 export default function LandingPage() {
   return (
@@ -53,11 +32,17 @@ export default function LandingPage() {
 
 function Navbar() {
   const [openDialog, setOpenDialog] = useState(false);
-  const { status } = useSession();
+  const { status, data } = useSession();
   const router = useRouter();
 
   useEffect(() => {
     if (status === "authenticated") {
+      console.log("User data:", data);
+      if (data?.user.role === "recruiter") {
+        //user don't have role wtf
+        router.replace("/recruiter/dashboard");
+        return;
+      }
       router.replace("/dashboard");
     } else if (status === "unauthenticated") {
       router.replace("/");
@@ -68,8 +53,8 @@ function Navbar() {
       <div className="container">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
-            <BrainCircuitIcon className="size-8 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">Landr</h1>
+            <Brain className="size-8 text-primary" />
+            <h1 className="text-2xl font-bold text-foreground">JobPrep.AI</h1>
           </div>
 
           <div>
@@ -89,25 +74,9 @@ function Navbar() {
   );
 }
 
-// async function NavButton() {
-//   const { userId } = await getCurrentUser();
-
-//   if (userId == null) {
-//     return (
-//       <SignInButton forceRedirectUrl="/app">
-//         <Button variant="outline">Sign In</Button>
-//       </SignInButton>
-//     );
-//   }
-
-//   return (
-//     <Button asChild>
-//       <Link href="/dashboard">Dashboard</Link>
-//     </Button>
-//   );
-// }
-
 function Hero() {
+  const [openDialog, setOpenDialog] = useState(false);
+
   return (
     <section className="relative overflow-hidden py-20 sm:py-32">
       <div className="container">
@@ -125,10 +94,13 @@ function Hero() {
             the technical edge to land offers faster.
           </p>
           <Button size="lg" className="h-12 px-6 text-base" asChild>
-            <Link href="/app">Get Started for Free</Link>
+            <Button onClick={() => setOpenDialog(true)}>
+              Get Started for Free
+            </Button>
           </Button>
         </div>
       </div>
+      <Login openDialog={openDialog} closeDialog={() => setOpenDialog(false)} />
     </section>
   );
 }

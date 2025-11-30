@@ -29,8 +29,8 @@ export default async function JobInfos() {
 
   return (
     <div className="container my-4">
-      <div className="flex gap-2 justify-between mb-6">
-        <h1 className="text-3xl md:text-4xl lg:text-5xl">
+      <div className="flex gap-2 justify-between mb-6 mt-8">
+        <h1 className="text-3xl md:text-4xl lg:text-4xl font-bold">
           Select a job description
         </h1>
         <Button asChild>

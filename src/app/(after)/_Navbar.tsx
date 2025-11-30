@@ -2,6 +2,7 @@
 
 import {
   BookOpenIcon,
+  Brain,
   BrainCircuitIcon,
   FileSlidersIcon,
   SpeechIcon,
@@ -33,17 +34,17 @@ export function Navbar({
   const pathName = usePathname();
 
   return (
-    <nav className="h-header border-b">
+    <nav className="h-header border-b p-4">
       <div className="container flex h-full items-center justify-between">
-        <Link href="/app" className="flex items-center gap-2">
-          <BrainCircuitIcon className="size-8 text-primary" />
-          <span className="text-xl font-bold">Landr</span>
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Brain className="size-8 text-primary" />
+          <span className="text-xl font-bold">JobPrep.AI</span>
         </Link>
 
         <div className="flex items-center gap-4">
           {typeof jobInfoId === "string" &&
             navLinks.map(({ name, href, Icon }) => {
-              const hrefPath = `/app/job-infos/${jobInfoId}/${href}`;
+              const hrefPath = `/job-infos/${jobInfoId}/${href}`;
 
               return (
                 <Button

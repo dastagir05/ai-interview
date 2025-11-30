@@ -93,7 +93,7 @@ export function ResumePageClient({ jobInfoId }: { jobInfoId: string }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <LoadingSwap className="size-16" isLoading={isLoading}>
+          <LoadingSwap isLoading={isLoading}>
             <div
               className={cn(
                 "mt-2 border-2 border-dashed rounded-lg p-6 transition-colors relative",
@@ -127,8 +127,8 @@ export function ResumePageClient({ jobInfoId }: { jobInfoId: string }) {
                   handleFileUpload(e.target.files?.[0] ?? null);
                 }}
               />
-              <div className="flex flex-col items-center justify-center text-center gap-4">
-                <UploadIcon className="size-12 text-muted-foreground" />
+              <div className="flex-grow flex-col items-center justify-center text-center gap-4">
+                <UploadIcon className="size-12 text-muted-foreground inline" />
                 <div className="space-y-2">
                   <p className="text-lg">
                     Drag your resume here or click to upload
@@ -166,6 +166,7 @@ function AnalysisResults({
     keywordCoverage: "Keyword Coverage",
     other: "Additional Insights",
   };
+  console.log("ai analysis", aiAnalysis);
 
   return (
     <Card>
