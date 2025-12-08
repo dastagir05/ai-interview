@@ -1,6 +1,10 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
+// import { db } from "@/drizzle/db";
+// import { UserTable } from "@/drizzle/schema/user";
+// import { eq } from "drizzle-orm";
+// import { randomUUID } from "crypto";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -25,6 +29,7 @@ export const authOptions: NextAuthOptions = {
         // token.isAdmin = (user as any).isAdmin || false;
       }
 
+      
       // const dbUser = await db.query.UserTable.findFirst({
       //   where: eq(UserTable.id, token.id as string),
       // });
@@ -46,39 +51,28 @@ export const authOptions: NextAuthOptions = {
     },
     async signIn({ user, account }) {
       try {
-        console.log("SIGN IN USER:", user, process.env.BACKEND_URL);
-        const existing = await fetch(`${process.env.BACKEND_URL}/auth/verify`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: user.name,
-            email: user.email,
-            profilePictureUrl: user.image,
-            oauthId: account?.providerAccountId,
-            oauthProvider: account?.provider,
-          }),
-        }).then((res) => res.json());
-        console.log("EXISTING USER:", existing);
-        user.id = existing.id;
-        // if (existing.length === 0) {
-        //   // Create new user
-        //   const created = await db
-        //     .insert(UserTable)
-        //     .values({
-        //       id: randomUUID(),
-        //       name: user.name!,
-        //       email: user.email!,
-        //       imageUrl: user.image!,
-        //       permissions: ["1_interview"],
-        //     })
-        //     .returning();
+        const existing = await db
+          .select()
+          .from(UserTable)
+          .where(eq(UserTable.email, user.email!));
 
-        //   user.id = created[0].id;
-        // } else {
-        //   user.id = existing[0].id;
-        // }
+        if (existing.length === 0) {
+          // Create new user
+          const created = await db
+            .insert(UserTable)
+            .values({
+              id: randomUUID(),
+              name: user.name!,
+              email: user.email!,
+              imageUrl: user.image!,
+              permissions: ["1_interview"],
+            })
+            .returning();
+
+          user.id = created[0].id;
+        } else {
+          user.id = existing[0].id;
+        }
       } catch (err) {
         console.error("CREATE USER ERROR:", err);
         return false;

@@ -26,37 +26,73 @@ import {
 import { jobInfoSchema } from "../schemas";
 import { formatExperienceLevel } from "../lib/formatters";
 import { LoadingSwap } from "@/components/ui/loading-swap";
-import { createJobInfo, updateJobInfo } from "../actions";
 import { toast } from "sonner";
+import SkillsRequired from "./SkillsRequired";
+import { getCurrentUserId } from "@/lib/auth";
 
-type JobInfoFormData = z.infer<typeof jobInfoSchema>;
+export type JobInfoFormData = z.infer<typeof jobInfoSchema>;
 
 export function JobInfoForm({
   jobInfo,
 }: {
   jobInfo?: Pick<
     typeof JobInfoTable.$inferSelect,
-    "id" | "name" | "title" | "description" | "experienceLevel"
+    | "id"
+    | "name"
+    | "title"
+    | "description"
+    | "experienceLevel"
+    | "skillsRequired"
   >;
 }) {
   const form = useForm<JobInfoFormData>({
     resolver: zodResolver(jobInfoSchema),
-    defaultValues: jobInfo ?? {
-      name: "",
-      title: null,
-      description: "",
-      experienceLevel: "junior",
-    },
+    defaultValues: jobInfo
+      ? {
+          title: jobInfo.title,
+          name: jobInfo.name,
+          description: jobInfo.description,
+          experienceLevel: jobInfo.experienceLevel,
+          skillsRequired: jobInfo.skillsRequired ?? [],
+        }
+      : {
+          title: "",
+          name: null,
+          description: "",
+          experienceLevel: "junior",
+          skillsRequired: [],
+        },
   });
 
   async function onSubmit(values: JobInfoFormData) {
-    const action = jobInfo
-      ? updateJobInfo.bind(null, jobInfo.id)
-      : createJobInfo;
-    const res = await action(values);
+    const currRecId = await getCurrentUserId();
+    try {
+      const response = await fetch(`/api/jobs?recruiterId=${currRecId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: values.title,
+          description: values.description,
+          skillsRequired: values.skillsRequired,
+          experienceLevel: values.experienceLevel.toUpperCase(),
+        }),
+      });
 
-    if (res.error) {
-      toast.error(res.message);
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        toast.error(
+          (data && (data.message || data.error)) ?? "Failed to save job"
+        );
+        return;
+      }
+
+      toast.success("Job saved successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("An unexpected error occurred");
     }
   }
 
@@ -65,7 +101,7 @@ export function JobInfoForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="name"
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
@@ -81,27 +117,7 @@ export function JobInfoForm({
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Job Title</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => field.onChange(e.target.value || null)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Optional. Only enter if there is a specific job title you are
-                  applying for.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <SkillsRequired form={form} />
 
           <FormField
             control={form.control}

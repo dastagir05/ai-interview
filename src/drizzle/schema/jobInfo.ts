@@ -1,6 +1,5 @@
 import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "../schemaHelpers";
-import { UserTable } from "./user";
 import { desc, relations } from "drizzle-orm";
 import { QuestionTable } from "./question";
 import { InterviewTable } from "./interview";
@@ -13,22 +12,17 @@ export const experienceLevelEnum = pgEnum(
 );
 export const JobInfoTable = pgTable("job_info", {
   id,
-  title: varchar(),
-  name: varchar().notNull(),
+  title: varchar().notNull(),
+  name: varchar(),
   experienceLevel: experienceLevelEnum().notNull(),
-  userId: varchar()
-    .references(() => UserTable.id, { onDelete: "cascade" })
-    .notNull(),
+  userId: varchar().notNull(),
   description: varchar().notNull(),
+  skillsRequired: varchar().array().default([]),
   createdAt,
   updatedAt,
 });
 
 export const jobInfoRelations = relations(JobInfoTable, ({ one, many }) => ({
-  user: one(UserTable, {
-    fields: [JobInfoTable.userId],
-    references: [UserTable.id],
-  }),
   questions: many(QuestionTable),
   interviews: many(InterviewTable),
 }));
