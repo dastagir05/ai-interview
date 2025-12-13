@@ -1,6 +1,6 @@
 export enum ExperienceLevel {
   JUNIOR = "JUNIOR",
-  MID = "MID",
+  MID_LEVEL = "MID_LEVEL",
   SENIOR = "SENIOR",
 }
 export interface JobDetails {
@@ -12,6 +12,19 @@ export interface JobDetails {
   skillsRequired: string[];
   experienceLevel: ExperienceLevel;
   isActive: boolean;
+  questionCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface PersonalJobDetails {
+  id: string;
+  recruiterId: string;
+  recruiterName: string;
+  title: string;
+  name: string | null;
+  description: string;
+  skillsRequired: string[];
+  experienceLevel: ExperienceLevel | "JUNIOR";
   questionCount: number;
   createdAt: string;
   updatedAt: string;

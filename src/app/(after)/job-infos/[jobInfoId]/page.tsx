@@ -9,14 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { db } from "@/drizzle/db";
-import { JobInfoTable } from "@/drizzle/schema";
 import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters";
-import { and, eq } from "drizzle-orm";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { requireUserId } from "@/lib/auth";
+import { env } from "@/data/env/server";
+import { PersonalJobDetails } from "@/data/type/job";
 
 const options = [
   {
@@ -51,19 +50,20 @@ export default async function JobInfoPage({
   const { jobInfoId } = await params;
 
   const userId = await requireUserId();
-  const jobInfo = await getJobInfo(jobInfoId, userId);
+  const jobInfo: PersonalJobDetails = await fetch(
+    `${env.BACKEND_URL}/personal-jobs/${jobInfoId}`
+  ).then((res) => {
+    if (res.status === 404) {
+      return null;
+    }
+    return res.json();
+  });
+
+  if (jobInfo && jobInfo.recruiterId !== userId) {
+    return redirect("/dashboard");
+  }
 
   if (!jobInfo) return notFound();
-  // const jobInfo = getCurrentUser().then(
-  //   async ({ userId, redirectToSignIn }) => {
-  //     if (userId == null) return redirectToSignIn()
-
-  //     const jobInfo = await getJobInfo(jobInfoId, userId)
-  //     if (jobInfo == null) return notFound()
-
-  //     return jobInfo
-  //   }
-  // )
 
   return (
     <div className="container my-4 space-y-4">
@@ -76,7 +76,7 @@ export default async function JobInfoPage({
               <SuspendedItem
                 item={Promise.resolve(jobInfo)}
                 fallback={<Skeleton className="w-48" />}
-                result={(j) => j.name}
+                result={(j) => j.title}
               />
             </h1>
             <div className="flex gap-2">
@@ -84,9 +84,7 @@ export default async function JobInfoPage({
                 item={Promise.resolve(jobInfo)}
                 fallback={<Skeleton className="w-12" />}
                 result={(j) => (
-                  <Badge variant="secondary">
-                    {formatExperienceLevel(j.experienceLevel)}
-                  </Badge>
+                  <Badge variant="secondary">{j.experienceLevel}</Badge>
                 )}
               />
               <SuspendedItem
@@ -94,7 +92,9 @@ export default async function JobInfoPage({
                 fallback={null}
                 result={(j) => {
                   return (
-                    j.title && <Badge variant="secondary">{j.title}</Badge>
+                    j.title && (
+                      <Badge variant="secondary">{j.skillsRequired}</Badge>
+                    )
                   );
                 }}
               />
@@ -131,10 +131,4 @@ export default async function JobInfoPage({
       </div>
     </div>
   );
-}
-
-async function getJobInfo(id: string, userId: string) {
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  });
 }

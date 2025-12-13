@@ -1,6 +1,7 @@
 import { BackLink } from "@/components/BackLink";
 import { Card, CardContent } from "@/components/ui/card";
 import { JobInfoForm } from "@/features/jobInfos/components/JobInfoForm";
+import { PersonalJobInfoForm } from "@/features/jobInfos/components/PersonalInfoForm";
 
 export default function JobInfoNewPage() {
   return (
@@ -11,7 +12,17 @@ export default function JobInfoNewPage() {
 
       <Card>
         <CardContent>
-          <JobInfoForm />
+          <CardContent>
+            <PersonalJobInfoForm
+              jobInfo={{
+                title: "",
+                description: "",
+                experienceLevel: "JUNIOR",
+                skillsRequired: [],
+                name: "",
+              }}
+            />
+          </CardContent>
         </CardContent>
       </Card>
     </div>

@@ -8,21 +8,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { JobInfoForm } from "@/features/jobInfos/components/JobInfoForm";
-import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters";
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { requireUserId } from "@/lib/auth";
-import { getJobInfos } from "./JobInfoActions";
+import { ExperienceLevel, PersonalJobDetails } from "@/data/type/job";
+import { env } from "@/data/env/server";
+import { toast } from "sonner";
+import { PersonalJobInfoForm } from "@/features/jobInfos/components/PersonalInfoForm";
 
 export default async function JobInfos() {
-  // const { userId, redirectToSignIn } = await getCurrentUser()
-  // if (userId == null) return redirectToSignIn()
-  // const session = await getServerSession(authOptions);
   const userId = await requireUserId();
 
-  const jobInfos = await getJobInfos(userId);
+  let jobInfos: PersonalJobDetails[] = [];
 
+  try {
+    jobInfos = await fetch(
+      `${env.BACKEND_URL}/personal-jobs/user/${userId}`
+    ).then((res) => res.json());
+    console.log("jobInfos:", jobInfos);
+  } catch (error) {
+    toast.error("Failed to load job descriptions");
+    return null;
+  }
   if (jobInfos.length === 0) {
     return <NoJobInfos />;
   }
@@ -51,17 +58,15 @@ export default async function JobInfos() {
               <div className="flex items-center justify-between h-full">
                 <div className="space-y-4 h-full">
                   <CardHeader>
-                    <CardTitle className="text-lg">{jobInfo.name}</CardTitle>
+                    <CardTitle className="text-lg">{jobInfo.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="text-muted-foreground line-clamp-3">
                     {jobInfo.description}
                   </CardContent>
                   <CardFooter className="flex gap-2">
-                    <Badge variant="outline">
-                      {formatExperienceLevel(jobInfo.experienceLevel)}
-                    </Badge>
+                    <Badge variant="outline">{jobInfo.experienceLevel}</Badge>
                     {jobInfo.title && (
-                      <Badge variant="outline">{jobInfo.title}</Badge>
+                      <Badge variant="outline">{jobInfo.skillsRequired}</Badge>
                     )}
                   </CardFooter>
                 </div>
@@ -100,7 +105,21 @@ function NoJobInfos() {
       </p>
       <Card>
         <CardContent>
-          <JobInfoForm />
+          <PersonalJobInfoForm
+            jobInfo={{
+              title: "",
+              description: "",
+              experienceLevel: "JUNIOR",
+              skillsRequired: [],
+              id: "",
+              recruiterId: "",
+              recruiterName: "",
+              name: "",
+              questionCount: 0,
+              createdAt: "",
+              updatedAt: "",
+            }}
+          />
         </CardContent>
       </Card>
     </div>

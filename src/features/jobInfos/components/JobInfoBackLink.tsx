@@ -1,8 +1,7 @@
 import { BackLink } from "@/components/BackLink";
-import { db } from "@/drizzle/db";
-import { JobInfoTable } from "@/drizzle/schema";
+import { env } from "@/data/env/server";
+
 import { cn } from "@/lib/utils";
-import { eq } from "drizzle-orm";
 import { Suspense } from "react";
 
 export function JobInfoBackLink({
@@ -30,7 +29,8 @@ async function JobName({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getJobInfo(id: string) {
-  return db.query.JobInfoTable.findFirst({
-    where: eq(JobInfoTable.id, id),
-  });
+  const res = await fetch(`${env.BACKEND_URL}/personalJobs/${id}`).then((res) =>
+    res.json()
+  );
+  return res;
 }

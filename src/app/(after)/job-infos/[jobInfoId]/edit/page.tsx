@@ -1,10 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { db } from "@/drizzle/db";
-import { JobInfoTable } from "@/drizzle/schema";
+import { env } from "@/data/env/server";
+
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
 import { JobInfoForm } from "@/features/jobInfos/components/JobInfoForm";
 import { getCurrentUserId } from "@/lib/auth";
-import { and, eq } from "drizzle-orm";
 import { Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -47,7 +46,8 @@ async function SuspendedForm({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  });
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`).then(
+    (res) => res.json()
+  );
+  return res;
 }

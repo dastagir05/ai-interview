@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -27,20 +25,20 @@ import { jobInfoSchema } from "../schemas";
 import { formatExperienceLevel } from "../lib/formatters";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { toast } from "sonner";
-import SkillsRequired from "./SkillsRequired";
 import { getCurrentUserId } from "@/lib/auth";
+import PersonalSkillsRequired from "./PersonalSkillsRequired";
 
 export type JobInfoFormData = z.infer<typeof jobInfoSchema>;
 
-export function JobInfoForm({ jobInfo }: { jobInfo: PersonalJobDetails }) {
+export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
   const form = useForm<JobInfoFormData>({
     resolver: zodResolver(jobInfoSchema),
     defaultValues: jobInfo
       ? {
           title: jobInfo.title,
-          name: jobInfo.name,
+          name: null,
           description: jobInfo.description,
-          experienceLevel: ExperienceLevel,
+          experienceLevel: jobInfo.experienceLevel || "JUNIOR",
           skillsRequired: jobInfo.skillsRequired ?? [],
         }
       : {
@@ -54,8 +52,9 @@ export function JobInfoForm({ jobInfo }: { jobInfo: PersonalJobDetails }) {
 
   async function onSubmit(values: JobInfoFormData) {
     const currRecId = await getCurrentUserId();
+    console.log("Current User ID:", currRecId);
     try {
-      const response = await fetch(`/api/jobs?recruiterId=${currRecId}`, {
+      const response = await fetch(`/api/personalJobs?userId=${currRecId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +85,18 @@ export function JobInfoForm({ jobInfo }: { jobInfo: PersonalJobDetails }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(
+          async (values) => {
+            console.log("handleSubmit: success — values:", values);
+            await onSubmit(values);
+          },
+          (errors) => {
+            console.log("handleSubmit: validation errors:", errors);
+          }
+        )}
+        className="space-y-6"
+      >
         <FormField
           control={form.control}
           name="title"
@@ -105,7 +115,7 @@ export function JobInfoForm({ jobInfo }: { jobInfo: PersonalJobDetails }) {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-          <SkillsRequired form={form} />
+          <PersonalSkillsRequired form={form} />
 
           <FormField
             control={form.control}

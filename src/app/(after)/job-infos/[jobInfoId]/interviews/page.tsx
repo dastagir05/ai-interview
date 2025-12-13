@@ -6,12 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { db } from "@/drizzle/db";
-import { InterviewTable } from "@/drizzle/schema";
+import { env } from "@/data/env/server";
+import { SessionCardDTO } from "@/data/type/interview";
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
-import { requireUserId } from "@/lib/auth";
+import { getCurrentUserId, requireUserId } from "@/lib/auth";
 import { formatDateTime } from "@/lib/formatters";
-import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { ArrowRightIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -57,30 +56,21 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 has-hover:*:not-hover:opacity-70">
-        <Link
-          className="transition-opacity"
-          href={`/job-infos/${jobInfoId}/interviews/new`}
-        >
-          <Card className="h-full flex items-center justify-center border-dashed border-3 bg-transparent hover:border-primary/50 transition-colors shadow-none">
-            <div className="text-lg flex items-center gap-2">
-              <PlusIcon className="size-6" />
-              New Interview
-            </div>
-          </Card>
-        </Link>
-        {interviews.map((interview) => (
+        {interviews.map((interview: SessionCardDTO) => (
           <Link
             className="hover:scale-[1.02] transition-[transform_opacity]"
-            href={`/job-infos/${jobInfoId}/interviews/${interview.id}`}
-            key={interview.id}
+            href={`/job-infos/${jobInfoId}/interviews/${interview.sessionId}`}
+            key={interview.sessionId}
           >
             <Card className="h-full">
               <div className="flex items-center justify-between h-full">
                 <CardHeader className="gap-1 flex-grow">
                   <CardTitle className="text-lg">
-                    {formatDateTime(interview.createdAt)}
+                    {/* {formatDateTime(interview.createdAt)} */}
+                    {interview.interviewTitle}
+                    <span className="block text-sm">{interview.createdAt}</span>
                   </CardTitle>
-                  <CardDescription>{interview.duration}</CardDescription>
+                  <CardDescription>{interview.durationMinutes}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ArrowRightIcon className="size-6" />
@@ -95,18 +85,22 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getInterviews(jobInfoId: string, userId: string) {
-  // "use cache"
-  // cacheTag(getInterviewJobInfoTag(jobInfoId))
-  // cacheTag(getJobInfoIdTag(jobInfoId))
-
-  const data = await db.query.InterviewTable.findMany({
-    where: and(
-      eq(InterviewTable.jobInfoId, jobInfoId),
-      isNotNull(InterviewTable.humeChatId)
-    ),
-    with: { jobInfo: { columns: { userId: true } } },
-    orderBy: desc(InterviewTable.updatedAt),
-  });
-
-  return data.filter((interview) => interview.jobInfo.userId === userId);
+  try {
+    //const userId = await getCurrentUserId(); // Or get from auth context
+    const response = await fetch(
+      `${env.BACKEND_URL}/practice-interview/user/${userId}/job/${jobInfoId}/sessions`
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   },
+      // }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch sessions:", error);
+  } finally {
+    console.log("Fetch sessions attempt finished.");
+  }
+  return [];
 }
