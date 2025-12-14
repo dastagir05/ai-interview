@@ -25,7 +25,6 @@ export default async function JobInfos() {
     jobInfos = await fetch(
       `${env.BACKEND_URL}/personal-jobs/user/${userId}`
     ).then((res) => res.json());
-    console.log("jobInfos:", jobInfos);
   } catch (error) {
     toast.error("Failed to load job descriptions");
     return null;

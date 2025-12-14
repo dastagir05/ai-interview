@@ -19,6 +19,12 @@ import { PersonalJobDetails } from "@/data/type/job";
 
 const options = [
   {
+    label: "Aptitude Practice",
+    description:
+      "Sharpen your problem-solving skills with tailored aptitude tests.",
+    href: "aptitude",
+  },
+  {
     label: "Answer Technical Questions",
     description:
       "Challenge yourself with practice questions tailored to your job description.",
