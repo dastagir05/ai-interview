@@ -3,19 +3,6 @@ export enum ExperienceLevel {
   MID_LEVEL = "MID_LEVEL",
   SENIOR = "SENIOR",
 }
-export interface JobDetails {
-  id: string;
-  recruiterId: string;
-  recruiterName: string;
-  title: string;
-  description: string;
-  skillsRequired: string[];
-  experienceLevel: ExperienceLevel;
-  isActive: boolean;
-  questionCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
 export interface PersonalJobDetails {
   id: string;
   recruiterId: string;
@@ -35,6 +22,19 @@ export interface CreateQuestion {
   questionType: "TECHNICAL" | "BEHAVIORAL" | "SITUATIONAL";
   difficultyLevel: "EASY" | "MEDIUM" | "HARD";
   orderInInterview: number;
+}
+export interface JobDetails {
+  id: string;
+  recruiterId: string;
+  recruiterName: string;
+  title: string;
+  description: string;
+  skillsRequired: string[];
+  experienceLevel: ExperienceLevel;
+  isActive: boolean;
+  questionCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Question {

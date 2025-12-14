@@ -24,6 +24,12 @@ const navLinks = [
   { name: "Questions", href: "questions", Icon: BookOpenIcon },
   { name: "Resume", href: "resume", Icon: FileSlidersIcon },
 ];
+const navLinks1 = [
+  { name: "Dashboard", href: "interviews", Icon: SpeechIcon },
+  { name: "Personal Jobs", href: "questions", Icon: BookOpenIcon },
+  { name: "Resume", href: "resume", Icon: FileSlidersIcon },
+  { name: "User", href: "resume", Icon: FileSlidersIcon },
+];
 
 export function Navbar({
   user,
@@ -38,10 +44,28 @@ export function Navbar({
       <div className="container flex h-full items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Brain className="size-8 text-primary" />
-          <span className="text-xl font-bold">JobPrep.AI</span>
+          <span className="text-xl font-bold">IPrepWithAI</span>
         </Link>
 
         <div className="flex items-center gap-4">
+          {typeof jobInfoId !== "string" &&
+            navLinks1.map(({ name, href, Icon }) => {
+              const hrefPath = `/job-infos/${jobInfoId}/${href}`;
+
+              return (
+                <Button
+                  variant={pathName === hrefPath ? "secondary" : "ghost"}
+                  key={name}
+                  asChild
+                  className="cursor-pointer max-sm:hidden"
+                >
+                  <Link href={hrefPath}>
+                    <Icon className="mr-2" />
+                    {name}
+                  </Link>
+                </Button>
+              );
+            })}
           {typeof jobInfoId === "string" &&
             navLinks.map(({ name, href, Icon }) => {
               const hrefPath = `/job-infos/${jobInfoId}/${href}`;

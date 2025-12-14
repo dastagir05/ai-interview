@@ -2,8 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { env } from "@/data/env/server";
 
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
-import { JobInfoForm } from "@/features/jobInfos/components/JobInfoForm";
 import { getCurrentUserId } from "@/lib/auth";
+import { EditPersonalJobInfoForm } from "@/features/jobInfos/components/EditPersonalJobInfoForm";
 import { Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -42,7 +42,7 @@ async function SuspendedForm({ jobInfoId }: { jobInfoId: string }) {
   const jobInfo = await getJobInfo(jobInfoId, userId);
   if (jobInfo == null) return notFound();
 
-  return <JobInfoForm jobInfo={jobInfo} />;
+  return <EditPersonalJobInfoForm jobInfo={jobInfo} jobId={jobInfoId} />;
 }
 
 async function getJobInfo(id: string, userId: string) {

@@ -1,41 +1,37 @@
-import {
-  JobInfoTable,
-  QuestionDifficulty,
-  QuestionTable,
-} from "@/drizzle/schema"
-import { CoreMessage, streamText } from "ai"
-import { google } from "./models/google"
+import { CoreMessage, streamText } from "ai";
+import { google } from "./models/google";
+import { PersonalJobDetails } from "@/data/type/job";
+import { QuestionDifficulty } from "@/data/type/question";
 
 export function generateAiQuestion({
   jobInfo,
-  previousQuestions,
+  // previousQuestions,
   difficulty,
-  onFinish,
-}: {
+}: // onFinish,
+{
   jobInfo: Pick<
-    typeof JobInfoTable.$inferSelect,
+    PersonalJobDetails,
     "title" | "description" | "experienceLevel"
-  >
-  previousQuestions: Pick<
-    typeof QuestionTable.$inferSelect,
-    "text" | "difficulty"
-  >[]
-  difficulty: QuestionDifficulty
-  onFinish: (question: string) => void
+  >;
+  // previousQuestions: Pick<
+  //   typeof QuestionTable.$inferSelect,
+  //   "text" | "difficulty"
+  // >[]
+  difficulty: QuestionDifficulty;
+  // onFinish: (question: string) => void;
 }) {
-  const previousMessages = previousQuestions.flatMap(
-    q =>
-      [
-        { role: "user", content: q.difficulty },
-        { role: "assistant", content: q.text },
-      ] satisfies CoreMessage[]
-  )
+  // const previousMessages = previousQuestions.flatMap(
+  //   q =>
+  //     [
+  //       { role: "user", content: q.difficulty },
+  //       { role: "assistant", content: q.text },
+  //     ] satisfies CoreMessage[]
+  // )
 
   return streamText({
     model: google("gemini-2.5-flash"),
-    onFinish: ({ text }) => onFinish(text),
+    // onFinish: ({ text }) => onFinish(text),
     messages: [
-      ...previousMessages,
       {
         role: "user",
         content: difficulty,
@@ -60,15 +56,15 @@ Guidelines:
 - It is ok to ask a question about just a single part of the job description, such as a specific technology or skill (e.g., if the job description is for a Next.js, Drizzle, and TypeScript developer, you can ask a TypeScript only question).
 - The question should be formatted as markdown.
 - Stop generating output as soon you have provided the full question.`,
-  })
+  });
 }
 
 export function generateAiQuestionFeedback({
   question,
   answer,
 }: {
-  question: string
-  answer: string
+  question: string;
+  answer: string;
 }) {
   return streamText({
     model: google("gemini-2.5-flash"),
@@ -104,5 +100,5 @@ Output Format (strictly follow this structure):
 ## Correct Answer
 <The full correct answer as markdown>
 \`\`\``,
-  })
+  });
 }

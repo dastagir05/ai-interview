@@ -1,18 +1,10 @@
-import { db } from "@/drizzle/db";
-import {
-  JobInfoTable,
-  questionDifficulties,
-  QuestionTable,
-} from "@/drizzle/schema";
-import { insertQuestion } from "@/features/questions/db";
-import { canCreateQuestion } from "@/features/questions/permissions";
 import { getCurrentUserId } from "@/lib/auth";
-import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast";
+// import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast";
+import { env } from "@/data/env/server";
 import { generateAiQuestion } from "@/services/ai/questions";
 import { createDataStreamResponse } from "ai";
-import { and, asc, eq } from "drizzle-orm";
 import z from "zod";
-
+import { QuestionDifficulty, questionDifficulties } from "@/data/type/question";
 const schema = z.object({
   prompt: z.enum(questionDifficulties),
   jobInfoId: z.string().min(1),
@@ -33,9 +25,9 @@ export async function POST(req: Request) {
     return new Response("You are not logged in", { status: 401 });
   }
 
-  if (!(await canCreateQuestion())) {
-    return new Response(PLAN_LIMIT_MESSAGE, { status: 403 });
-  }
+  // if (!(await canCreateQuestion())) {
+  //   return new Response(PLAN_LIMIT_MESSAGE, { status: 403 });
+  // }
 
   const jobInfo = await getJobInfo(jobInfoId, userId);
   if (jobInfo == null) {
@@ -44,39 +36,41 @@ export async function POST(req: Request) {
     });
   }
 
-  const previousQuestions = await getQuestions(jobInfoId);
+  // const previousQuestions = await getQuestions(jobInfoId);
 
   return createDataStreamResponse({
     execute: async (dataStream) => {
       const res = generateAiQuestion({
-        previousQuestions,
+        // previousQuestions,
         jobInfo,
         difficulty,
-        onFinish: async (question) => {
-          const { id } = await insertQuestion({
-            text: question,
-            jobInfoId,
-            difficulty,
-          });
+        // onFinish: async (question) => {
+        // const { id } = await insertQuestion({
+        //   text: question,
+        //   jobInfoId,
+        //   difficulty,
+        // });
 
-          dataStream.writeData({ questionId: id });
-        },
+        // dataStream.writeData({ questionId: id });
+        // },
       });
       // console.log("generated question", res);
+      console.log("generated question stream", res);
       res.mergeIntoDataStream(dataStream, { sendUsage: false });
     },
   });
 }
 
-async function getQuestions(jobInfoId: string) {
-  return db.query.QuestionTable.findMany({
-    where: eq(QuestionTable.jobInfoId, jobInfoId),
-    orderBy: asc(QuestionTable.createdAt),
-  });
-}
+// async function getQuestions(jobInfoId: string) {
+//   return db.query.QuestionTable.findMany({
+//     where: eq(QuestionTable.jobInfoId, jobInfoId),
+//     orderBy: asc(QuestionTable.createdAt),
+//   });
+// }
 
 async function getJobInfo(id: string, userId: string) {
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  });
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`).then(
+    (res) => res.json()
+  );
+  return res;
 }

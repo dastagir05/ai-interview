@@ -1,7 +1,5 @@
-import { db } from "@/drizzle/db";
-import { JobInfoTable } from "@/drizzle/schema";
 import { canCreateQuestion } from "@/features/questions/permissions";
-import { and, eq } from "drizzle-orm";
+import { env } from "@/data/env/server";
 import { Loader2Icon } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -31,7 +29,7 @@ export default async function QuestionsPage({
 async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
   const userId = await requireUserId();
 
-  if (!(await canCreateQuestion())) return redirect("/upgrade");
+  // if (!(await canCreateQuestion())) return redirect("/upgrade");
 
   const jobInfo = await getJobInfo(jobInfoId, userId);
   if (jobInfo == null) return notFound();
@@ -40,10 +38,8 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  // "use cache"
-  // cacheTag(getJobInfoIdTag(id))
-
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  });
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`).then(
+    (res) => res.json()
+  );
+  return res;
 }

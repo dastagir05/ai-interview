@@ -111,13 +111,7 @@ function NoJobInfos() {
               description: "",
               experienceLevel: "JUNIOR",
               skillsRequired: [],
-              id: "",
-              recruiterId: "",
-              recruiterName: "",
               name: "",
-              questionCount: 0,
-              createdAt: "",
-              updatedAt: "",
             }}
           />
         </CardContent>

@@ -1,5 +1,3 @@
-import { db } from "@/drizzle/db";
-import { JobInfoTable, QuestionTable } from "@/drizzle/schema";
 import { requireUserId } from "@/lib/auth";
 import { hasPermission } from "@/services/Oauth/lib/hasPermission";
 import { count, eq } from "drizzle-orm";
@@ -26,11 +24,12 @@ async function getUserQuestionCount() {
 }
 
 async function getQuestionCount(userId: string) {
-  const [{ count: c }] = await db
-    .select({ count: count() })
-    .from(QuestionTable)
-    .innerJoin(JobInfoTable, eq(QuestionTable.jobInfoId, JobInfoTable.id))
-    .where(eq(JobInfoTable.userId, userId));
+  return 2;
+  // const [{ count: c }] = await db
+  //   .select({ count: count() })
+  //   .from(QuestionTable)
+  //   .innerJoin(JobInfoTable, eq(QuestionTable.jobInfoId, JobInfoTable.id))
+  //   .where(eq(JobInfoTable.userId, userId));
 
-  return c;
+  // return Number(c) || 0;
 }

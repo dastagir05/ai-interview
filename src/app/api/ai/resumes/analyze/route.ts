@@ -1,10 +1,8 @@
-import { db } from "@/drizzle/db";
-import { JobInfoTable } from "@/drizzle/schema";
 import { canRunResumeAnalysis } from "@/features/resumeAnalyses/permissions";
 import { getCurrentUserId } from "@/lib/auth";
 import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast";
 import { analyzeResumeForJob } from "@/services/ai/resumes/ai";
-import { and, eq } from "drizzle-orm";
+import { env } from "@/data/env/server";
 
 export async function POST(req: Request) {
   const userId = await getCurrentUserId();
@@ -58,7 +56,8 @@ export async function POST(req: Request) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  });
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`).then(
+    (res) => res.json()
+  );
+  return res;
 }
