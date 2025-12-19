@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const res = await fetch(`${env.BACKEND_URL}/aptitude/start?jobId=${jobId}`, {
+  const res = await fetch(`${env.BACKEND_URL}/aptitude/history?jobId=${jobId}`, {
     // headers: {
     //   Authorization: `Bearer ${userId}`,
     // },

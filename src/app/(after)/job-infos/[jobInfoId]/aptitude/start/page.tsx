@@ -80,7 +80,7 @@ export default function AptitudeTestPage() {
 
       const result = await res.json();
       router.push(
-        `/job-infos/${jobId}/aptitude/result?score=${result.score}&total=${result.total}`
+        `/job-infos/${jobId}/aptitude/result?score=${result.score}&total=${result.total}&attemptId=${attemptId}`
       );
     } catch (e: any) {
       errorToast(e.message);
@@ -92,6 +92,7 @@ export default function AptitudeTestPage() {
   const q = questions[current];
 
   return (
+    // handle like api don't give response reach limit then so server with 503 so plz wait or contact dastagir
     <div className="max-w-3xl mx-auto p-6 space-y-4">
       <div className="flex justify-between">
         <h2 className="text-xl font-semibold">Aptitude Test</h2>

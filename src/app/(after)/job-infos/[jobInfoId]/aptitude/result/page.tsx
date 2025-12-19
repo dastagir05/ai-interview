@@ -10,6 +10,7 @@ export default function AptitudeResultPage() {
 
   const score = params.get("score");
   const total = params.get("total");
+  const attemId = params.get("attemptId")
 
   return (
     <div className="max-w-xl mx-auto p-10 text-center space-y-6">
@@ -26,6 +27,12 @@ export default function AptitudeResultPage() {
           onClick={() => router.push(`/job-infos/${jobInfoId}/aptitude`)}
         >
           Back to History
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => router.push(`/job-infos/${jobInfoId}/aptitude/review/${attemId}`)}
+        >
+          Review
         </Button>
 
         <Button

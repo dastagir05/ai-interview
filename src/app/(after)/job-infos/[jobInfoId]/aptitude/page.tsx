@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { errorToast } from "@/lib/errorToast";
 
 type AptitudeAttempt = {
-  id: string;
+  attemptId: string;
   score: number;
-  totalQuestions: number;
-  completed: boolean;
-  startedAt: string;
+  total: number;
+  finishedAt: string;
+  // startedAt: string;
 };
 
 export default function AptitudeHistoryPage() {
@@ -33,7 +33,8 @@ export default function AptitudeHistoryPage() {
         if (!res.ok) throw new Error("Failed to load history");
 
         const data = await res.json();
-        setAttempts(data.completed);
+        console.log("attempts",data)
+        setAttempts(data);
         setActiveAttempt(data.active || null);
       } catch (e: any) {
         errorToast(e.message);
@@ -58,7 +59,7 @@ export default function AptitudeHistoryPage() {
             <div>
               <p className="font-semibold">Active Attempt</p>
               <p className="text-sm text-muted-foreground">
-                Started at {new Date(activeAttempt.startedAt).toLocaleString()}
+                {/* Started at {new Date(activeAttempt.startedAt).toLocaleString()} */}
               </p>
             </div>
             <Button
@@ -95,14 +96,14 @@ export default function AptitudeHistoryPage() {
         )}
 
         {attempts.map((a) => (
-          <Card key={a.id}>
+          <Card key={a.attemptId}>
             <CardContent className="p-4 flex justify-between items-center">
               <div>
                 <p className="font-medium">
-                  Score: {a.score} / {a.totalQuestions}
+                  Score: {a.score} / {a.total}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(a.startedAt).toLocaleString()}
+                  {new Date(a.finishedAt).toLocaleString()}
                 </p>
               </div>
 
@@ -110,7 +111,7 @@ export default function AptitudeHistoryPage() {
                 variant="outline"
                 onClick={() =>
                   router.push(
-                    `/job-infos/${jobInfoId}/aptitude/review/${a.id}`
+                    `/job-infos/${jobInfoId}/aptitude/review/${a.attemptId}`
                   )
                 }
               >

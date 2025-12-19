@@ -3,18 +3,18 @@ import { env } from "@/data/env/server";
 import { getCurrentUserId } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const jobId = req.nextUrl.searchParams.get("jobId");
+  const attemptId = req.nextUrl.searchParams.get("attemptId");
 
-  if (!jobId) {
-    return new Response("Job ID required", { status: 400 });
+  if (!attemptId) {
+    return new Response("attemptId required", { status: 400 });
   }
 
   const userId = await getCurrentUserId();
   if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }
-
-  const res = await fetch(`${env.BACKEND_URL}/aptitude/start?jobId=${jobId}`, {
+//  console.log("attempId in route", attemptId)
+  const res = await fetch(`${env.BACKEND_URL}/aptitude/review/${attemptId}`, {
     // headers: {
     //   Authorization: `Bearer ${userId}`,
     // },
