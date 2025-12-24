@@ -1,8 +1,8 @@
 import { BackLink } from "@/components/BackLink";
 import { Card, CardContent } from "@/components/ui/card";
-import { PersonalJobInfoForm } from "@/features/jobInfos/components/PersonalInfoForm";
+import { PublicJobInfoForm } from "@/features/admin/CreatePublicJob";
 
-export default function JobInfoNewPage() {
+export default function PublicJobInfoNewPage() {
   return (
     <div className="container my-4 max-w-5xl space-y-4">
       <BackLink href="/dashboard">Dashboard</BackLink>
@@ -12,10 +12,11 @@ export default function JobInfoNewPage() {
       <Card>
         <CardContent>
           <CardContent>
-            <PersonalJobInfoForm
+            <PublicJobInfoForm
               jobInfo={{
                 title: "",
                 description: "",
+                category:"PROGRAMING",
                 experienceLevel: "JUNIOR",
                 skillsRequired: [],
                 name: "",

@@ -12,13 +12,19 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { formatQuestionDifficulty } from "@/features/questions/formatters";
-import { useMemo, useState } from "react";
-import { useCompletion } from "@ai-sdk/react";
+import { useState } from "react";
+// import { useCompletion } from "@ai-sdk/react";
 import { errorToast } from "@/lib/errorToast";
 import { PersonalJobDetails } from "@/data/type/job";
 import { QuestionDifficulty, questionDifficulties } from "@/data/type/question";
 
 type Status = "awaiting-answer" | "awaiting-difficulty" | "init";
+export type GeneratedQuestion = {
+  QString: string;      // The text of the question
+  correctIndex?: number; // Optional if MCQ
+  difficulty?: string;   // Optional metadata
+};
+
 
 export function NewQuestionClientPage({
   jobInfo,
@@ -27,30 +33,67 @@ export function NewQuestionClientPage({
 }) {
   const [status, setStatus] = useState<Status>("init");
   const [answer, setAnswer] = useState<string>("");
+  const [question, setQuestion] = useState<string>("");
+  const [feedback, setFeedback] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Question Generation
-  const {
-    complete: generateQuestion,
-    completion: question,
-    setCompletion: setQuestion,
-    isLoading: isGeneratingQuestion,
-  } = useCompletion({
-    api: "/api/ai/questions/generate-question",
-    onFinish: () => setStatus("awaiting-answer"),
-    onError: (error) => errorToast(error.message),
-  });
+  // Generate question
+  const handleGenerateQuestion = async (difficulty: QuestionDifficulty) => {
+    setLoading(true);
+    setQuestion("");
+    setFeedback("");
+    setAnswer("");
+    setStatus("init");
 
-  // Feedback Generation
-  const {
-    complete: generateFeedback,
-    completion: feedback,
-    setCompletion: setFeedback,
-    isLoading: isGeneratingFeedback,
-  } = useCompletion({
-    api: "/api/ai/questions/generate-feedback",
-    onFinish: () => setStatus("awaiting-difficulty"),
-    onError: (error) => errorToast(error.message),
-  });
+    try {
+      const res = await fetch("/api/question/generateTechnicalQuestion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobInfoId: jobInfo.id, difficulty }),
+      });
+       console.log("res from gene question", res)
+      if (!res.ok) throw new Error("Failed to generate question");
+
+      const text : GeneratedQuestion= await res.json();
+      console.log("text res of gene ques in page.tsx", text)
+      setQuestion(text.QString);
+      setStatus("awaiting-answer");
+    } catch (err: any) {
+      errorToast(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Submit answer and get feedback
+  const handleSubmitAnswer = async () => {
+    if (!question || !answer.trim()) return;
+
+    setLoading(true);
+    setFeedback("");
+
+    try {
+      const res = await fetch("/api/question/submitTechnicalQuestion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobInfoId: jobInfo.id,
+          question,
+          answer: answer.trim(),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to get feedback");
+
+      const text = await res.json();
+      setFeedback(text);
+      setStatus("awaiting-difficulty");
+    } catch (err: any) {
+      errorToast(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };  
 
   //UI
   return (
@@ -61,7 +104,7 @@ export function NewQuestionClientPage({
         </div>
         <Controls
           status={status}
-          isLoading={isGeneratingQuestion || isGeneratingFeedback}
+          isLoading={loading}
           disableAnswerButton={!answer.trim() || !question}
           reset={() => {
             setStatus("init");
@@ -69,25 +112,8 @@ export function NewQuestionClientPage({
             setFeedback("");
             setAnswer("");
           }}
-          generateQuestion={(difficulty) => {
-            setQuestion("");
-            setFeedback("");
-            setAnswer("");
-            generateQuestion(difficulty, {
-              body: { jobInfoId: jobInfo.id },
-            });
-          }}
-          generateFeedback={() => {
-            if (!question || !answer.trim()) return;
-
-            generateFeedback(answer.trim(), {
-              body: {
-                question,
-                answer: answer.trim(),
-                jobInfoId: jobInfo.id,
-              },
-            });
-          }}
+          generateQuestion={handleGenerateQuestion}
+  generateFeedback={handleSubmitAnswer}
         />
         <div className="flex md:block" />
       </div>

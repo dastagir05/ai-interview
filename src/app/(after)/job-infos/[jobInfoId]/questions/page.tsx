@@ -1,7 +1,6 @@
-import { canCreateQuestion } from "@/features/questions/permissions";
 import { env } from "@/data/env/server";
 import { Loader2Icon } from "lucide-react";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { NewQuestionClientPage } from "./_NewQuestionClientPage";
 import { requireUserId } from "@/lib/auth";

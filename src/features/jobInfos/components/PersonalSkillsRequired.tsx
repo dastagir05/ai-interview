@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { JobInfoFormData } from "./PersonalInfoForm";
+import { PublicJobInfoFormData } from "../../admin/CreatePublicJob"
 
 const PersonalSkillsRequired = ({
   form,
 }: {
-  form: UseFormReturn<JobInfoFormData>;
+  form: UseFormReturn<JobInfoFormData | PublicJobInfoFormData>;
 }) => {
   return (
     <FormField

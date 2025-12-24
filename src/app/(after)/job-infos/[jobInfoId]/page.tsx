@@ -65,8 +65,9 @@ export default async function JobInfoPage({
     return res.json();
   });
 
-  if (jobInfo && jobInfo.recruiterId !== userId) {
-    return redirect("/dashboard");
+  if (!jobInfo && !userId) {
+    console.log("jobInfo", jobInfo, "userId", userId)
+    return redirect("/upgrade");
   }
 
   if (!jobInfo) return notFound();

@@ -20,15 +20,14 @@ import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
 
 const navLinks = [
+  { name: "Aptitude", href: "aptitude", Icon: FileSlidersIcon },
   { name: "Interviews", href: "interviews", Icon: SpeechIcon },
   { name: "Questions", href: "questions", Icon: BookOpenIcon },
-  { name: "Resume", href: "resume", Icon: FileSlidersIcon },
 ];
 const navLinks1 = [
-  { name: "Dashboard", href: "interviews", Icon: SpeechIcon },
-  { name: "Personal Jobs", href: "questions", Icon: BookOpenIcon },
+  { name: "Dashboard", href: "dashboard", Icon: SpeechIcon },
+  { name: "Personal Jobs", href: "personalJob", Icon: BookOpenIcon },
   { name: "Resume", href: "resume", Icon: FileSlidersIcon },
-  { name: "User", href: "resume", Icon: FileSlidersIcon },
 ];
 
 export function Navbar({
@@ -50,7 +49,7 @@ export function Navbar({
         <div className="flex items-center gap-4">
           {typeof jobInfoId !== "string" &&
             navLinks1.map(({ name, href, Icon }) => {
-              const hrefPath = `/job-infos/${jobInfoId}/${href}`;
+              const hrefPath = `${href}`;
 
               return (
                 <Button

@@ -64,9 +64,11 @@ export default async function JobInfos() {
                   </CardContent>
                   <CardFooter className="flex gap-2">
                     <Badge variant="outline">{jobInfo.experienceLevel}</Badge>
-                    {jobInfo.title && (
-                      <Badge variant="outline">{jobInfo.skillsRequired}</Badge>
-                    )}
+                    {jobInfo.skillsRequired?.map((skill, index) => (
+                        <Badge key={index} variant="outline">
+                          {skill}
+                        </Badge>
+                      ))}
                   </CardFooter>
                 </div>
                 <CardContent>

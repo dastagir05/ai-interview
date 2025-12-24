@@ -3,6 +3,14 @@ export enum ExperienceLevel {
   MID_LEVEL = "MID_LEVEL",
   SENIOR = "SENIOR",
 }
+
+export enum Category {
+  DATABASE = "DATABASE",
+  PROGRAMING = "PROGRAMING",
+  FRONTEND = "FRONTEND",
+  BACKEND = "BACKEND",
+  FULLSTACK = "FULLSTACK"
+}
 export interface PersonalJobDetails {
   id: string;
   recruiterId: string;
@@ -15,6 +23,17 @@ export interface PersonalJobDetails {
   questionCount: number;
   createdAt: string;
   updatedAt: string;
+}
+export interface PublicJobDetails {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  skillsRequired: string[];
+  experienceLevel: ExperienceLevel | "JUNIOR";
+  createdAt: string;
+  started: boolean;
+  personalJobId: string | null;
 }
 
 export interface CreateQuestion {
