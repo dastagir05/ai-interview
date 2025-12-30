@@ -38,7 +38,7 @@ function Navbar() {
   useEffect(() => {
     if (status === "authenticated") {
       console.log("User data:", data);
-      if (data?.user.role === "recruiter") {
+      if (data?.user.role?.toLocaleLowerCase() === "admin") {
         //user don't have role wtf
         router.replace("/recruiter/dashboard");
         return;

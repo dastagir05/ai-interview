@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
         </button>
 
         <h2 className="text-4xl font-bold mb-8 py-2">
-          Welcome to AI Interview Assistant
+          Welcome to IPrepWithAI
         </h2>
 
         <button

@@ -17,37 +17,35 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        console.log("Initial JWT callback - user:", user);
+        
+        token.backendAccessToken = (user as any).backendAccessToken;
+        token.backendRefreshTokenId = (user as any).backendRefreshTokenId;
         token.id = user.id;
-        console.log("USER ROLE:", (user as any).role);
-        token.role = (user as any).role || "recruiter";
-        // token.adminId = (user as any).adminId;
+        token.role = (user as any).role || "USER";
         token.permissions = (user as any).permissions || [];
-        // token.isAdmin = (user as any).isAdmin || false;
       }
 
-      // const dbUser = await db.query.UserTable.findFirst({
-      //   where: eq(UserTable.id, token.id as string),
-      // });
-
-      // // If found, sync permissions from DB
-      // token.permissions = dbUser?.permissions ?? [];
       return token;
     },
 
     async session({ session, token }) {
       if (token) {
+        console.log("Initial SESSION callback - token:", token);
+        
+        session.backendAccessToken = token.backendAccessToken as string;
+        session.backendRefreshTokenId = token.backendRefreshTokenId as string;
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        // session.user.adminId = token.adminId as string;
         session.user.permissions = token.permissions as string[];
-        // session.user.isAdmin = token.isAdmin as boolean;
+
       }
       return session;
     },
     async signIn({ user, account }) {
       try {
         console.log("SIGN IN USER:", user, process.env.BACKEND_URL);
-        const existing = await fetch(`${process.env.BACKEND_URL}/auth/verify`, {
+        const response = await fetch(`${process.env.BACKEND_URL}/auth/verify`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -60,31 +58,30 @@ export const authOptions: NextAuthOptions = {
             oauthProvider: account?.provider,
           }),
         }).then((res) => res.json());
-        console.log("EXISTING USER:", existing);
-        user.id = existing.id;
-        // if (existing.length === 0) {
-        //   // Create new user
-        //   const created = await db
-        //     .insert(UserTable)
-        //     .values({
-        //       id: randomUUID(),
-        //       name: user.name!,
-        //       email: user.email!,
-        //       imageUrl: user.image!,
-        //       permissions: ["1_interview"],
-        //     })
-        //     .returning();
+        if (!response.ok) {
+          console.error("Backend verification failed");
+          return false;
+        }
 
-        //   user.id = created[0].id;
-        // } else {
-        //   user.id = existing[0].id;
-        // }
+        const data = await response.json();
+        console.log("BACKEND RESPONSE:", data);
+
+        // Store backend data in user object (will be passed to jwt callback)
+        user.id = data.user.id;
+        (user as any).role = data.user.role;
+        (user as any).backendAccessToken = data.accessToken;
+        (user as any).backendRefreshTokenId = data.refreshTokenId;
+        (user as any).permissions = data.user.permissions || [];
+
       } catch (err) {
         console.error("CREATE USER ERROR:", err);
         return false;
       }
-
       return true;
     },
+  },
+  pages: {
+    signIn: "/signin",
+    error: "/signin",
   },
 };

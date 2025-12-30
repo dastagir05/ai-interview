@@ -38,6 +38,7 @@ export function PublicJobInfoForm({ jobInfo }: { jobInfo: PublicJobInfoFormData 
     defaultValues: jobInfo
       ? {
           title: jobInfo.title,
+          imgUrl: jobInfo.imgUrl,
           name: null,
           description: jobInfo.description,
           category: jobInfo.category || "PROGRAMING",
@@ -46,6 +47,7 @@ export function PublicJobInfoForm({ jobInfo }: { jobInfo: PublicJobInfoFormData 
         }
       : {
           title: "",
+          imgUrl: "",
           name: null,
           description: "",
           category: "PROGRAMING",
@@ -67,6 +69,7 @@ export function PublicJobInfoForm({ jobInfo }: { jobInfo: PublicJobInfoFormData 
           title: values.title,
           description: values.description,
           category: values.category,
+          imgUrl: values.imgUrl,
           skillsRequired: values.skillsRequired,
           experienceLevel: values.experienceLevel,
         }),
@@ -113,6 +116,22 @@ export function PublicJobInfoForm({ jobInfo }: { jobInfo: PublicJobInfoFormData 
               </FormControl>
               <FormDescription>
                 This name is displayed in the UI for easy identification.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="imgUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image URL</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>
+                Give a URL to an image that represents the job.
               </FormDescription>
               <FormMessage />
             </FormItem>

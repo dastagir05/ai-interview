@@ -4,6 +4,7 @@ import z from "zod";
 export const publicJobInfoSchema = z.object({
   title: z.string().min(1, "Required"),
   name: z.string().min(1).nullable(),
+  imgUrl: z.string().min(1, "Required"),
   category: z.enum(
     Object.values(Category) as [string, ...string[]]
   ),

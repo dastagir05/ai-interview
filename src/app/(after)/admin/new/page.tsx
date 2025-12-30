@@ -17,6 +17,7 @@ export default function PublicJobInfoNewPage() {
                 title: "",
                 description: "",
                 category:"PROGRAMING",
+                imgUrl: "",
                 experienceLevel: "JUNIOR",
                 skillsRequired: [],
                 name: "",

@@ -29,6 +29,7 @@ export interface PublicJobDetails {
   title: string;
   description: string;
   category: string;
+  imgUrl: string;
   skillsRequired: string[];
   experienceLevel: ExperienceLevel | "JUNIOR";
   createdAt: string;

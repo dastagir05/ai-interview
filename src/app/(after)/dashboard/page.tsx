@@ -48,6 +48,7 @@ export default async function JobInfos() {
             <Card className="h-full">
               <div className="flex items-center justify-between h-full">
                 <div className="space-y-4 h-full">
+                  <img src={jobInfo.imgUrl} alt={jobInfo.title} width={100} height={100} />
                   <CardHeader>
                     <CardTitle className="text-lg">{jobInfo.title}</CardTitle>
                   </CardHeader>
@@ -58,10 +59,10 @@ export default async function JobInfos() {
                     <Badge variant="outline">{jobInfo.experienceLevel}</Badge>
                     <Badge variant="outline">{jobInfo.category}</Badge>
                     {jobInfo.skillsRequired?.map((skill, index) => (
-    <Badge key={index} variant="outline">
-      {skill}
-    </Badge>
-  ))}
+                    <Badge key={index} variant="outline">
+                      {skill}
+                    </Badge>
+                  ))}
                   </CardFooter>
                 </div>
                 <CardContent>
@@ -104,6 +105,7 @@ function NoJobInfos() {
               title: "",
               description: "",
               category:"PROGRAMING",
+              imgUrl: "",
               experienceLevel: "JUNIOR",
               skillsRequired: [],
               name: "",
