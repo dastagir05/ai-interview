@@ -12,8 +12,8 @@ import {
 import Link from "next/link";
 import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { ThemeToggle } from "./ThemeToggle";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/useAuth";
 
 export default function LandingPage() {
   return (
@@ -32,22 +32,21 @@ export default function LandingPage() {
 
 function Navbar() {
   const [openDialog, setOpenDialog] = useState(false);
-  const { status, data } = useSession();
+  const {  user, isAdmin, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "authenticated") {
-      console.log("User data:", data);
-      if (data?.user.role?.toLocaleLowerCase() === "admin") {
-        //user don't have role wtf
+      console.log("User data:", user);
+      if (isAdmin == true) {
         router.replace("/recruiter/dashboard");
         return;
       }
-      router.replace("/dashboard");
-    } else if (status === "unauthenticated") {
-      router.replace("/");
-    }
-  }, [status, router]);
+      if (!isLoading) {  
+        if (user) {
+          router.replace("/dashboard");
+        }
+      }
+  }, [router, isAdmin, user, isLoading]);
   return (
     <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
       <div className="container">

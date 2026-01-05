@@ -3,7 +3,6 @@
 import {
   BookOpenIcon,
   Brain,
-  BrainCircuitIcon,
   FileSlidersIcon,
   SpeechIcon,
 } from "lucide-react";
@@ -17,7 +16,7 @@ import Link from "next/link";
 import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { useParams, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { signOut } from "next-auth/react";
+import { useAuth } from "@/lib/useAuth";
 
 const navLinks = [
   { name: "Aptitude", href: "aptitude", Icon: FileSlidersIcon },
@@ -36,6 +35,7 @@ export function Navbar({
   user: { name?: string; image?: string } | null | undefined;
 }) {
   const { jobInfoId } = useParams();
+  const { logout } = useAuth();
   const pathName = usePathname();
 
   return (
@@ -100,7 +100,7 @@ export function Navbar({
             <DropdownMenuContent align="end" className="w-56 p-2">
               <button
                 className="w-full bg-red-500 text-white px-3 py-2 cursor-pointer rounded text-sm hover:bg-red-700 transition-colors"
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={() => logout()}
               >
                 Sign Out
               </button>

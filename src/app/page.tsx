@@ -1,20 +1,20 @@
 "use client";
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LandingPage from "../components/Landing";
+import { useAuth } from "@/lib/useAuth";
 
 export default function Home() {
-  const { status } = useSession();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "authenticated") {
-      router.replace("/dashboard");
-    } else if (status === "unauthenticated") {
-      router.replace("/");
+    if (!isLoading) {  
+      if (user) {
+        router.replace("/dashboard");
+      }
     }
-  }, [status, router]);
+  }, [user, isLoading, router]);
 
   return <LandingPage />;
 }

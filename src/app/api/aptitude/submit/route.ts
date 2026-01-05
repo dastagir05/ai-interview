@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { env } from "@/data/env/server";
 import { getCurrentUserId } from "@/lib/auth";
 import z from "zod";
+import { cookies } from "next/headers";
 
 const schema = z.object({
   attemptId: z.string().min(1),
@@ -17,7 +18,8 @@ export async function POST(req: NextRequest) {
   }
 
   const { attemptId, answers } = parsed.data;
-
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
   const userId = await getCurrentUserId();
   if (!userId) {
     return new Response("Unauthorized", { status: 401 });
@@ -27,13 +29,17 @@ export async function POST(req: NextRequest) {
   const res = await fetch(`${env.BACKEND_URL}/aptitude/submit`, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userId}`,
     },
+  
+    credentials: "include", 
+    cache: "no-store",
     body: JSON.stringify({
       attemptId,
       answers,
     }),
+
   });
 
   if (!res.ok) {

@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,17 +9,18 @@ import {
 import Link from "next/link";
 import { PublicJobDetails } from "@/data/type/job";
 import { PublicJobInfoForm } from "@/features/admin/CreatePublicJob";
-import { env } from "@/data/env/server";
 import { PracticeJobAction } from "./PracticeJobAction";
-import { getCurrentUserId } from "@/lib/auth";
-
+import { cookies } from "next/headers";
 
 export default async function JobInfos() {
-
+  
   let jobInfos: PublicJobDetails[] = [];
-  const userId = await getCurrentUserId();
   try {
-    jobInfos = await fetch(`${env.BACKEND_URL}/practice-jobs?userId=${userId}`).then((res) => res.json());
+    jobInfos = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/publicJobs/getAllForUser`, {
+      headers: {
+        Cookie: (await cookies()).toString(),
+      },
+    }).then((res) => res.json());
     console.log("jobInfos", jobInfos)
   } catch (error) {
     // toast.error("Failed to load job descriptions");
@@ -72,9 +72,7 @@ export default async function JobInfos() {
                   personalJobId={jobInfo.personalJobId}
                 />
               </CardContent>
-                {/* <CardContent>
-                  <ArrowRightIcon className="size-6" />
-                </CardContent> */}
+
               </div>
             </Card>
           </Link>

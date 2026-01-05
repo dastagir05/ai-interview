@@ -3,9 +3,8 @@ import { getCurrentUserId } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
-    // const body = await req.json();
     
-    const rawBody = await req.text(); // ✅ MUST BE text()
+    const rawBody = await req.text(); 
     console.log("RAW BODY >>>", rawBody);
 
     const body = JSON.parse(rawBody);
@@ -40,7 +39,6 @@ const { question, answer } = body;
       return new Response(text, { status: res.status });
     }
 
-    // useCompletion expects TEXT
     const feedback = await res.text();
     return new Response(feedback, { status: 200 });
 

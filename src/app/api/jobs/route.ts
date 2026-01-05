@@ -1,10 +1,8 @@
 import { NextRequest } from "next/server";
 import { env } from "@/data/env/server";
-import { getCurrentUserId } from "@/lib/auth";
 
 const { BACKEND_URL } = env;
 
-// POST /api/jobs?recruiterId=123
 export async function POST(req: NextRequest) {
   const recruiterId = req.nextUrl.searchParams.get("recruiterId");
   const body = await req.json();

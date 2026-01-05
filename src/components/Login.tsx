@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { useEffect } from "react";
-import { signIn } from "next-auth/react";
-// { openDialog, closeDialog }
+
 type LoginProps = {
   openDialog: boolean;
   closeDialog: () => void;
@@ -15,7 +14,6 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
     } else {
       document.body.style.overflow = "";
     }
-    // Clean up on unmount
     return () => {
       document.body.style.overflow = "";
     };
@@ -38,7 +36,7 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
 
         <button
           onClick={() => {
-            signIn("google");
+            window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/google`;
           }}
           className="flex items-center justify-center w-full border rounded px-4 py-2  hover:bg-gray-100"
         >
@@ -58,7 +56,7 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
 
         <button
           onClick={() => {
-            signIn("github");
+            window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/github`;
           }}
           className="flex items-center justify-center w-full border rounded px-4 py-2 mb-3 hover:bg-gray-100"
         >

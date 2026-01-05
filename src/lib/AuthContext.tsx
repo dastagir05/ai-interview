@@ -1,120 +1,118 @@
 "use client";
-
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import apiClient from "./api-client";
 
 interface User {
   id: string;
   email: string;
   name: string;
-  role: "USER" | "ADMIN";
+  role: string;
+  imageUrl?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   accessToken: string | null;
-  login: (accessToken: string, refreshTokenId: string, user: User) => void;
+  login: (token: string, userData: User) => void;
   logout: () => void;
+  isAuthenticated: boolean;
   isLoading: boolean;
-  isAdmin: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
-  // Check for existing session on mount
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const userStr = localStorage.getItem("user");
-    
-    if (token && userStr) {
-      setAccessToken(token);
-      setUser(JSON.parse(userStr));
-    }
-    
-    setIsLoading(false);
+    // Check for existing auth on mount
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem("accessToken");
+      
+      if (storedToken) {
+        setAccessToken(storedToken);
+        await fetchCurrentUser(storedToken);
+      }
+      
+      setIsLoading(false);
+    };
+
+    initAuth();
   }, []);
 
-  // Auto-refresh token before expiry
-  useEffect(() => {
-    if (!accessToken) return;
-
-    // Refresh token 1 minute before expiry (assuming 15 min expiry)
-    const refreshInterval = setInterval(() => {
-      refreshAccessToken();
-    }, 12 * 60 * 60 * 1000); // 12 hours
-
-    return () => clearInterval(refreshInterval);
-  }, [accessToken]);
-
-  const refreshAccessToken = async () => {
-    const refreshTokenId = localStorage.getItem("refreshTokenId");
-    
-    if (!refreshTokenId) {
-      logout();
-      return;
-    }
-
+  const fetchCurrentUser = async (token: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/refresh`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshTokenId }),
-      });
-
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include", // ← Include cookies
+        }
+      );
+      
       if (response.ok) {
         const data = await response.json();
-        setAccessToken(data.accessToken);
-        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("accessToken", token);
+        setAccessToken(token);
+        setUser(data.user);
       } else {
-        logout();
+        // Token invalid, clear it
+        localStorage.removeItem("accessToken");
+        setAccessToken(null);
+        setUser(null);
       }
     } catch (error) {
-      console.error("Token refresh failed:", error);
-      logout();
+      console.error("Error fetching user:", error);
+      localStorage.removeItem("accessToken");
+      setAccessToken(null);
+      setUser(null);
     }
   };
 
-  const login = (token: string, refreshTokenId: string, userData: User) => {
+  const login = async (token: string, userData: User) => {
     setAccessToken(token);
     setUser(userData);
-    
     localStorage.setItem("accessToken", token);
-    localStorage.setItem("refreshTokenId", refreshTokenId);
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    // Redirect based on role
-    if (userData.role === "ADMIN") {
-      router.push("/admin/dashboard");
-    } else {
-      router.push("/dashboard");
+    
+    // Set token in cookie via API route
+    try {
+      await fetch("/api/auth/set-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+    } catch (error) {
+      console.error("Error setting token cookie:", error);
     }
   };
 
   const logout = async () => {
-    if (accessToken) {
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/logout`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-      } catch (error) {
-        console.error("Logout failed:", error);
-      }
+    try {
+      // Call backend logout to clear refresh token
+      await apiClient.post("/api/auth/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setAccessToken(null);
+      setUser(null);
+      localStorage.removeItem("accessToken");
+      
+      // Clear auth cookie
+      document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
+  };
 
-    setAccessToken(null);
-    setUser(null);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshTokenId");
-    localStorage.removeItem("user");
-    
-    router.push("/signin");
+  const refreshUser = async () => {
+    if (accessToken) {
+      await fetchCurrentUser(accessToken);
+    }
   };
 
   return (
@@ -124,19 +122,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         accessToken,
         login,
         logout,
+        isAuthenticated: !!user,
         isLoading,
-        isAdmin: user?.role === "ADMIN",
+        refreshUser,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

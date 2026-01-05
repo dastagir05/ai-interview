@@ -1,25 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getCurrentUserId } from "@/lib/auth";
 import { env } from "@/data/env/server";
 
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
-  console.log("cookieStore", cookieStore) 
-  const accessToken = cookieStore.get("authToken")?.value;
-
-  if (!accessToken) {
-    console.log("❌Unauthorized from getAllForUser route");
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const userId = await getCurrentUserId();
 
   const res = await fetch(
-    `${env.BACKEND_URL}/practice-jobs`,
+    `${env.BACKEND_URL}/practice-jobs?userId=${userId}`,
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Cookie: cookieStore.toString(),
       },
     }
   );
@@ -33,5 +25,6 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // Now safe to parse
   return NextResponse.json(JSON.parse(text));
 }

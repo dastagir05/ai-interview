@@ -9,13 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { requireUserId } from "@/lib/auth";
 import { env } from "@/data/env/server";
 import { PersonalJobDetails } from "@/data/type/job";
+import { cookies } from "next/headers";
+
 
 const options = [
   {
@@ -54,10 +55,17 @@ export default async function JobInfoPage({
   params: Promise<{ jobInfoId: string }>;
 }) {
   const { jobInfoId } = await params;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
 
   const userId = await requireUserId();
   const jobInfo: PersonalJobDetails = await fetch(
-    `${env.BACKEND_URL}/personal-jobs/${jobInfoId}`
+    `${env.BACKEND_URL}/personal-jobs/${jobInfoId}`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", 
+      }
   ).then((res) => {
     if (res.status === 404) {
       return null;

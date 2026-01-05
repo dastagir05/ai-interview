@@ -1,9 +1,12 @@
 import { NextRequest } from "next/server";
 import { env } from "@/data/env/server";
 import { getCurrentUserId } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 export async function GET(req: NextRequest) {
   const attemptId = req.nextUrl.searchParams.get("attemptId");
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
 
   if (!attemptId) {
     return new Response("attemptId required", { status: 400 });
@@ -15,9 +18,11 @@ export async function GET(req: NextRequest) {
   }
 //  console.log("attempId in route", attemptId)
   const res = await fetch(`${env.BACKEND_URL}/aptitude/review/${attemptId}`, {
-    // headers: {
-    //   Authorization: `Bearer ${userId}`,
-    // },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    credentials: "include", 
     cache: "no-store",
   });
 

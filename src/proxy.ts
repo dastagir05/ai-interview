@@ -55,7 +55,7 @@ export default withAuth(
         // }
 
         if (pathname.startsWith("/dashboard")) {
-          return !!token; // user must be logged in
+          return !!token; 
         }
         return true;
       },

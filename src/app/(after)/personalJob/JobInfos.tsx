@@ -15,15 +15,22 @@ import { ExperienceLevel, PersonalJobDetails } from "@/data/type/job";
 import { env } from "@/data/env/server";
 import { toast } from "sonner";
 import { PersonalJobInfoForm } from "@/features/jobInfos/components/PersonalInfoForm";
+import { cookies } from "next/headers";
 
 export default async function JobInfos() {
   const userId = await requireUserId();
 
   let jobInfos: PersonalJobDetails[] = [];
-
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
   try {
     jobInfos = await fetch(
-      `${env.BACKEND_URL}/personal-jobs/user/${userId}`
+      `${env.BACKEND_URL}/personal-jobs/user/${userId}`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", 
+      }
     ).then((res) => res.json());
   } catch (error) {
     toast.error("Failed to load job descriptions");

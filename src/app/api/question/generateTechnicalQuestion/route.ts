@@ -16,14 +16,12 @@ export async function POST(req: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    // Call Java backend
     const res = await fetch(
       `${env.BACKEND_URL}/questions/generate`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // forward auth if needed
           Authorization: req.headers.get("authorization") ?? "",
         },
         body: JSON.stringify({
@@ -37,7 +35,6 @@ export async function POST(req: Request) {
       const text = await res.text();
       return new Response(text, { status: res.status });
     }
-    // IMPORTANT: return plain text for useCompletion
     const question = await res.text();
     console.log("res from back url", question)
     const QString = question.replace(/^```markdown\s*/, "").replace(/```$/, "").trim()
