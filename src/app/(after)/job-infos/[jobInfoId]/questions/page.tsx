@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { NewQuestionClientPage } from "./_NewQuestionClientPage";
 import { requireUserId } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 export default async function QuestionsPage({
   params,
@@ -37,7 +38,15 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`).then(
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include", 
+    cache: "no-store",
+  }).then(
     (res) => res.json()
   );
   return res;

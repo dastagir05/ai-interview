@@ -24,7 +24,6 @@ export default function AptitudeTestPage() {
   const [timeLeft, setTimeLeft] = useState(15 * 60);
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- TIMER ---------------- */
   useEffect(() => {
     if (timeLeft === 0) submitTest();
 
@@ -35,7 +34,6 @@ export default function AptitudeTestPage() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  /* ---------------- LOAD QUESTIONS ---------------- */
   useEffect(() => {
     async function load() {
       try {
@@ -75,6 +73,14 @@ export default function AptitudeTestPage() {
           answers,
         }),
       });
+        
+      if (res.status === 500 || res.status === 503) {
+        errorToast("AI or server is down, try later");
+        setLoading(false);
+        return;
+      }
+      // if (!res.ok) throw new Error("Failed to load aptitude test");
+      
 
       if (!res.ok) throw new Error("Submission failed");
 
@@ -92,7 +98,6 @@ export default function AptitudeTestPage() {
   const q = questions[current];
 
   return (
-    // handle like api don't give response reach limit then so server with 503 so plz wait or contact dastagir
     <div className="max-w-3xl mx-auto p-6 space-y-4">
       <div className="flex justify-between">
         <h2 className="text-xl font-semibold">Aptitude Test</h2>

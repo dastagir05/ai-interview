@@ -13,16 +13,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { formatQuestionDifficulty } from "@/features/questions/formatters";
 import { useState } from "react";
-// import { useCompletion } from "@ai-sdk/react";
 import { errorToast } from "@/lib/errorToast";
 import { PersonalJobDetails } from "@/data/type/job";
 import { QuestionDifficulty, questionDifficulties } from "@/data/type/question";
 
 type Status = "awaiting-answer" | "awaiting-difficulty" | "init";
 export type GeneratedQuestion = {
-  QString: string;      // The text of the question
-  correctIndex?: number; // Optional if MCQ
-  difficulty?: string;   // Optional metadata
+  question: string;      
+  correctIndex?: number; 
+  difficulty?: string;
 };
 
 
@@ -56,7 +55,7 @@ export function NewQuestionClientPage({
 
       const text : GeneratedQuestion= await res.json();
       console.log("text res of gene ques in page.tsx", text)
-      setQuestion(text.QString);
+      setQuestion(text.question);
       setStatus("awaiting-answer");
     } catch (err: any) {
       errorToast(err.message || "Something went wrong");

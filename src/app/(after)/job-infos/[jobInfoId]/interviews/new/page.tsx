@@ -49,20 +49,12 @@ export default function CreateInterviewPage({
   });
 
   const domainOptions = [
-    "Java",
-    "Spring Boot",
-    "React",
-    "Node.js",
-    "PostgreSQL",
-    "MongoDB",
-    "AWS",
-    "Docker",
-    "Kubernetes",
+    "Foundation",
+    "Technical",
+    "Practical",
+    "Behavioural",
     "System Design",
     "DSA",
-    "JavaScript",
-    "TypeScript",
-    "Python",
     "Microservices",
   ];
 

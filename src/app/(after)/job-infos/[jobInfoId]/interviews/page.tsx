@@ -9,9 +9,9 @@ import {
 import { env } from "@/data/env/server";
 import { SessionCardDTO } from "@/data/type/interview";
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
-import { getCurrentUserId, requireUserId } from "@/lib/auth";
-import { formatDateTime } from "@/lib/formatters";
+import { requireUserId } from "@/lib/auth";
 import { ArrowRightIcon, Loader2Icon, PlusIcon } from "lucide-react";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -86,14 +86,20 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
 
 async function getInterviews(jobInfoId: string, userId: string) {
   try {
-    //const userId = await getCurrentUserId(); // Or get from auth context
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken")?.value;
+    if (!token) {
+      return new Response("Unauthorized", { status: 401 });
+    }
     const response = await fetch(
-      `${env.BACKEND_URL}/practice-interview/user/${userId}/job/${jobInfoId}/sessions`
-      // {
-      //   headers: {
-      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //   },
-      // }
+      `${env.BACKEND_URL}/practice-interview/user/${userId}/job/${jobInfoId}/sessions`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", 
+      }
     );
     const data = await response.json();
     return data;

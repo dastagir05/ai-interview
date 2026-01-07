@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { env } from "@/data/env/server";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   const { userId, jobId } = await req.json();
-
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
+  if (!token) {
+    return new Response("Unauthorized", { status: 401 });
+  }
   if (!userId || !jobId) {
     return NextResponse.json(
       { message: "userId and jobId are required" },
@@ -15,9 +20,10 @@ export async function POST(req: Request) {
     `${env.BACKEND_URL}/practice-interview/user/${userId}/job/${jobId}/sessions`,
     {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`,
+  },
+  credentials: "include", 
+  cache: "no-store", 
     }
   );
 

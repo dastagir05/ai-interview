@@ -1,10 +1,16 @@
 import { env } from "@/data/env/server";
 import { getCurrentUserId } from "@/lib/auth";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken")?.value;
+    if (!token) {
+      return new Response("Unauthorized", { status: 401 });
+    }
 
     const { jobInfoId, difficulty } = body;
     if (!jobInfoId || !difficulty) {
@@ -22,29 +28,31 @@ export async function POST(req: Request) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: req.headers.get("authorization") ?? "",
+          Authorization: `Bearer ${token}`,
         },
+        credentials: "include", 
+        cache: "no-store",
         body: JSON.stringify({
           jobInfoId,
           difficulty,
         }),
       }
     );
-
     if (!res.ok) {
-      const text = await res.text();
-      return new Response(text, { status: res.status });
+      return NextResponse.json(
+        { error: 'Failed to generate question' },
+        { status: res.status }
+      );
     }
+    
     const question = await res.text();
-    console.log("res from back url", question)
-    const QString = question.replace(/^```markdown\s*/, "").replace(/```$/, "").trim()
-    return NextResponse.json({
-      QString
-    });
-
-  } catch (err: any) {
-    return new Response(err.message ?? "Failed to generate question", {
-      status: 500,
-    });
+    return NextResponse.json({ question }, { status: 200 });
+    
+  } catch (error) {
+    console.error('Error in generateTechnicalQuestion route:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

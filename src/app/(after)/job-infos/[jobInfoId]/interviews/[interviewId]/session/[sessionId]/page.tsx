@@ -40,6 +40,8 @@ export default function AIInterviewSessionPage({
   const { interviewId } = use(params);
   const { sessionId } = use(params);
   const jobId = jobInfoId;
+  const token = localStorage.getItem('accessToken');
+
 
   const [session, setSession] = useState<SessionDetailResponse>();
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
@@ -96,9 +98,8 @@ export default function AIInterviewSessionPage({
       const response = await fetch(
         `http://localhost:8080/api/practice-interview/${sessionId}`,
         {
-          // headers: {
-          //   'Authorization': `Bearer ${localStorage.getItem('token')}`
-          // }
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`,
+        }
         }
       );
       const data = await response.json();
@@ -138,7 +139,7 @@ export default function AIInterviewSessionPage({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ sessionId }),
         }
@@ -158,7 +159,8 @@ export default function AIInterviewSessionPage({
           `http://localhost:8080/api/practice-interview/${sessionId}/status`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           }
         );
@@ -269,7 +271,7 @@ export default function AIInterviewSessionPage({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ sessionId, message }),
         }
@@ -313,7 +315,7 @@ export default function AIInterviewSessionPage({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ sessionId }),
         }
@@ -331,7 +333,7 @@ export default function AIInterviewSessionPage({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ sessionId }),
       });
@@ -355,7 +357,7 @@ export default function AIInterviewSessionPage({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ sessionId }),
         }

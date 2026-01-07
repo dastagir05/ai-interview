@@ -2,6 +2,7 @@ import { BackLink } from "@/components/BackLink";
 import { env } from "@/data/env/server";
 
 import { cn } from "@/lib/utils";
+import { cookies } from "next/headers";
 import { Suspense } from "react";
 
 export function JobInfoBackLink({
@@ -29,7 +30,15 @@ async function JobName({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getJobInfo(id: string) {
-  const res = await fetch(`${env.BACKEND_URL}/personalJobs/${id}`).then((res) =>
+  const cookieStore = await cookies();
+    const token = cookieStore.get("authToken")?.value;
+    if (!token) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+  const res = await fetch(`${env.BACKEND_URL}/personalJobs/${id}`, {
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`,
+  }
+  }).then((res) =>
     res.json()
   );
   return res;

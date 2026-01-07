@@ -1,9 +1,14 @@
 import { env } from "@/data/env/server";
 import { getCurrentUserId } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   try {
-    
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken")?.value;
+    if (!token) {
+      return new Response("Unauthorized", { status: 401 });
+    }
     const rawBody = await req.text(); 
     console.log("RAW BODY >>>", rawBody);
 
@@ -25,8 +30,10 @@ const { question, answer } = body;
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: req.headers.get("authorization") ?? "",
+          "Authorization": `Bearer ${token}`,
         },
+        credentials: "include", 
+        cache: "no-store",
         body: JSON.stringify({
           question,
           answer,
