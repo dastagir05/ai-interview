@@ -3,7 +3,7 @@ import { env } from "@/data/env/server";
 import { generateAiQuestion } from "@/services/ai/questions";
 import { createDataStreamResponse } from "ai";
 import z from "zod";
-import { QuestionDifficulty, questionDifficulties } from "@/data/type/question";
+import { questionDifficulties } from "@/data/type/question";
 const schema = z.object({
   prompt: z.enum(questionDifficulties),
   jobInfoId: z.string().min(1),

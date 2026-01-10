@@ -1,5 +1,5 @@
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
-import { canRunResumeAnalysis } from "@/features/resumeAnalyses/permissions";
+// import { canRunResumeAnalysis } from "@/features/resumeAnalyses/permissions";
 import { Loader2Icon } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -25,7 +25,7 @@ export default async function ResumePage({
 }
 
 async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
-  if (!(await canRunResumeAnalysis())) return redirect("/upgrade");
+  // if (!(await canRunResumeAnalysis())) return redirect("/upgrade");
 
   return <ResumePageClient jobInfoId={jobInfoId} />;
 }

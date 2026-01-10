@@ -30,10 +30,11 @@ import { getCurrentUserId } from "@/lib/auth";
 export default function CreateInterviewPage({
   params,
 }: {
-  params: Promise<{ jobInfoId: string }>;
+  params: Promise<{ jobInfoId: string; interviewId: string }>;
 }) {
   const router = useRouter();
   const { jobInfoId } = use(params);
+  const { interviewId } = use(params);
   const jobId = jobInfoId;
   const [job, setJob] = useState<JobDetails>();
   const [loading, setLoading] = useState(false);
@@ -105,19 +106,20 @@ export default function CreateInterviewPage({
 
       const data = await response.json();
 
-      const startResponse = await fetch(`/api/practice-interview/start`, {
-        method: "POST",
-        // headers: {
-        //   "Content-Type": "application/json",
-        //   Authorization: `Bearer ${localStorage.getItem("token")}`,
-        // },
-        body: JSON.stringify({
-          sessionId: data.sessionId,
-        }),
-      });
+      // const startResponse = await fetch(`/api/practice-interview/start`, {
+      //   method: "POST",
+      //   // headers: {
+      //   //   "Content-Type": "application/json",
+      //   //   Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   // },
+      //   body: JSON.stringify({
+      //     sessionId: data.sessionId,
+      //   }),
+      // });
 
-      await startResponse.json();
-      router.push(`/interviews/${jobId}/session/${data.sessionId}`);
+      // await startResponse.json();
+ //     router.push(`/job-info/${jobInfoId}/interviews/${interviewId}/session/${data.sessionId}`);
+      router.push(`/job-info/${jobInfoId}/interviews`);
     } catch (error) {
       console.error("Failed to create interview:", error);
       alert("Failed to create interview. Please try again.");
@@ -331,7 +333,8 @@ export default function CreateInterviewPage({
           disabled={loading || formData.focusDomains.length === 0}
           className="flex-1"
         >
-          {loading ? "Creating..." : "Create & Start Interview"}
+         {/* {loading ? "Creating..." : "Create & Start Interview"} */}
+          {loading ? "Creating..." : "Create Interview"}
         </Button>
       </div>
     </div>

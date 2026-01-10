@@ -226,7 +226,6 @@ export default function AIInterviewSessionPage({
     }
 
     // Only start countdown if interview is in progress
-    // Note: Countdown will continue even when time reaches 0 - backend manages completion
     if (interviewStateRef.current !== "IN_PROGRESS") {
       return;
     }
@@ -242,13 +241,21 @@ export default function AIInterviewSessionPage({
       }
 
       setTimeRemaining((prevTime) => {
-        // Don't stop countdown when time reaches 0 - let backend manage completion
-        // Just keep it at 0 and let user continue interacting
         if (prevTime <= 0) {
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
           return 0;
         }
         // Decrease by 1 second (timeRemaining is in minutes, so subtract 1/60)
         const newTime = Math.max(0, prevTime - (1 / 60));
+        
+        // If time reaches 0, trigger completion
+        if (newTime <= 0 && countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
         
         return newTime;
       });
@@ -279,8 +286,8 @@ export default function AIInterviewSessionPage({
         const backendTime = status.timeRemaining ?? 0;
         setTimeRemaining(backendTime);
         
-        // Restart countdown if interview is in progress (even if time is 0, backend manages completion)
-        if (interviewStateRef.current === "IN_PROGRESS") {
+        // Restart countdown with new time if interview is in progress
+        if (interviewStateRef.current === "IN_PROGRESS" && backendTime > 0) {
           startCountdown();
         }
         
@@ -288,9 +295,7 @@ export default function AIInterviewSessionPage({
           setQuestionNumber(status.currentQuestion);
         }
 
-        // Check if backend has marked session as completed
-        if (status.status === "COMPLETED") {
-          setInterviewState("COMPLETED");
+        if (status.shouldComplete) {
           if (pollIntervalRef.current !== null) {
             clearInterval(pollIntervalRef.current);
             pollIntervalRef.current = null;
@@ -299,7 +304,7 @@ export default function AIInterviewSessionPage({
             clearInterval(countdownIntervalRef.current);
             countdownIntervalRef.current = null;
           }
-          loadResults();
+          handleCompleteInterview();
         }
       } catch (error) {
         console.error("Failed to poll status:", error);
@@ -420,12 +425,8 @@ export default function AIInterviewSessionPage({
         speakText(data.aiResponse);
       }
 
-      // Backend will manage completion based on time and session state
-      // Check if backend marked session as completed after this message
-      if (data.status === "COMPLETED") {
-        // Backend has marked the session as completed
-        setInterviewState("COMPLETED");
-        loadResults();
+      if (data.shouldEnd) {
+        setTimeout(() => handleCompleteInterview(), 2000);
       }
     } catch (error) {
       console.error("Failed to send message:", error);

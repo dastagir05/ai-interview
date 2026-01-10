@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/useAuth";
 
 const navLinks = [
-  { name: "Aptitude", href: "aptitude", Icon: FileSlidersIcon },
+  { name: "JD", href: "/", Icon: FileSlidersIcon },
   { name: "Interviews", href: "interviews", Icon: SpeechIcon },
   { name: "Questions", href: "questions", Icon: BookOpenIcon },
 ];

@@ -37,8 +37,7 @@ export default function InterviewSessionsPage({
 
   const [sessions, setSessions] = useState<SessionCardDTO[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSession, setSelectedSession] =
-    useState<SessionFullDetailsDTO>();
+  const [selectedSession, setSelectedSession] = useState<SessionFullDetailsDTO>();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -87,8 +86,30 @@ export default function InterviewSessionsPage({
     }
   };
 
-  const handleResumeInterview = (sessionId: String) => {
-    router.push(`${interviewId}/session/${sessionId}`);
+  const handleResumeInterview = async (sessionId: String) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/practice-interview/${sessionId}/resume`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to resume interview");
+      }
+
+      // Navigate to session page after successful resume
+      router.push(`${interviewId}/session/${sessionId}`);
+    } catch (error) {
+      console.error("Failed to resume interview:", error);
+      alert("Failed to resume interview. Please try again.");
+    }
   };
 
   const getStatusColor = (status: InterviewStatus) => {
@@ -138,7 +159,7 @@ export default function InterviewSessionsPage({
           </p>
         </div>
         <Button
-          onClick={() => router.push(`/interviews/${jobId}/new`)}
+          onClick={() => router.push(`new`)}
           size="lg"
         >
           <Plus className="w-5 h-5 mr-2" />
@@ -246,13 +267,21 @@ export default function InterviewSessionsPage({
                         ).toLocaleDateString()}`}
                   </div>
                   <Button
-                    onClick={() =>
-                      router.push(`${interviewId}/session/${session.sessionId}`)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (session.status === "PAUSED") {
+                        handleResumeInterview(session.sessionId);
+                      } else {
+                        router.push(`${interviewId}/session/${session.sessionId}`);
+                      }
+                    }}
                     size="lg"
                   >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Start Interview
+                    {session.status === "NOT_STARTED" 
+                      ? "Start Interview" 
+                      : session.status === "PAUSED"
+                      ? "Resume Interview"
+                      : "View Stat"}
                   </Button>
                 </div>
               </CardContent>

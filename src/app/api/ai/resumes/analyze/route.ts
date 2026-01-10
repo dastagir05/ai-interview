@@ -1,8 +1,9 @@
-import { canRunResumeAnalysis } from "@/features/resumeAnalyses/permissions";
+// import { canRunResumeAnalysis } from "@/features/resumeAnalyses/permissions";
 import { getCurrentUserId } from "@/lib/auth";
-import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast";
+// import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast";
 import { analyzeResumeForJob } from "@/services/ai/resumes/ai";
 import { env } from "@/data/env/server";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   const userId = await getCurrentUserId();
@@ -43,9 +44,9 @@ export async function POST(req: Request) {
     });
   }
 
-  if (!(await canRunResumeAnalysis())) {
-    return new Response(PLAN_LIMIT_MESSAGE, { status: 403 });
-  }
+  // if (!(await canRunResumeAnalysis())) {
+  //   return new Response(PLAN_LIMIT_MESSAGE, { status: 403 });
+  // }
 
   const res = await analyzeResumeForJob({
     resumeFile,
@@ -56,7 +57,19 @@ export async function POST(req: Request) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`).then(
+  const cookieStore = await cookies();
+    const token = cookieStore.get("authToken")?.value;
+    if (!token) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+  // const token = localStorage.getItem("accessToken");
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`,{
+    headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`},
+    credentials: "include",
+    cache: "no-cache"
+  },
+
+  ).then(
     (res) => res.json()
   );
   return res;

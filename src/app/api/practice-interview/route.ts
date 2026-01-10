@@ -12,8 +12,7 @@ export async function POST(req: Request) {
 
   const res = await fetch(`${env.BACKEND_URL}/practice-interview/create`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`,
-  },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`},
   credentials: "include", 
   cache: "no-store", 
   body: JSON.stringify(body)
