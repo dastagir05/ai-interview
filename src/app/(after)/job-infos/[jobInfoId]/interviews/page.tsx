@@ -40,6 +40,8 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
   const userId = await requireUserId();
 
   const interviews = await getInterviews(jobInfoId, userId);
+  // const interviews = await fetch(`/api/personalJobs/${jobInfoId}/interviews`);
+  console.log("interview in interview page", interviews);
   if (interviews.length === 0) {
     return redirect(`/job-infos/${jobInfoId}/interviews/new`);
   }
@@ -57,10 +59,11 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 has-hover:*:not-hover:opacity-70">
         {interviews.map((interview: SessionCardDTO) => (
+          
           <Link
             className="hover:scale-[1.02] transition-[transform_opacity]"
-            href={`/job-infos/${jobInfoId}/interviews/${interview.sessionId}`}
-            key={interview.sessionId}
+            href={`/job-infos/${jobInfoId}/interviews/${interview.configurationId}`}
+            key={interview.configurationId}
           >
             <Card className="h-full">
               <div className="flex items-center justify-between h-full">
@@ -91,8 +94,9 @@ async function getInterviews(jobInfoId: string, userId: string) {
     if (!token) {
       return new Response("Unauthorized", { status: 401 });
     }
+    //      `${env.BACKEND_URL}/practice-interview/user/${userId}/job/${jobInfoId}/sessions`,
     const response = await fetch(
-      `${env.BACKEND_URL}/practice-interview/user/${userId}/job/${jobInfoId}/sessions`,
+      `${env.BACKEND_URL}/practice-interview/configuration/job/${jobInfoId}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -104,9 +108,9 @@ async function getInterviews(jobInfoId: string, userId: string) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Failed to fetch sessions:", error);
+    console.error("Failed to fetch interviews:", error);
   } finally {
-    console.log("Fetch sessions attempt finished.");
+    console.log("Fetch interviews attempt finished.");
   }
   return [];
 }

@@ -41,7 +41,6 @@ export default function AIInterviewSessionPage({
   const { interviewId } = use(params);
   const { sessionId } = use(params);
   const jobId = jobInfoId;
-  const token = localStorage.getItem('accessToken');
 
 
   const [session, setSession] = useState<SessionDetailResponse>();
@@ -124,10 +123,9 @@ export default function AIInterviewSessionPage({
   const initializeSession = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/practice-interview/${sessionId}`,
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}`,
         {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`,
-        }
+          headers: { "Content-Type": "application/json" },
         }
       );
       const data = await response.json();
@@ -167,10 +165,9 @@ export default function AIInterviewSessionPage({
       if (data.status === "IN_PROGRESS" || data.status === "PAUSED") {
         try {
           const statusResponse = await fetch(
-            `http://localhost:8080/api/practice-interview/${sessionId}/status`,
+            `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/status`,
             {
               headers: {
-                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
             }
@@ -200,12 +197,11 @@ export default function AIInterviewSessionPage({
   const loadResults = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/practice-interview/complete",
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/complete`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ sessionId }),
         }
@@ -264,10 +260,9 @@ export default function AIInterviewSessionPage({
       
       try {
         const response = await fetch(
-          `http://localhost:8080/api/practice-interview/${sessionId}/status`,
+          `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/status`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
@@ -392,12 +387,11 @@ export default function AIInterviewSessionPage({
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/practice-interview/message",
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/message`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ sessionId, message }),
         }
@@ -448,12 +442,11 @@ export default function AIInterviewSessionPage({
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/practice-interview/start",
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/start`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ sessionId }),
         }
@@ -466,11 +459,10 @@ export default function AIInterviewSessionPage({
       
       // Refresh session data to get updated status, conversation, and question number
       const sessionResponse = await fetch(
-        `http://localhost:8080/api/practice-interview/${sessionId}`,
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}`,
         {
           headers: { 
-            "Content-Type": "application/json", 
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           }
         }
       );
@@ -499,10 +491,9 @@ export default function AIInterviewSessionPage({
       // Fetch status to get accurate question number and time remaining
       try {
         const statusResponse = await fetch(
-          `http://localhost:8080/api/practice-interview/${sessionId}/status`,
+          `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/status`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
@@ -537,11 +528,10 @@ export default function AIInterviewSessionPage({
     if (recognitionRef.current) recognitionRef.current.stop();
 
     try {
-      await fetch("http://localhost:8080/api/practice-interview/pause", {
+      await fetch(`/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/pause`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ sessionId }),
       });
@@ -560,12 +550,11 @@ export default function AIInterviewSessionPage({
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/practice-interview/complete",
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/complete`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ sessionId }),
         }
@@ -589,12 +578,11 @@ export default function AIInterviewSessionPage({
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8080/api/practice-interview/${sessionId}/resume`,
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/resume`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -610,11 +598,10 @@ export default function AIInterviewSessionPage({
       
       // Refresh session data
       const sessionResponse = await fetch(
-        `http://localhost:8080/api/practice-interview/${sessionId}`,
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}`,
         {
           headers: { 
-            "Content-Type": "application/json", 
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           }
         }
       );
@@ -643,10 +630,9 @@ export default function AIInterviewSessionPage({
       // Fetch latest status to get accurate question number and time
       try {
         const statusResponse = await fetch(
-          `http://localhost:8080/api/practice-interview/${sessionId}/status`,
+          `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/status`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }

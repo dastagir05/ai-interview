@@ -1,4 +1,4 @@
-"use ";
+"use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,6 +28,7 @@ import { LoadingSwap } from "@/components/ui/loading-swap";
 import { toast } from "sonner";
 import { getCurrentUserId } from "@/lib/auth";
 import PersonalSkillsRequired from "./PersonalSkillsRequired";
+import { useRouter } from "next/navigation";
 
 export type JobInfoFormData = z.infer<typeof jobInfoSchema>;
 
@@ -55,7 +56,7 @@ export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
     const currRecId = await getCurrentUserId();
     console.log("Current User ID:", currRecId);
     try {
-      const response = await fetch(`/api/personalJobs?userId=${currRecId}`, {
+      const response = await fetch(`/api/personalJobs/create?userId=${currRecId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,6 +79,9 @@ export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
       }
 
       toast.success("Job saved successfully");
+      const router = useRouter();
+      router.push("/personalJob")
+      
     } catch (err) {
       console.error(err);
       toast.error("An unexpected error occurred");

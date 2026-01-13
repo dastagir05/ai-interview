@@ -25,7 +25,17 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { JobDetails } from "@/data/type/job";
+import PersonalSkillsRequired from "@/features/jobInfos/components/PersonalSkillsRequired";
 import { getCurrentUserId } from "@/lib/auth";
+
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function CreateInterviewPage({
   params,
@@ -58,7 +68,32 @@ export default function CreateInterviewPage({
     "DSA",
     "Microservices",
   ];
+  // Add this state at the top with your other useState declarations
+  const [skillInput, setSkillInput] = useState("");
 
+  const addCustomSkill = () => {
+    const trimmed = skillInput.trim();
+    if (!trimmed) return;
+    
+    // Prevent duplicates (case-insensitive check)
+    if (formData.focusDomains.some(d => d.toLowerCase() === trimmed.toLowerCase())) {
+      alert("This focus area is already added");
+      return;
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      focusDomains: [...prev.focusDomains, trimmed]
+    }));
+    setSkillInput("");
+  };
+
+  const removeSkill = (skill: string) => {
+    setFormData(prev => ({
+      ...prev,
+      focusDomains: prev.focusDomains.filter(s => s !== skill)
+    }));
+  };
   useEffect(() => {
     fetchJobDetails();
   }, []);
@@ -92,7 +127,7 @@ export default function CreateInterviewPage({
 
     try {
       const userId = await getCurrentUserId();
-      const response = await fetch("/api/practice-interview", {
+      const response = await fetch(`/api/personalJobs/${jobId}/interviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,21 +140,8 @@ export default function CreateInterviewPage({
       });
 
       const data = await response.json();
-
-      // const startResponse = await fetch(`/api/practice-interview/start`, {
-      //   method: "POST",
-      //   // headers: {
-      //   //   "Content-Type": "application/json",
-      //   //   Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //   // },
-      //   body: JSON.stringify({
-      //     sessionId: data.sessionId,
-      //   }),
-      // });
-
-      // await startResponse.json();
- //     router.push(`/job-info/${jobInfoId}/interviews/${interviewId}/session/${data.sessionId}`);
-      router.push(`/job-info/${jobInfoId}/interviews`);
+      //handle if response is not ok
+      router.push(`/job-infos/${jobInfoId}/interviews`);
     } catch (error) {
       console.error("Failed to create interview:", error);
       alert("Failed to create interview. Please try again.");
@@ -175,8 +197,30 @@ export default function CreateInterviewPage({
 
           <div className="space-y-3">
             <Label>Focus Domains *</Label>
+             <div>
+              <Label htmlFor="customSkill" className="text-sm">
+                Add Custom Focus Area
+              </Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  id="customSkill"
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                  placeholder="Enter a custom focus area"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCustomSkill();
+                    }
+                  }}
+                />
+                <Button type="button" onClick={addCustomSkill}>
+                  Add
+                </Button>
+              </div>
+            </div>
             <p className="text-sm text-muted-foreground">
-              Select topics to focus on (select at least one)
+              Or select topics to focus on (select at least one)
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {domainOptions.map((domain) => (
@@ -195,7 +239,32 @@ export default function CreateInterviewPage({
                 </div>
               ))}
             </div>
+
+            <div className="flex flex-wrap gap-2 mt-3 p-3 bg-secondary/50 rounded-md min-h-[50px]">
+              {formData.focusDomains.length > 0 ? (
+                formData.focusDomains.map((skill) => (
+                  <div
+                    key={skill}
+                    className="px-3 py-1 bg-background border rounded-full flex items-center gap-2 text-sm"
+                  >
+                    {skill}
+                    <button
+                      type="button"
+                      onClick={() => removeSkill(skill)}
+                      className="text-red-500 hover:text-red-700 font-bold"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No focus areas selected yet. Add custom or select from checkboxes above.
+                </p>
+              )}
+            </div>
           </div>
+          
 
           <div className="space-y-3">
             <Label>
@@ -277,7 +346,7 @@ export default function CreateInterviewPage({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="resume">Resume URL (Optional)</Label>
+            <Label htmlFor="resume">Resume URL (Optional | Future)</Label>
             <Input
               id="resume"
               type="url"

@@ -22,8 +22,15 @@ import {
   SessionCardDTO,
   SessionFullDetailsDTO,
   InterviewStatus,
+  InterviewCardDTO
 } from "@/data/type/interview";
-import { getCurrentUserId } from "@/lib/auth";
+import { Label } from "@/components/ui/label";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 export default function InterviewSessionsPage({
   params,
@@ -36,26 +43,24 @@ export default function InterviewSessionsPage({
   const router = useRouter();
 
   const [sessions, setSessions] = useState<SessionCardDTO[]>([]);
+  const [interviewDetail, setInterviewDetail] = useState<InterviewCardDTO>();
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState<SessionFullDetailsDTO>();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     fetchSessions();
+    fetchInterviewDetails();
   }, []);
 
   const fetchSessions = async () => {
     try {
-      const userId = await getCurrentUserId(); // Or get from auth context
-      const response = await fetch("/api/practice-interview/sessions", {
-        method: "POST",
+      const response = await fetch(`/api/personalJobs/${jobId}/interviews/${interviewId}/sessions`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId,
-          jobId,
-        }),
       });
 
       const data = await response.json();
@@ -66,17 +71,31 @@ export default function InterviewSessionsPage({
       setLoading(false);
     }
   };
-
-  const handleCardClick = async (sessionId: String) => {
+  const fetchInterviewDetails = async () => {
     try {
-      const response = await fetch(`/api/practice-interview/details`, {
-        method: "POST",
+      const response = await fetch(`/api/personalJobs/${jobId}/interviews/${interviewId}`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          sessionId,
-        }),
+      });
+
+      const data = await response.json();
+      setInterviewDetail(data);
+    } catch (error) {
+      console.error("Failed to fetch sessions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCardClick = async (sessionId: String) => {
+    try {
+      const response = await fetch(`/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/details`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       const data = await response.json();
       setSelectedSession(data);
@@ -86,16 +105,40 @@ export default function InterviewSessionsPage({
     }
   };
 
-  const handleResumeInterview = async (sessionId: String) => {
-    const token = localStorage.getItem('accessToken');
+  const handleCreateSession = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/practice-interview/${sessionId}/resume`,
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({}),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create session");
+      }
+
+      const data = await response.json();
+      // Navigate to the new session page
+      router.push(`${interviewId}/session/${data.sessionId}`);
+    } catch (error) {
+      console.error("Failed to create session:", error);
+      alert("Failed to create session. Please try again.");
+    }
+  };
+
+  const handleResumeInterview = async (sessionId: String) => {
+    try {
+      const response = await fetch(
+        `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/resume`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
         }
       );
@@ -151,7 +194,7 @@ export default function InterviewSessionsPage({
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-4">
         <div>
           <h1 className="text-3xl font-bold">Interview Sessions</h1>
           <p className="text-muted-foreground mt-2">
@@ -159,14 +202,162 @@ export default function InterviewSessionsPage({
           </p>
         </div>
         <Button
-          onClick={() => router.push(`new`)}
+          onClick={handleCreateSession}
           size="lg"
         >
           <Plus className="w-5 h-5 mr-2" />
-          Create New Interview
+          Create New Session
         </Button>
       </div>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4">
+      <CollapsibleTrigger asChild>
+        <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
+          <h2 className="text-2xl font-bold tracking-tight">Interview Description</h2>
+          <ChevronDown
+            className={`h-5 w-5 transition-transform duration-200 ${
+              isOpen ? "transform rotate-180" : ""
+            }`}
+          />
+        </div>
+      </CollapsibleTrigger>
 
+      <CollapsibleContent className="space-y-6 pt-4">
+        {/* Main Content */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Left Column - Basic Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Basic Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                  Interview Title
+                </Label>
+                <p className="text-base font-medium mt-1">
+                  {interviewDetail?.interviewTitle || "N/A"}
+                </p>
+              </div>
+
+              <div>
+                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                  Job Title
+                </Label>
+                <p className="text-base font-medium mt-1">
+                  {interviewDetail?.jobTitle || "N/A"}
+                </p>
+              </div>
+
+              <div>
+                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                  Difficulty Level
+                </Label>
+                <div className="mt-1">
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                      interviewDetail?.difficulty === "EASY"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                        : interviewDetail?.difficulty === "MEDIUM"
+                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                    }`}
+                  >
+                    {interviewDetail?.difficulty || "N/A"}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Right Column - Progress & Domains */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Progress & Focus</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                  Sessions Progress
+                </Label>
+                <div className="mt-2 flex items-center gap-3">
+                  <div className="flex-1">
+                    <div className="w-full bg-secondary rounded-full h-2">
+                      <div
+                        className="bg-primary h-2 rounded-full transition-all"
+                        style={{
+                          width: `${
+                            interviewDetail?.totalSessions
+                              ? (interviewDetail.completedSessions /
+                                  interviewDetail.totalSessions) *
+                                100
+                              : 0
+                          }%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <span className="text-sm font-semibold">
+                    {interviewDetail?.completedSessions || 0} /{" "}
+                    {interviewDetail?.totalSessions || 0}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                  Focus Domains
+                </Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {interviewDetail?.focusDomains &&
+                  interviewDetail.focusDomains.length > 0 ? (
+                    interviewDetail.focusDomains.map((domain: string) => (
+                      <span
+                        key={domain}
+                        className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+                      >
+                        {domain}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No focus domains specified
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Full Width - Job Description */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Job Description</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
+              {interviewDetail?.jobDescription || "No description provided"}
+            </p>
+          </CardContent>
+        </Card>
+      </CollapsibleContent>
+
+      <CollapsibleContent className="space-y-6 pt-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Job Description</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
+              {interviewDetail?.jobDescription || "No description provided"}
+            </p>
+          </CardContent>
+        </Card>
+      </CollapsibleContent>
+
+    </Collapsible>
+
+          
       {/* Sessions Grid */}
       {sessions.length === 0 ? (
         <Card className="text-center py-12">
@@ -177,14 +368,14 @@ export default function InterviewSessionsPage({
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2">
-                  No interviews yet
+                  No sessions yet
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Create your first practice interview to get started
+                  Create your first practice session to get started
                 </p>
-                <Button onClick={() => router.push(`/interviews/${jobId}/new`)}>
+                <Button onClick={handleCreateSession}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Interview
+                  Create Session
                 </Button>
               </div>
             </div>
@@ -231,7 +422,7 @@ export default function InterviewSessionsPage({
                     <div>
                       <p className="text-muted-foreground">Duration</p>
                       <p className="font-medium">
-                        {session.durationMinutes} min
+                        {session.plannedDuration} min
                       </p>
                     </div>
                     <div>
@@ -343,7 +534,7 @@ export default function InterviewSessionsPage({
                     <p className="text-sm text-muted-foreground">Duration</p>
                     <p className="text-lg font-medium">
                       {selectedSession.actualDuration ||
-                        selectedSession.durationMinutes}{" "}
+                        selectedSession.plannedDuration}{" "}
                       minutes
                     </p>
                   </div>

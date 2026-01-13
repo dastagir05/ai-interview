@@ -1,6 +1,9 @@
 export interface SessionCardDTO {
+  configurationId: string;
   sessionId: string;
   interviewTitle: string;
+  interviewId: string;
+  plannedDuration: number;
   jobTitle: string;
   focusDomains: string[];
   status: InterviewStatus;
@@ -12,6 +15,22 @@ export interface SessionCardDTO {
   overallScore: number | null;
   difficulty: DifficultyLevel;
   canResume: boolean;
+}
+export interface InterviewCardDTO {
+  configurationId: string;
+  interviewTitle: string;
+  jobTitle: string;
+  jobDescription: string;
+  focusDomains: string[];
+  difficulty:string;
+  isActive: Boolean;
+  createdAt: string; // ISO string from backend
+  durationMinutes: number | null;
+  expectedQuestions: number;
+  includeCodeChallenges: Boolean;
+  totalSessions: number;
+  completedSessions: number;
+  averageScore: number;
 }
 
 export enum InterviewStatus {
@@ -40,7 +59,7 @@ export interface SessionFullDetailsDTO {
   createdAt: string; // ISO date-time
   startedAt: string | null;
   completedAt: string | null;
-  durationMinutes: number | null;
+  plannedDuration: number | null;
   actualDuration: number | null;
 
   // Questions
