@@ -13,7 +13,6 @@ import Link from "next/link";
 import { requireUserId } from "@/lib/auth";
 import { ExperienceLevel, PersonalJobDetails } from "@/data/type/job";
 import { env } from "@/data/env/server";
-import { toast } from "sonner";
 import { PersonalJobInfoForm } from "@/features/jobInfos/components/PersonalInfoForm";
 import { cookies } from "next/headers";
 
@@ -24,17 +23,28 @@ export default async function JobInfos() {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken")?.value;
   try {
-    jobInfos = await fetch(
-      `${env.BACKEND_URL}/personal-jobs/user/${userId}`,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include", 
-      }
-    ).then((res) => res.json());
+    const url = `${env.BACKEND_URL}/personal-jobs/user/${userId}`;
+    console.log("Fetching:", url);
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    const raw = await res.text();
+    console.log("RAW RESPONSE:", raw);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch");
+    }
+
+    jobInfos = JSON.parse(raw);
+
   } catch (error) {
-    toast.error("Failed to load job descriptions");
-    return null;
+    console.error("Failed to load job descriptions", error);
+    return <div>Failed to load job descriptions</div>;
   }
   if (jobInfos.length === 0) {
     return <NoJobInfos />;

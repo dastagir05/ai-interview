@@ -4,7 +4,9 @@ import { env } from "@/data/env/server";
 
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("authToken")?.value;
+  let token = cookieStore.get("authToken")?.value;
+ 
+  // console.log("token in api/auth/me", token)
 
   if (!token) {
     return NextResponse.json({ user: null }, { status: 401 });
