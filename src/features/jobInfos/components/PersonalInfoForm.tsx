@@ -33,6 +33,8 @@ import { useRouter } from "next/navigation";
 export type JobInfoFormData = z.infer<typeof jobInfoSchema>;
 
 export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
+  const router = useRouter();
+
   const form = useForm<JobInfoFormData>({
     resolver: zodResolver(jobInfoSchema),
     defaultValues: jobInfo
@@ -71,6 +73,16 @@ export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
 
       const data = await response.json().catch(() => null);
 
+      console.log("PersonalInfoForm create Perjob",data)
+
+      if (response.status === 429 || data.error === 'USAGE_LIMIT_EXCEEDED') {
+        toast.warning("Upgrade your Tier to create more job")
+        setTimeout(() => {
+          router.push("/upgrade")
+        }, 2000)
+        return;
+      }
+
       if (!response.ok) {
         toast.error(
           (data && (data.message || data.error)) ?? "Failed to save job"
@@ -79,12 +91,18 @@ export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
       }
 
       toast.success("Job saved successfully");
-      const router = useRouter();
       router.push("/personalJob")
       
     } catch (err) {
-      console.error(err);
-      toast.error("An unexpected error occurred");
+      console.error("err while create job",err); //NR
+      let message = "An unexpected error occurred";
+      if (err instanceof Error) {
+        message = err.message;
+      } else if (typeof err === "string") {
+        message = err;
+      }
+      toast.error(message);
+      // toast.error("An unexpected error occurred");
     }
   }
 

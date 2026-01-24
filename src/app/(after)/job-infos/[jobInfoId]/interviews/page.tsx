@@ -41,7 +41,7 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
 
   const interviews = await getInterviews(jobInfoId, userId);
   // const interviews = await fetch(`/api/personalJobs/${jobInfoId}/interviews`);
-  console.log("interview in interview page", interviews);
+  // console.log("interview in interview page", interviews);
   if (interviews.length === 0) {
     return redirect(`/job-infos/${jobInfoId}/interviews/new`);
   }
@@ -69,7 +69,6 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
               <div className="flex items-center justify-between h-full">
                 <CardHeader className="gap-1 flex-grow">
                   <CardTitle className="text-lg">
-                    {/* {formatDateTime(interview.createdAt)} */}
                     {interview.interviewTitle}
                     <span className="block text-sm">{interview.createdAt}</span>
                   </CardTitle>
@@ -94,7 +93,6 @@ async function getInterviews(jobInfoId: string, userId: string) {
     if (!token) {
       return new Response("Unauthorized", { status: 401 });
     }
-    //      `${env.BACKEND_URL}/practice-interview/user/${userId}/job/${jobInfoId}/sessions`,
     const response = await fetch(
       `${env.BACKEND_URL}/practice-interview/configuration/job/${jobInfoId}`,
       {

@@ -46,7 +46,7 @@ export async function GET(
   }
 
   const res = await fetch(
-    `${env.BACKEND_URL}/personalJobs/${jobId}/interviews`,
+    `${env.BACKEND_URL}/practice-interview/${jobId}/interviews`, //check backend
     {
       method: "GET",
       headers: {

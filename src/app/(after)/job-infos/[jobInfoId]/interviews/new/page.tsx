@@ -27,15 +27,7 @@ import { Slider } from "@/components/ui/slider";
 import { JobDetails } from "@/data/type/job";
 import PersonalSkillsRequired from "@/features/jobInfos/components/PersonalSkillsRequired";
 import { getCurrentUserId } from "@/lib/auth";
-
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import {toast} from "sonner";
 
 export default function CreateInterviewPage({
   params,
@@ -140,6 +132,23 @@ export default function CreateInterviewPage({
       });
 
       const data = await response.json();
+
+      console.log("new interview create",data)
+
+      if (response.status === 429 || data.error === 'USAGE_LIMIT_EXCEEDED') {
+        toast.warning("Upgrade your Tier to create more interview")
+        setTimeout(() => {
+          router.push("/upgrade")
+        }, 2000)
+        return;
+      }
+      if (!response.ok) {
+        toast.error(
+          (data && (data.message || data.error)) ?? "Failed to save job"
+        );
+        return;
+      }
+
       //handle if response is not ok
       router.push(`/job-infos/${jobInfoId}/interviews`);
     } catch (error) {

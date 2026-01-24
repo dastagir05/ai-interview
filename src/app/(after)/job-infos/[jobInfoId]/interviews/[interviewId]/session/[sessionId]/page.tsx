@@ -93,7 +93,6 @@ export default function AIInterviewSessionPage({
     };
   }, []);
 
-  // Start/stop countdown based on interview state
   useEffect(() => {
     if (interviewState === "IN_PROGRESS" && timeRemaining > 0) {
       startCountdown();
@@ -150,7 +149,6 @@ export default function AIInterviewSessionPage({
         );
         setConversation(filtered);
 
-        // Only speak if interview is in progress (not when just starting)
         if (data.status === "IN_PROGRESS" && filtered.length > 0) {
           const lastAI = filtered
             .filter((m: ConversationMessage) => m.role === "assistant")
@@ -161,7 +159,6 @@ export default function AIInterviewSessionPage({
         }
       }
 
-      // Fetch initial status to get time remaining and question number
       if (data.status === "IN_PROGRESS" || data.status === "PAUSED") {
         try {
           const statusResponse = await fetch(
@@ -398,7 +395,9 @@ export default function AIInterviewSessionPage({
       );
 
       const data = await response.json();
-      
+      if (!response.ok) {
+        return alert("response is not ok try again later /message")
+      }
       // Update conversation with AI response
       setConversation((prev) => [
         ...prev,
@@ -453,6 +452,9 @@ export default function AIInterviewSessionPage({
       );
       
       const data = await response.json();
+      if (!response.ok){
+        return alert("response is not ok try again later")
+      }
       
       // Update interview state
       setInterviewState("IN_PROGRESS");
@@ -592,11 +594,8 @@ export default function AIInterviewSessionPage({
       }
 
       const data = await response.json();
-      
-      // Update interview state to IN_PROGRESS
       setInterviewState("IN_PROGRESS");
       
-      // Refresh session data
       const sessionResponse = await fetch(
         `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}`,
         {
@@ -608,7 +607,6 @@ export default function AIInterviewSessionPage({
       const sessionData = await sessionResponse.json();
       setSession(sessionData);
       
-      // Update conversation from session data
       if (sessionData.conversationHistory) {
         const history = JSON.parse(sessionData.conversationHistory);
         const filtered = history.filter(
@@ -617,7 +615,6 @@ export default function AIInterviewSessionPage({
         setConversation(filtered);
       }
       
-      // Update question number and time remaining from response if available
       if (data.currentQuestion !== undefined) {
         setQuestionNumber(data.currentQuestion);
       }
@@ -627,7 +624,6 @@ export default function AIInterviewSessionPage({
         setTimeRemaining(0);
       }
 
-      // Fetch latest status to get accurate question number and time
       try {
         const statusResponse = await fetch(
           `/api/personalJobs/${jobId}/interviews/${interviewId}/sessions/${sessionId}/status`,
@@ -645,13 +641,11 @@ export default function AIInterviewSessionPage({
           ? status.timeRemaining 
           : 0;
         setTimeRemaining(backendTime);
-        // Restart countdown if we have time
         if (backendTime > 0) {
           setTimeout(() => startCountdown(), 100);
         }
       } catch (statusError) {
         console.error("Failed to fetch status after resume:", statusError);
-        // Non-critical, continue anyway
       }
     } catch (error) {
       console.error("Failed to resume interview:", error);
@@ -673,12 +667,10 @@ export default function AIInterviewSessionPage({
     );
   }
 
-  // COMPLETED STATE - Results View
   if (interviewState === "COMPLETED" && results) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* Header */}
           <div className="mb-8">
             <Button
               variant="ghost"

@@ -34,7 +34,7 @@ export default async function JobInfos() {
     });
 
     const raw = await res.text();
-    console.log("RAW RESPONSE:", raw);
+    // console.log("RAW RESPONSE:", raw);
 
     if (!res.ok) {
       throw new Error("Failed to fetch");

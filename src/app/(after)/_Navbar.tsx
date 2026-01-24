@@ -24,7 +24,7 @@ const navLinks = [
   { name: "Questions", href: "questions", Icon: BookOpenIcon },
 ];
 const navLinks1 = [
-  { name: "Dashboard", href: "dashboard", Icon: SpeechIcon },
+  { name: "Dashboard", href: "/dashboard", Icon: SpeechIcon },
   { name: "Personal Jobs", href: "personalJob", Icon: BookOpenIcon },
   { name: "Resume", href: "resume", Icon: FileSlidersIcon },
 ];
@@ -86,7 +86,6 @@ export function Navbar({
 
           <ThemeToggle />
 
-          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger>
               <UserAvatar

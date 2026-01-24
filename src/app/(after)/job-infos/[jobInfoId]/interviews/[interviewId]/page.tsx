@@ -342,7 +342,7 @@ export default function InterviewSessionsPage({
         </Card>
       </CollapsibleContent>
 
-      <CollapsibleContent className="space-y-6 pt-4">
+      {/* <CollapsibleContent className="space-y-6 pt-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Job Description</CardTitle>
@@ -353,7 +353,7 @@ export default function InterviewSessionsPage({
             </p>
           </CardContent>
         </Card>
-      </CollapsibleContent>
+      </CollapsibleContent> */}
 
     </Collapsible>
 
