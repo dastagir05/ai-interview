@@ -43,7 +43,7 @@ export default function UpgradePage() {
 
   const handlePayment = async () => {
     if (!razorpayLoaded) {
-      alert("Payment system is loading. Please wait...");
+      alert("Payment system is loading. Please wait... Or you can reload page and try again");
       return;
     }
     setLoading(true);
@@ -82,9 +82,9 @@ export default function UpgradePage() {
           await verifyPayment(response);
         },
         prefill: {
-          name: "User Name", // Get from user context
-          email: "user@example.com", // Get from user context
-          contact: "9999999999", // Get from user context
+          name: "User Name", 
+          email: "user@example.com", 
+          contact: "9999999999", 
         },
         theme: {
           color: "#3399cc",
@@ -124,12 +124,35 @@ export default function UpgradePage() {
       const data = await response.json();
 
       if (data.success) {
-        toast.success("🎉 Payment successful! Your account has been upgraded.")
-        // alert("🎉 Payment successful! Your account has been upgraded.");
-        window.location.href = "/dashboard"; 
-      } else {
-        alert("Payment verification failed. Please contact support.");
+        const refreshResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/refresh`,
+          {
+            method: "POST",
+            credentials: "include", 
+          }
+        );
+    
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          
+          localStorage.setItem("accessToken", refreshData.accessToken);
+          await fetch("/api/auth/set-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: refreshData.accessToken }),
+          });
+
+          toast.success("🎉 Payment successful! Your account has been upgraded.")
+          window.location.href = "/dashboard";
+        }
       }
+    
+      // if (data.success) {
+      //   toast.success("🎉 Payment successful! Your account has been upgraded.")
+      //   window.location.href = "/dashboard"; 
+      // } else {
+      //   alert("Payment verification failed. Please contact support.");
+      // }
     } catch (error) {
       console.error("Verification error:", error);
       alert("Payment verification failed. Please contact support.");

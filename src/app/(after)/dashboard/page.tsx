@@ -21,7 +21,7 @@ export default async function JobInfos() {
         Cookie: (await cookies()).toString(),
       },
     }).then((res) => res.json());
-    console.log("jobInfos", jobInfos)
+    // console.log("jobInfos", jobInfos)
   } catch (error) {
     // toast.error("Failed to load job descriptions");
     console.log("fail to fetch job", error)

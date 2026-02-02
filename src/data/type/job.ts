@@ -57,6 +57,16 @@ export interface JobDetails {
   updatedAt: string;
 }
 
+export interface PublicJob {
+  id: string;
+  title: string;
+  category: string;
+  imgUrl: string | null;
+  enabled: boolean;
+  experienceLevel: ExperienceLevel;
+  usageCount: number;
+}
+
 export interface Question {
   id: string;
   jobId?: string;

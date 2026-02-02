@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/AuthContext";
 import Script from 'next/script'
+import QueryProvider from "./QueryProvider";
 
 
 export default function RootLayout({
@@ -20,6 +21,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <QueryProvider>
         <AuthProvider>
           <ThemeProvider
             attribute="class"
@@ -31,6 +33,7 @@ export default function RootLayout({
             <Toaster />
           </ThemeProvider>
             </AuthProvider>
+            </QueryProvider>
       </body>
     </html>
   );

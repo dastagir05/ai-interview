@@ -17,6 +17,7 @@ import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { useParams, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/useAuth";
+import { Settings } from "lucide-react";
 
 const navLinks = [
   { name: "JD", href: "/", Icon: FileSlidersIcon },
@@ -25,7 +26,7 @@ const navLinks = [
 ];
 const navLinks1 = [
   { name: "Dashboard", href: "/dashboard", Icon: SpeechIcon },
-  { name: "Personal Jobs", href: "personalJob", Icon: BookOpenIcon },
+  { name: "Personal Jobs", href: "/personalJob", Icon: BookOpenIcon },
   { name: "Resume", href: "resume", Icon: FileSlidersIcon },
 ];
 
@@ -35,7 +36,7 @@ export function Navbar({
   user: { name?: string; image?: string } | null | undefined;
 }) {
   const { jobInfoId } = useParams();
-  const { logout } = useAuth();
+  const { logout, isAdmin } = useAuth();
   const pathName = usePathname();
 
   return (
@@ -84,7 +85,21 @@ export function Navbar({
               );
             })}
 
+          {isAdmin && (
+            <Button
+              variant={pathName?.startsWith("/admin") ? "secondary" : "ghost"}
+              asChild
+              className="cursor-pointer"
+            >
+              <Link href="/admin/dashboard">
+                <Settings className="mr-2 h-4 w-4" />
+                Admin
+              </Link>
+            </Button>
+          )}
+
           <ThemeToggle />
+
 
           <DropdownMenu>
             <DropdownMenuTrigger>
