@@ -5,6 +5,8 @@ import {
   Brain,
   FileSlidersIcon,
   SpeechIcon,
+  UserIcon,
+  BarChart3Icon,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -28,6 +30,8 @@ const navLinks1 = [
   { name: "Dashboard", href: "/dashboard", Icon: SpeechIcon },
   { name: "Personal Jobs", href: "/personalJob", Icon: BookOpenIcon },
   { name: "Resume", href: "resume", Icon: FileSlidersIcon },
+  { name: "Analytics", href: "analytics", Icon: BarChart3Icon },
+  { name: "User", href: "user", Icon: UserIcon },
 ];
 
 export function Navbar({

@@ -12,3 +12,5 @@
 //   interviewsCompleted: number;
 //   joinedDate: string;
  }
+
+ export type UserTier = "FREE" | "BASIC" | "PRO";
