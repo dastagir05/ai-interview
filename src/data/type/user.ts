@@ -9,8 +9,8 @@
   updatedAt: string;
   tier: string;
   interviewsCompleted: number | null;
-//   interviewsCompleted: number;
-//   joinedDate: string;
+  totalAchievements: number | null;
+  memberSince : string | null;
  }
 
  export type UserTier = "FREE" | "BASIC" | "PRO";

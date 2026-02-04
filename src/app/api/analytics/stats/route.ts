@@ -10,8 +10,8 @@ export async function GET(
   if (!token) {
     return new Response("Unauthorized", { status: 401 });
   }
-  // console.log("admin stats route");
-  const res = await fetch(`${env.BACKEND_URL}/admin/practice-jobs/stats`, {
+  console.log("user analytics stats route");
+  const res = await fetch(`${env.BACKEND_URL}/analytics/stats`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,

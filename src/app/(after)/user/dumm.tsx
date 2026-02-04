@@ -58,14 +58,122 @@ export default function UserSettingsPage() {
 
 function UserSettingsContent() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  // const [user , setUser] = useState<UserDetails>();
+  
+
+  const fetchUserProfile = async (): Promise<UserDetails> => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`,
+      { credentials: "include" }
+    );
+  
+    if (!res.ok) throw new Error("Failed to fetch user");
+    return res.json();
+  };
+
+  const queryClient = useQueryClient();
+
+const {
+  data: userA,
+  isLoading,
+  error,
+} = useQuery<UserDetails>({
+  queryKey: ["user-profile"],
+  queryFn: fetchUserProfile,
+});
+
+const updateProfileMutation = useMutation({
+  mutationFn: async (payload: { name: string }) => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) throw new Error("Update failed");
+    return res.json();
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+    toast.success("Profile updated successfully");
+  },
+  onError: () => {
+    toast.error("Failed to update profile");
+  },
+});
+// const handleUpdateProfile = () => {
+//   updateProfileMutation.mutate({
+//     name: profileForm.name,
+//   });
+// };
+
+const changePasswordMutation = useMutation({
+  mutationFn: async (payload: { otp: string; newPassword: string }) => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/change-password/verify`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) throw new Error("Password change failed");
+  },
+  onSuccess: () => {
+    toast.success("Password changed successfully");
+    setPasswordForm({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  },
+  onError: () => {
+    toast.error("Failed to change password");
+  },
+});
+
+const deleteAccountMutation = useMutation({
+  mutationFn: async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+
+    if (!res.ok) throw new Error("Delete failed");
+  },
+  onSuccess: () => {
+    toast.info("Account deleted");
+    queryClient.clear();
+    router.push("/");
+  },
+});
+
+  const [user, setUser] = useState({name: "", email: "" , subscriptionTier : "FREE", memberSince : "12-12-25", totalAchievements : "3"})
+  // Subscription usage stats
+  const [usage, setUsage] = useState({
+    interviews: { used: 7, limit: 10 },
+    jobPosts: { used: 3, limit: 5 },
+    aiMinutes: { used: 85, limit: 120 },
+  });
+
+  // Loading states
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   // Form states
   const [profileForm, setProfileForm] = useState({
-    name: "",
-    email: "",
+    name: user?.name,
+    email: user?.email,
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -74,172 +182,89 @@ function UserSettingsContent() {
     confirmPassword: "",
   });
 
-  // Fetch user profile
-  const fetchUserProfile = async (): Promise<UserDetails> => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`,
-      { credentials: "include" }
-    );
+  // Handle profile update
+  const handleUpdateProfile = async () => {
+    setIsUpdatingProfile(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: profileForm.name,
+          email: profileForm.email,
+        }),
+      });
 
-    if (!res.ok) throw new Error("Failed to fetch user");
-    return res.json();
+      if (!response.ok) throw new Error("Failed to update profile");
+
+      const data = await response.json();
+      setUser({ ...user, name: data.name, email: data.email });
+      toast.success("Your profile has been updated successfully.");
+    } catch (error) {
+      toast.error("Failed to update profile. Please try again.");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
 
-  const {
-    data: user,
-    isLoading: isLoadingUser,
-    error: userError,
-  } = useQuery<UserDetails>({
-    queryKey: ["user-profile"],
-    queryFn: fetchUserProfile,
-    // onSuccess: (data) => {
-    //   // Update form with fetched data
-    //   setProfileForm({
-    //     name: data.name || "",
-    //     email: data.email || "",
-    //   });
-    // },
-  });
+  // Handle password change
+  const handleChangePassword = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("New passwords do not match.");
+      return;
+    }
 
-  // Update profile mutation
-  const updateProfileMutation = useMutation({
-    mutationFn: async (payload: { name: string }) => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        }
-      );
+    setIsUpdatingPassword(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/change-password`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Update failed");
-      }
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-      toast.success("Profile updated successfully");
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to update profile");
-    },
-  });
+      if (!response.ok) throw new Error("Failed to change password");
 
-  // Request OTP for password change
-  const requestPasswordOTPMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/change-password/request`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      toast.success("Your password has been changed successfully.");
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to request OTP");
-      }
-      return res.json();
-    },
-    onSuccess: () => {
-      toast.success("OTP sent to your email");
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to send OTP");
-    },
-  });
-
-  // Change password mutation
-  const changePasswordMutation = useMutation({
-    mutationFn: async (payload: { otp: string; newPassword: string }) => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/change-password/verify`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Password change failed");
-      }
-      return res.json();
-    },
-    onSuccess: () => {
-      toast.success("Password changed successfully");
       setPasswordForm({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-      setOpen(false);
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to change password");
-    },
-  });
-
-  // Delete account mutation
-  const deleteAccountMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Delete failed");
-      }
-      return res.json();
-    },
-    onSuccess: () => {
-      toast.info("Account deleted successfully");
-      queryClient.clear();
-      router.push("/");
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete account");
-    },
-  });
-
-  // Handle profile update
-  const handleUpdateProfile = () => {
-    if (!profileForm.name.trim()) {
-      toast.error("Name cannot be empty");
-      return;
+    } catch (error) {
+      toast.error("Failed to change password. Please check your current password.");
+    } finally {
+      setIsUpdatingPassword(false);
     }
-    updateProfileMutation.mutate({ name: profileForm.name });
   };
 
-  // Handle password change
-  const handleChangePassword = () => {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error("New passwords do not match");
-      return;
-    }
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/delete`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (passwordForm.newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters long");
-      return;
-    }
+      if (!response.ok) throw new Error("Failed to delete account");
 
-    // For now, using currentPassword as OTP (adjust based on your API)
-    changePasswordMutation.mutate({
-      otp: passwordForm.currentPassword,
-      newPassword: passwordForm.newPassword,
-    });
+      toast.info("Your account has been permanently deleted.");
+      router.push("/");
+    } catch (error) {
+      toast.error("Failed to delete account. Please try again.");
+    } finally {
+      setIsDeletingAccount(false);
+    }
   };
 
   // Handle subscription upgrade
@@ -290,33 +315,6 @@ function UserSettingsContent() {
     },
   };
 
-  // Mock usage data (replace with actual API call when available)
-  const usage = {
-    interviews: { used: 7, limit: user?.tier === "PRO" ? 999 : user?.tier === "BASIC" ? 10 : 3 },
-    jobPosts: { used: 3, limit: user?.tier === "PRO" ? 999 : user?.tier === "BASIC" ? 5 : 1 },
-    aiMinutes: { used: 85, limit: user?.tier === "PRO" ? 999 : user?.tier === "BASIC" ? 120 : 30 },
-  };
-
-  if (isLoadingUser) {
-    return (
-      <div className="container my-6 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (userError || !user) {
-    return (
-      <div className="container my-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-destructive">Failed to load user data</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="container my-6 space-y-6">
       {/* Header */}
@@ -335,6 +333,7 @@ function UserSettingsContent() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
+        {/* Updated TabsList with better styling for active state */}
         <TabsList className="grid w-full max-w-2xl grid-cols-2 h-11 p-1 bg-muted">
           <TabsTrigger 
             value="profile" 
@@ -378,7 +377,7 @@ function UserSettingsContent() {
                 </div>
               </div>
 
-              {/* Email Field (Read-only) */}
+              {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
                 <div className="relative">
@@ -387,14 +386,13 @@ function UserSettingsContent() {
                     id="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="pl-9 bg-muted"
-                    value={user?.email}
-                    disabled
+                    className="pl-9"
+                    value={profileForm.email}
+                    onChange={(e) =>
+                      setProfileForm({ ...profileForm, email: e.target.value })
+                    }
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Email cannot be changed
-                </p>
               </div>
 
               {/* Member Info */}
@@ -404,7 +402,7 @@ function UserSettingsContent() {
                   <div>
                     <p className="text-sm font-medium">Member Since</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(user.createdAt || Date.now()).toLocaleDateString("en-US", {
+                      {new Date(user.memberSince ).toLocaleDateString("en-US", {
                         month: "long",
                         day: "numeric",
                         year: "numeric",
@@ -419,7 +417,7 @@ function UserSettingsContent() {
                   <div>
                     <p className="text-sm font-medium">Achievements</p>
                     <p className="text-xs text-muted-foreground">
-                      {user.totalAchievements || 0} badges earned
+                      {user.totalAchievements} badges earned
                     </p>
                   </div>
                 </div>
@@ -427,10 +425,10 @@ function UserSettingsContent() {
 
               <Button
                 onClick={handleUpdateProfile}
-                disabled={updateProfileMutation.isPending}
+                disabled={isUpdatingProfile}
                 className="w-full sm:w-auto"
               >
-                {updateProfileMutation.isPending && (
+                {isUpdatingProfile && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
                 Save Changes
@@ -461,15 +459,15 @@ function UserSettingsContent() {
 
               <CollapsibleContent>
                 <CardContent className="space-y-4 pt-0">
-                  {/* OTP/Current Password */}
+                  {/* Current Password */}
                   <div className="space-y-2">
-                    <Label htmlFor="current-password">OTP / Current Password</Label>
+                    <Label htmlFor="current-password">Current Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="current-password"
                         type="password"
-                        placeholder="Enter OTP or current password"
+                        placeholder="Enter current password"
                         className="pl-9"
                         value={passwordForm.currentPassword}
                         onChange={(e) =>
@@ -480,28 +478,14 @@ function UserSettingsContent() {
                         }
                       />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <button
-                        type="button"
-                        onClick={() => router.push("/forgot-password")}
-                        className="text-xs text-primary hover:underline"
-                      >
-                        Forgot password?
-                      </button>
-                      <Button
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        className="h-auto p-0 text-xs"
-                        onClick={() => requestPasswordOTPMutation.mutate()}
-                        disabled={requestPasswordOTPMutation.isPending}
-                      >
-                        {requestPasswordOTPMutation.isPending ? (
-                          <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                        ) : null}
-                        Request OTP
-                      </Button>
-                    </div>
+                    {/* Forgot password link */}
+                    <button
+                      type="button"
+                      onClick={() => router.push("/forgot-password")}
+                      className="text-xs text-primary hover:underline mt-1"
+                    >
+                      Forgot current password?
+                    </button>
                   </div>
 
                   {/* New Password */}
@@ -548,10 +532,10 @@ function UserSettingsContent() {
 
                   <Button
                     onClick={handleChangePassword}
-                    disabled={changePasswordMutation.isPending}
+                    disabled={isUpdatingPassword}
                     className="w-full sm:w-auto"
                   >
-                    {changePasswordMutation.isPending && (
+                    {isUpdatingPassword && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Update Password
@@ -595,11 +579,11 @@ function UserSettingsContent() {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => deleteAccountMutation.mutate()}
+                      onClick={handleDeleteAccount}
                       className="bg-destructive hover:bg-destructive/90"
-                      disabled={deleteAccountMutation.isPending}
+                      disabled={isDeletingAccount}
                     >
-                      {deleteAccountMutation.isPending && (
+                      {isDeletingAccount && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
                       Delete Account
@@ -626,15 +610,15 @@ function UserSettingsContent() {
                 <div className="space-y-2 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-2xl font-bold">
-                      {tiers[user.tier as keyof typeof tiers]?.name || "Free"}
+                      {tiers[user.subscriptionTier as keyof typeof tiers].name}
                     </h3>
                     <Badge variant="secondary" className="text-xs">
                       Current Plan
                     </Badge>
                   </div>
                   <p className="text-muted-foreground text-lg">
-                    {tiers[user.tier as keyof typeof tiers]?.price || "₹0"} /{" "}
-                    {tiers[user.tier as keyof typeof tiers]?.period || "forever"}
+                    {tiers[user.subscriptionTier as keyof typeof tiers].price} /{" "}
+                    {tiers[user.subscriptionTier as keyof typeof tiers].period}
                   </p>
                 </div>
                 <Crown className="h-10 w-10 sm:h-12 sm:w-12 text-primary flex-shrink-0" />
@@ -708,7 +692,7 @@ function UserSettingsContent() {
                 </div>
               </div>
 
-              {user.tier !== "PRO" && (
+              {user.subscriptionTier !== "PRO" && (
                 <p className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-lg">
                   💡 Usage resets on the 1st of every month
                 </p>
@@ -717,7 +701,7 @@ function UserSettingsContent() {
           </Card>
 
           {/* Upgrade Plans */}
-          {user.tier !== "PRO" && (
+          {user.subscriptionTier !== "PRO" && (
             <Card>
               <CardHeader>
                 <CardTitle>Upgrade Your Plan</CardTitle>
@@ -725,7 +709,7 @@ function UserSettingsContent() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {user.tier === "FREE" && (
+                  {user.subscriptionTier === "FREE" && (
                     <>
                       {/* BASIC Plan */}
                       <div className="border-2 rounded-xl p-6 space-y-5 hover:shadow-lg transition-shadow bg-card">
@@ -781,7 +765,7 @@ function UserSettingsContent() {
                     </>
                   )}
 
-                  {user.tier === "BASIC" && (
+                  {user.subscriptionTier === "BASIC" && (
                     <div className="border-2 border-primary rounded-xl p-6 space-y-5 bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-xl transition-all max-w-2xl mx-auto lg:max-w-none">
                       <Badge className="bg-primary text-primary-foreground">
                         <Sparkles className="h-3 w-3 mr-1" />
@@ -812,21 +796,18 @@ function UserSettingsContent() {
             </Card>
           )}
 
-          {/* Manage Subscription - Placeholder for future API */}
-          {user.tier !== "FREE" && (
+          {/* Manage Subscription */}
+          {user.subscriptionTier !== "FREE" && (
             <Card>
               <CardHeader>
                 <CardTitle>Manage Subscription</CardTitle>
-                <CardDescription>
-                  Payment and subscription management coming soon
-                </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col sm:flex-row gap-4">
-                <Button variant="outline" className="w-full sm:w-auto" disabled>
+                <Button variant="outline" className="w-full sm:w-auto">
                   <CreditCard className="mr-2 h-4 w-4" />
                   Update Payment Method
                 </Button>
-                <Button variant="outline" className="w-full sm:w-auto" disabled>
+                <Button variant="outline" className="w-full sm:w-auto">
                   Cancel Subscription
                 </Button>
               </CardContent>

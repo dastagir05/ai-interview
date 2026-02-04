@@ -32,7 +32,6 @@ import {
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRouteProps";
 import { useQuery } from "@tanstack/react-query";
-import { UserAnalytics } from "@/data/type/analytics";
 export default function UserAnalyticsPage() {
   return (
     <ProtectedRoute>
@@ -46,35 +45,33 @@ function UserAnalyticsContent() {
   const userTier : any = "FREE"; 
   const timeRange = "30d";
 
-  const { data: stats  } = useQuery<UserAnalytics>({
+  const { data: stats } = useQuery({
     queryKey: ["user-analytics"],
     queryFn: () =>
       fetch("/api/analytics/stats").then(r => r.json()),
   });
 
   console.log("stats", stats);
-  const metrics = stats?.metrics
-  const skillScores = stats?.skills
-  const dailyActivity = stats?.dailyActivity
-  const recentInterviews = stats?.recentInterviews
 
-  // const metrics = {
-  //   totalInterviews: 24,
-  //   passRate: 62,
-  //   failRate: 38,
-  //   averageScore: 7.4,
-  //   activeDays: 12,
-  //   currentStreak: 5,
-  //   longestStreak: 9,
-  // };
+  const metrics = {
+    totalInterviews: 24,
+    passRate: 62,
+    failRate: 38,
+    averageScore: 7.4,
+    activeDays: 12,
+    currentStreak: 5,
+    longestStreak: 9,
+  };
 
-  // const skillScores = {
-  //   technical: 8.2,
-  //   problemSolving: 7.5,
-  //   codeQuality: 6.8,
-  //   communication: 7.9,
-  // };
+  // Skill breakdown data for spider chart
+  const skillScores = {
+    technical: 8.2,
+    problemSolving: 7.5,
+    codeQuality: 6.8,
+    communication: 7.9,
+  };
 
+  // Achievement badges
   const achievements = [
     {
       id: 1,
@@ -128,6 +125,7 @@ function UserAnalyticsContent() {
     },
   ];
 
+  // Personalized insights
   const insights = {
     strengths: [
       "Strong technical knowledge with consistent 8+ scores",
@@ -153,82 +151,82 @@ function UserAnalyticsContent() {
     },
   };
 
-  // const dailyActivity = [
-  //   { date: "2024-03-01", interviews: 2, avgScore: 7.0 },
-  //   { date: "2024-03-02", interviews: 1, avgScore: 6.5 },
-  //   { date: "2024-03-03", interviews: 3, avgScore: 7.8 },
-  //   { date: "2024-03-04", interviews: 2, avgScore: 8.1 },
-  //   { date: "2024-03-05", interviews: 1, avgScore: 7.2 },
-  // ];
+  const dailyActivity = [
+    { date: "2024-03-01", interviews: 2, avgScore: 7.0 },
+    { date: "2024-03-02", interviews: 1, avgScore: 6.5 },
+    { date: "2024-03-03", interviews: 3, avgScore: 7.8 },
+    { date: "2024-03-04", interviews: 2, avgScore: 8.1 },
+    { date: "2024-03-05", interviews: 1, avgScore: 7.2 },
+  ];
 
-  // const recentInterviews = [
-  //   {
-  //     role: "React Developer",
-  //     score: 8.5,
-  //     status: "Passed",
-  //     date: "2024-03-05",
-  //     skills: {
-  //       technical: 8.5,
-  //       problemSolving: 8.0,
-  //       codeQuality: 7.5,
-  //       communication: 9.0,
-  //     },
-  //   },
-  //   {
-  //     role: "Python Backend Developer",
-  //     score: 6.3,
-  //     status: "Failed",
-  //     date: "2024-03-04",
-  //     skills: {
-  //       technical: 7.0,
-  //       problemSolving: 6.5,
-  //       codeQuality: 5.0,
-  //       communication: 6.8,
-  //     },
-  //   },
-  //   {
-  //     role: "Full Stack Developer",
-  //     score: 7.9,
-  //     status: "Passed",
-  //     date: "2024-03-03",
-  //     skills: {
-  //       technical: 8.0,
-  //       problemSolving: 7.5,
-  //       codeQuality: 7.2,
-  //       communication: 8.5,
-  //     },
-  //   },
-  //   {
-  //     role: "Data Analyst",
-  //     score: 7.1,
-  //     status: "Passed",
-  //     date: "2024-03-02",
-  //     skills: {
-  //       technical: 7.5,
-  //       problemSolving: 7.0,
-  //       codeQuality: 6.5,
-  //       communication: 7.5,
-  //     },
-  //   },
-  // ];
+  const recentInterviews = [
+    {
+      role: "React Developer",
+      score: 8.5,
+      status: "Passed",
+      date: "2024-03-05",
+      skills: {
+        technical: 8.5,
+        problemSolving: 8.0,
+        codeQuality: 7.5,
+        communication: 9.0,
+      },
+    },
+    {
+      role: "Python Backend Developer",
+      score: 6.3,
+      status: "Failed",
+      date: "2024-03-04",
+      skills: {
+        technical: 7.0,
+        problemSolving: 6.5,
+        codeQuality: 5.0,
+        communication: 6.8,
+      },
+    },
+    {
+      role: "Full Stack Developer",
+      score: 7.9,
+      status: "Passed",
+      date: "2024-03-03",
+      skills: {
+        technical: 8.0,
+        problemSolving: 7.5,
+        codeQuality: 7.2,
+        communication: 8.5,
+      },
+    },
+    {
+      role: "Data Analyst",
+      score: 7.1,
+      status: "Passed",
+      date: "2024-03-02",
+      skills: {
+        technical: 7.5,
+        problemSolving: 7.0,
+        codeQuality: 6.5,
+        communication: 7.5,
+      },
+    },
+  ];
 
   // Helper function to render spider chart (simplified with CSS)
   const renderSkillChart = () => {
     const skills = [
-      { name: "Technical Knowledge", score: skillScores?.technical, color: "bg-blue-500" },
+      { name: "Technical Knowledge", score: skillScores.technical, color: "bg-blue-500" },
       {
         name: "Problem Solving",
-        score: skillScores?.problemSolving,
+        score: skillScores.problemSolving,
         color: "bg-purple-500",
       },
       {
         name: "Code Quality",
-        score: skillScores?.codeQuality,
+        score: skillScores.codeQuality,
         color: "bg-orange-500",
       },
       {
         name: "Communication",
-        score: skillScores?.communication,
+        score: skillScores.communication,
         color: "bg-green-500",
       },
     ];
@@ -247,7 +245,7 @@ function UserAnalyticsContent() {
                 <div
                   key={index}
                   className={`h-2.5 flex-1 rounded-sm ${
-                    index < Math.round(skill.score != undefined ?skill.score : 0)
+                    index < Math.round(skill.score)
                       ? skill.color
                       : "bg-muted"
                   }`}
@@ -311,7 +309,7 @@ function UserAnalyticsContent() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics?.totalInterviews}</div>
+            <div className="text-2xl font-bold">{metrics.totalInterviews}</div>
             <p className="text-xs text-muted-foreground">
               Total AI mock interviews completed
             </p>
@@ -377,7 +375,7 @@ function UserAnalyticsContent() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {metrics?.averageScore}/10
+              {metrics.averageScore}/10
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               Average rating across all interviews
@@ -391,9 +389,9 @@ function UserAnalyticsContent() {
             <Flame className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics?.currentStreak} days</div>
+            <div className="text-2xl font-bold">{metrics.currentStreak} days</div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Longest: {metrics?.longestStreak} days
+              Longest: {metrics.longestStreak} days
             </p>
           </CardContent>
         </Card>
@@ -740,7 +738,7 @@ function UserAnalyticsContent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentInterviews != undefined && recentInterviews.slice(0, 4).map((item, index) => (
+              {recentInterviews.slice(0, 4).map((item, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -782,7 +780,7 @@ function UserAnalyticsContent() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {dailyActivity != undefined && dailyActivity.map((activity, index) => (
+            {dailyActivity.map((activity, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between p-3 border rounded-lg"

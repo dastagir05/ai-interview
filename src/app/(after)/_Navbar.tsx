@@ -29,9 +29,9 @@ const navLinks = [
 const navLinks1 = [
   { name: "Dashboard", href: "/dashboard", Icon: SpeechIcon },
   { name: "Personal Jobs", href: "/personalJob", Icon: BookOpenIcon },
-  { name: "Resume", href: "resume", Icon: FileSlidersIcon },
-  { name: "Analytics", href: "analytics", Icon: BarChart3Icon },
-  { name: "User", href: "user", Icon: UserIcon },
+  { name: "Resume", href: "/resume", Icon: FileSlidersIcon },
+  { name: "Analytics", href: "/analytics", Icon: BarChart3Icon },
+  { name: "User", href: "/user", Icon: UserIcon },
 ];
 
 export function Navbar({

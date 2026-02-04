@@ -20,7 +20,7 @@ import { cookies } from "next/headers";
 
 const options = [
   {
-    label: "Aptitude Practice",
+    label: "Quick Quiz",
     description:
       "Sharpen your problem-solving skills with tailored aptitude tests.",
     href: "aptitude",
