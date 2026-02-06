@@ -45,8 +45,8 @@ export async function POST(req: Request) {
       );
     }
     
-    const question = await res.text();
-    return NextResponse.json({ question }, { status: 200 });
+    const aiResponse = await res.json();
+    return NextResponse.json(aiResponse , { status: 200 });
     
   } catch (error) {
     console.error('Error in generateTechnicalQuestion route:', error);

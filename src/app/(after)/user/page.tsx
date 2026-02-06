@@ -448,11 +448,24 @@ function UserSettingsContent() {
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="profile">
+          <TabsTrigger value="profile"
+           className="
+           mr-2
+           data-[state=active]:bg-background
+           data-[state=active]:text-foreground
+           data-[state=active]:shadow-sm
+         "
+          >
             <User className="h-4 w-4 mr-2" />
             Profile & Security
           </TabsTrigger>
-          <TabsTrigger value="subscription">
+          <TabsTrigger value="subscription"
+           className="
+           data-[state=active]:bg-background
+           data-[state=active]:text-foreground
+           data-[state=active]:shadow-sm
+         "
+          >
             <Crown className="h-4 w-4 mr-2" />
             Subscription
           </TabsTrigger>

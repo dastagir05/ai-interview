@@ -16,14 +16,15 @@ import { useState } from "react";
 import { errorToast } from "@/lib/errorToast";
 import { PersonalJobDetails } from "@/data/type/job";
 import { QuestionDifficulty, questionDifficulties } from "@/data/type/question";
+import { CodeEditor } from "@/components/CodeEditor";
 
 type Status = "awaiting-answer" | "awaiting-difficulty" | "init";
+
 export type GeneratedQuestion = {
   question: string;      
-  correctIndex?: number; 
-  difficulty?: string;
+  questionType: string;
+  language: string;
 };
-
 
 export function NewQuestionClientPage({
   jobInfo,
@@ -35,6 +36,7 @@ export function NewQuestionClientPage({
   const [question, setQuestion] = useState<string>("");
   const [feedback, setFeedback] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [language, setLanguage] = useState("java");
 
   // Generate question
   const handleGenerateQuestion = async (difficulty: QuestionDifficulty) => {
@@ -54,7 +56,9 @@ export function NewQuestionClientPage({
       if (!res.ok) throw new Error("Failed to generate question");
 
       const text : GeneratedQuestion= await res.json();
-      console.log("text res of gene ques in page.tsx", text)
+      setLanguage(text.language)
+      console.log("text res of gene ques in page.tsx", text, text.question)
+      console.log("text res ", text.language, text.questionType)
       setQuestion(text.question);
       setStatus("awaiting-answer");
     } catch (err: any) {
@@ -112,7 +116,7 @@ export function NewQuestionClientPage({
             setAnswer("");
           }}
           generateQuestion={handleGenerateQuestion}
-  generateFeedback={handleSubmitAnswer}
+          generateFeedback={handleSubmitAnswer}
         />
         <div className="flex md:block" />
       </div>
@@ -123,6 +127,7 @@ export function NewQuestionClientPage({
         answer={answer}
         status={status}
         setAnswer={setAnswer}
+        language={language}
       />
     </div>
   );
@@ -135,13 +140,16 @@ function QuestionContainer({
   answer,
   status,
   setAnswer,
-}: {
+  language,
+}:{
   question: string | null;
   feedback: string | null;
   answer: string;
   status: Status;
+  language: string;
   setAnswer: (value: string) => void;
-}) {
+})
+{
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow border-t">
       <ResizablePanel defaultSize={50} minSize={5}>
@@ -179,13 +187,19 @@ function QuestionContainer({
       <ResizableHandle withHandle />
 
       <ResizablePanel defaultSize={50} minSize={5}>
-        <Textarea
+      <CodeEditor
+        value={answer}
+        onChange={setAnswer}
+        language={language}
+        readOnly={status !== "awaiting-answer"}
+      />
+        {/* <Textarea
           disabled={status !== "awaiting-answer"}
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           placeholder="Type your answer here..."
           className="w-full h-full resize-none border-none rounded-none focus-visible:ring focus-visible:ring-inset !text-base p-6"
-        />
+        /> */}
       </ResizablePanel>
     </ResizablePanelGroup>
   );
@@ -220,7 +234,8 @@ function Controls({
             onClick={generateFeedback}
             disabled={disableAnswerButton}
           >
-            <LoadingSwap isLoading={isLoading}>Answer</LoadingSwap>
+            {/* <LoadingSwap isLoading={isLoading}>Answer</LoadingSwap> */}
+            Answer
           </Button>
         </>
       ) : (
