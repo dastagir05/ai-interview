@@ -1,116 +1,121 @@
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Link from "next/link";
-import { PublicJobDetails } from "@/data/type/job";
-import { PublicJobInfoForm } from "@/features/admin/CreatePublicJob";
-import { PracticeJobAction } from "./PracticeJobAction";
-import { cookies } from "next/headers";
+"use client";
 
-export default async function Dashboard() {
-  
-  let jobInfos: PublicJobDetails[] = [];
-  try {
-    jobInfos = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/publicJobs/getAllForUser`, {
-      headers: {
-        Cookie: (await cookies()).toString(),
-      },
-    }).then((res) => res.json());
-    // console.log("jobInfos", jobInfos)
-  } catch (error) {
-    // toast.error("Failed to load job descriptions");
-    console.log("fail to fetch job", error)
-    return null;
-  }
-  if (jobInfos.length === 0) {
-    return <NoJobInfos />;
+import { useState } from "react";
+import { DashboardHeader } from "@/features/dashboard/components/DashHeader";
+import { JobSection } from "@/features/dashboard/components/JobSection";
+import { EmptyState } from "@/features/dashboard/components/EmptyState";
+import { useDashboardJobs } from "@/features/dashboard/components/useDashboardJobs";
+import { filterJobs } from "@/features/dashboard/components/filterJobs";
+import { Code, TrendingUp, Briefcase, Layers } from "lucide-react";
+
+export default function DashboardPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
+  const { data: jobs = [], isLoading } = useDashboardJobs();
+
+  const filteredJobs = filterJobs(jobs, searchQuery, activeFilters);
+
+  // Define sections with their filters
+  const sections = [
+    {
+      title: "Continue Practicing",
+      icon: TrendingUp,
+      jobs: filteredJobs.filter(j => j.progress > 0),
+    },
+    {
+      title: "Java Interviews - Senior",
+      icon: Code,
+      jobs: filteredJobs.filter(j => j.subCategory === "JAVA" && j.level === "SENIOR"),
+    },
+    {
+      title: "Java Interviews - Junior",
+      icon: Code,
+      jobs: filteredJobs.filter(j => j.subCategory === "JAVA" && j.level === "JUNIOR"),
+    },
+    {
+      title: "Python Interviews - Senior",
+      icon: Code,
+      jobs: filteredJobs.filter(j => j.subCategory === "PYTHON" && j.level === "SENIOR"),
+    },
+    {
+      title: "Python Interviews - Junior",
+      icon: Code,
+      jobs: filteredJobs.filter(j => j.subCategory === "PYTHON" && j.level === "JUNIOR"),
+    },
+    {
+      title: "JavaScript Interviews - Senior",
+      icon: Code,
+      jobs: filteredJobs.filter(j => j.subCategory === "JAVASCRIPT" && j.level === "SENIOR"),
+    },
+    {
+      title: "JavaScript Interviews - Junior",
+      icon: Code,
+      jobs: filteredJobs.filter(j => j.subCategory === "JAVASCRIPT" && j.level === "JUNIOR"),
+    },
+    {
+      title: "Spring Boot Practice",
+      icon: Briefcase,
+      jobs: filteredJobs.filter(j => j.subCategory === "SPRING_BOOT"),
+    },
+    {
+      title: "MERN Stack Practice",
+      icon: Layers,
+      jobs: filteredJobs.filter(j => j.subCategory === "MERN"),
+    },
+    {
+      title: "System Design - Senior",
+      icon: Briefcase,
+      jobs: filteredJobs.filter(j => j.category === "SYSTEM_DESIGN" && j.level === "SENIOR"),
+    },
+    {
+      title: "System Design - Junior",
+      icon: Briefcase,
+      jobs: filteredJobs.filter(j => j.category === "SYSTEM_DESIGN" && j.level === "JUNIOR"),
+    },
+  ];
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setActiveFilters([]);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading interviews...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container my-4">
-      <div className="flex gap-2 justify-between mb-6 mt-8">
-        <h1 className="text-3xl md:text-4xl lg:text-4xl font-bold">
-          Select a job description
-        </h1>
+    <div className="min-h-screen bg-background">
+      <DashboardHeader
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        activeFilters={activeFilters}
+        setActiveFilters={setActiveFilters}
+      />
+
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {filteredJobs.length === 0 ? (
+          <EmptyState onClearFilters={handleClearFilters} />
+        ) : (
+          <div className="space-y-10">
+            {sections.map((section, index) => (
+              <JobSection
+                key={index}
+                title={section.title}
+                jobs={section.jobs}
+                icon={section.icon}
+              />
+            ))}
+          </div>
+        )}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 has-hover:*:not-hover:opacity-70">
-        {jobInfos.map((jobInfo) => (
-          <Link
-            className="hover:scale-[1.02] transition-[transform_opacity]"
-            href={`/personalJob`}
-            key={jobInfo.id}
-          >
-            <Card className="h-full">
-              <div className="flex items-center justify-between h-full">
-                <div className="space-y-4 h-full">
-                  <img src={jobInfo.imgUrl} alt={jobInfo.title} width={100} height={100} />
-                  <CardHeader>
-                    <CardTitle className="text-lg">{jobInfo.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-muted-foreground line-clamp-3">
-                    {jobInfo.description}
-                  </CardContent>
-                  <CardFooter className="flex gap-2">
-                    <Badge variant="outline">{jobInfo.experienceLevel}</Badge>
-                    <Badge variant="outline">{jobInfo.category}</Badge>
-                    {jobInfo.skillsRequired?.map((skill, index) => (
-                    <Badge key={index} variant="outline">
-                      {skill}
-                    </Badge>
-                  ))}
-                  </CardFooter>
-                </div>
-                <CardContent>
-                <PracticeJobAction
-                  practiceJobId={jobInfo.id}
-                  started={jobInfo.started}
-                  personalJobId={jobInfo.personalJobId}
-                />
-              </CardContent>
-
-              </div>
-            </Card>
-          </Link>
-        ))}
-
-      </div>
-    </div>
-  );
-}
-
-function NoJobInfos() {
-  return (
-    <div className="container my-4 max-w-5xl">
-      <h1 className="text-3xl md:text-4xl lg:text-5xl mb-4">
-        Welcome to IPrepWithAI 
-      </h1>
-      <p className="text-muted-foreground mb-8">
-        To get started, enter information about the type of job you are wanting
-        to apply for. This can be specific information copied directly from a
-        job listing or general information such as the tech stack you want to
-        work in. The more specific you are in the description the closer the
-        test interviews will be to the real thing.
-      </p>
-      <Card>
-        <CardContent>
-          <PublicJobInfoForm
-            jobInfo={{
-              title: "",
-              description: "",
-              category:"PROGRAMING",
-              imgUrl: "",
-              experienceLevel: "JUNIOR",
-              skillsRequired: [],
-              name: "",
-            }}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 }

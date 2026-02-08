@@ -25,11 +25,23 @@ export interface PersonalJobDetails {
   updatedAt: string;
 }
 
-export enum JobLevel {
-  JUNIOR = "JUNIOR",
-  MID_LEVEL = "MID_LEVEL",
-  SENIOR = "SENIOR"
+export type JobCategory = "PROGRAMMING" | "SYSTEM_DESIGN" | "FRAMEWORK";
+
+export interface Job {
+  id: string;
+  title: string;
+  logo: string;
+  tech: string[];
+  time: number;
+  level: ExperienceLevel;
+  category: JobCategory;
+  subCategory: string;
+  progress: number;
+  description: string;
+  started: boolean;
+  personalJobId: string | null;
 }
+
 export interface PublicJobDetails {
   id: string;
   title: string;
@@ -45,7 +57,7 @@ export interface PublicJobDetails {
   logo: string;
   tech: string[];
   estimatedTime: number;
-  level: JobLevel;
+  level: ExperienceLevel;
   subCategory: string;
   progress: number;
 }

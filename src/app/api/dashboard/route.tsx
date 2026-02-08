@@ -28,6 +28,5 @@ export async function GET(
   }
 
   const data = await res.json();
-  console.log("dash ", data)
   return NextResponse.json(data);
 }
