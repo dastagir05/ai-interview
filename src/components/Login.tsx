@@ -218,74 +218,77 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
   if (!openDialog) return null;
 
   return (
-    <div className="fixed h-screen inset-0 z-50 flex items-center justify-center text-black bg-white/30 backdrop-blur-xs">
-      <div className="relative bg-white rounded-lg shadow-md p-6 w-[90%] max-w-sm">
+    <div className="fixed h-screen inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="relative bg-card text-card-foreground rounded-xl shadow-2xl p-8 w-[90%] max-w-md border border-border">
         <button
           onClick={handleClose}
-          className="absolute top-2 right-3 text-black text-xl font-bold w-6 h-6 rounded"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground text-2xl font-bold w-8 h-8 rounded-lg hover:bg-muted transition-colors flex items-center justify-center"
+          aria-label="Close"
         >
           ×
         </button>
 
         {mode === "initial" && (
           <>
-            <h2 className="text-4xl font-bold mb-8 py-2 text-center">
+            <h2 className="text-3xl font-bold mb-8 text-center text-foreground">
               Welcome to IPrepWithAI
             </h2>
 
-            <button
-              onClick={() => {
-                window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/google`;
-              }}
-              className="flex items-center justify-center w-full border rounded px-4 py-2 hover:bg-gray-100"
-            >
-              <img
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-                alt="Google"
-                className="w-5 h-5 mr-2"
-              />
-              Continue with Google
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/google`;
+                }}
+                className="flex items-center justify-center w-full border border-border bg-background hover:bg-muted rounded-lg px-4 py-3 transition-colors text-foreground font-medium"
+              >
+                <img
+                  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                  alt="Google"
+                  className="w-5 h-5 mr-3"
+                />
+                Continue with Google
+              </button>
 
-            <div className="flex items-center my-2">
-              <div className="flex-grow h-px bg-gray-300" />
-              <span className="mx-2 text-gray-500">Or</span>
-              <div className="flex-grow h-px bg-gray-300" />
+              <div className="flex items-center my-4">
+                <div className="flex-grow h-px bg-border" />
+                <span className="mx-3 text-muted-foreground text-sm">Or</span>
+                <div className="flex-grow h-px bg-border" />
+              </div>
+
+              <button
+                onClick={() => {
+                  window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/github`;
+                }}
+                className="flex items-center justify-center w-full border border-border bg-background hover:bg-muted rounded-lg px-4 py-3 transition-colors text-foreground font-medium"
+              >
+                <img
+                  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                  alt="GitHub"
+                  className="w-5 h-5 mr-3 dark:invert"
+                />
+                Continue with GitHub
+              </button>
+
+              <button
+                onClick={() => setMode("email-input")}
+                className="flex items-center justify-center w-full border-2 border-primary bg-primary/5 hover:bg-primary/10 text-primary rounded-lg px-4 py-3 transition-colors font-medium"
+              >
+                <Mail className="w-5 h-5 mr-3" />
+                Continue with Email
+              </button>
             </div>
 
-            <button
-              onClick={() => {
-                window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/github`;
-              }}
-              className="flex items-center justify-center w-full border rounded px-4 py-2 mb-3 hover:bg-gray-100"
-            >
-              <img
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
-                alt="GitHub"
-                className="w-5 h-5 mr-2"
-              />
-              Continue with GitHub
-            </button>
-
-            <button
-              onClick={() => setMode("email-input")}
-              className="flex items-center justify-center w-full border border-blue-500 text-blue-600 rounded px-4 py-2 hover:bg-blue-50"
-            >
-              <Mail className="w-5 h-5 mr-2" />
-              Continue with Email
-            </button>
-
-            <p className="text-xs text-gray-500 mt-4 text-center">
+            <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
               By proceeding, I agree to{" "}
-              <a href="#" className="text-blue-600 underline">
-                T&C
+              <a href="#" className="text-primary hover:underline">
+                Terms & Conditions
               </a>
               ,{" "}
-              <a href="#" className="text-blue-600 underline">
+              <a href="#" className="text-primary hover:underline">
                 Privacy Policy
               </a>{" "}
               &{" "}
-              <a href="#" className="text-blue-600 underline">
+              <a href="#" className="text-primary hover:underline">
                 Tariff Rates
               </a>
             </p>
@@ -296,36 +299,36 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
           <>
             <button
               onClick={() => setMode("initial")}
-              className="flex items-center text-gray-600 mb-4 hover:text-gray-800"
+              className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors group"
             >
-              <ArrowLeft className="w-4 h-4 mr-1" />
+              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               Back
             </button>
 
-            <h2 className="text-2xl font-bold mb-2">Sign in with Email</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              We'll send you a code to verify your email
+            <h2 className="text-2xl font-bold mb-2 text-foreground">Sign in with Email</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              We'll send you a verification code to your email
             </p>
 
-            <form onSubmit={handleEmailSubmit}>
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full border rounded px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 required
                 disabled={isLoading}
               />
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
+                <div className="p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-lg text-sm">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded text-sm">
+                <div className="p-3 bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 rounded-lg text-sm">
                   {success}
                 </div>
               )}
@@ -333,15 +336,15 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded flex items-center justify-center disabled:bg-gray-400"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Sending...
                   </>
                 ) : (
-                  "Send Code"
+                  "Send Verification Code"
                 )}
               </button>
             </form>
@@ -355,23 +358,23 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
                 setIsNewUser(false);
                 setName("");
               }}
-              className="flex items-center text-gray-600 mb-4 hover:text-gray-800"
+              className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors group"
             >
-              <ArrowLeft className="w-4 h-4 mr-1" />
+              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               Back
             </button>
 
-            <h2 className="text-2xl font-bold mb-2">Create Account</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              Looks like you're new! Let's set up your account
+            <h2 className="text-2xl font-bold mb-2 text-foreground">Create Your Account</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Welcome! Let's get you set up in seconds
             </p>
 
-            <form onSubmit={handleRegistrationSubmit}>
+            <form onSubmit={handleRegistrationSubmit} className="space-y-4">
               <input
                 type="email"
                 value={email}
                 readOnly
-                className="w-full border rounded px-4 py-2 mb-3 bg-gray-100"
+                className="w-full bg-muted border border-border rounded-lg px-4 py-3 text-muted-foreground cursor-not-allowed"
               />
 
               <input
@@ -379,19 +382,19 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Full Name"
-                className="w-full border rounded px-4 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 required
                 disabled={isLoading}
               />
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
+                <div className="p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-lg text-sm">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded text-sm">
+                <div className="p-3 bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 rounded-lg text-sm">
                   {success}
                 </div>
               )}
@@ -399,11 +402,11 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded flex items-center justify-center disabled:bg-gray-400"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Creating Account...
                   </>
                 ) : (
@@ -418,18 +421,18 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
           <>
             <button
               onClick={() => setMode("email-input")}
-              className="flex items-center text-gray-600 mb-4 hover:text-gray-800"
+              className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors group"
             >
-              <ArrowLeft className="w-4 h-4 mr-1" />
+              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               Back
             </button>
 
-            <h2 className="text-2xl font-bold mb-2">Enter Verification Code</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              We sent a 6-digit code to <strong>{email}</strong>
+            <h2 className="text-2xl font-bold mb-2 text-foreground">Enter Verification Code</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              We sent a 6-digit code to <strong className="text-foreground">{email}</strong>
             </p>
 
-            <form onSubmit={handleOtpSubmit}>
+            <form onSubmit={handleOtpSubmit} className="space-y-4">
               <input
                 type="text"
                 value={otp}
@@ -438,20 +441,20 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
                   if (value.length <= 6) setOtp(value);
                 }}
                 placeholder="000000"
-                className="w-full border rounded px-4 py-3 mb-4 text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-background border border-border rounded-lg px-4 py-4 text-center text-3xl tracking-[0.5em] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-mono"
                 maxLength={6}
                 required
                 disabled={isLoading}
               />
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
+                <div className="p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-lg text-sm">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded text-sm">
+                <div className="p-3 bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 rounded-lg text-sm">
                   {success}
                 </div>
               )}
@@ -459,28 +462,28 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
               <button
                 type="submit"
                 disabled={isLoading || otp.length !== 6}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded flex items-center justify-center disabled:bg-gray-400 mb-4"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Verifying...
                   </>
                 ) : (
-                  "Verify Code"
+                  "Verify & Continue"
                 )}
               </button>
 
-              <div className="text-center">
+              <div className="text-center pt-2">
                 {timer > 0 ? (
-                  <p className="text-sm text-gray-600">
-                    Resend code in {timer}s
+                  <p className="text-sm text-muted-foreground">
+                    Resend code in <span className="font-semibold text-foreground">{timer}s</span>
                   </p>
                 ) : (
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    className="text-sm text-blue-600 hover:underline"
+                    className="text-sm text-primary hover:underline font-medium"
                     disabled={isLoading}
                   >
                     Resend Code

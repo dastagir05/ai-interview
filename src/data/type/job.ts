@@ -24,6 +24,12 @@ export interface PersonalJobDetails {
   createdAt: string;
   updatedAt: string;
 }
+
+export enum JobLevel {
+  JUNIOR = "JUNIOR",
+  MID_LEVEL = "MID_LEVEL",
+  SENIOR = "SENIOR"
+}
 export interface PublicJobDetails {
   id: string;
   title: string;
@@ -35,6 +41,13 @@ export interface PublicJobDetails {
   createdAt: string;
   started: boolean;
   personalJobId: string | null;
+  company: string;
+  logo: string;
+  tech: string[];
+  estimatedTime: number;
+  level: JobLevel;
+  subCategory: string;
+  progress: number;
 }
 
 export interface CreateQuestion {

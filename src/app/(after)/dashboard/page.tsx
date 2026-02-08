@@ -12,7 +12,7 @@ import { PublicJobInfoForm } from "@/features/admin/CreatePublicJob";
 import { PracticeJobAction } from "./PracticeJobAction";
 import { cookies } from "next/headers";
 
-export default async function JobInfos() {
+export default async function Dashboard() {
   
   let jobInfos: PublicJobDetails[] = [];
   try {
@@ -87,7 +87,7 @@ function NoJobInfos() {
   return (
     <div className="container my-4 max-w-5xl">
       <h1 className="text-3xl md:text-4xl lg:text-5xl mb-4">
-        Welcome to IPrepareWithAI 
+        Welcome to IPrepWithAI 
       </h1>
       <p className="text-muted-foreground mb-8">
         To get started, enter information about the type of job you are wanting
@@ -114,64 +114,3 @@ function NoJobInfos() {
     </div>
   );
 }
-
-
-// "use client";
-
-// import { useEffect, useState } from "react";
-
-// type PracticeJob = {
-//   id: string;
-//   title: string;
-//   category: string;
-//   description: string;
-//   enabled: boolean;
-// };
-
-// export default function AdminPracticeJobsPage() {
-//   const [jobs, setJobs] = useState<PracticeJob[]>([]);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     fetch("/api/admin/publicJobs")
-//       .then(setJobs)
-//       .finally(() => setLoading(false));
-//   }, []);
-
-//   if (loading) return <p>Loading...</p>;
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold mb-4">Practice Jobs</h1>
-
-//       <a
-//         href="/admin/practice-jobs/create"
-//         className="bg-black text-white px-4 py-2 rounded"
-//       >
-//         + Create Job
-//       </a>
-
-//       <div className="mt-6 space-y-4">
-//         {jobs.map((job) => (
-//           <div
-//             key={job.id}
-//             className="border p-4 rounded flex justify-between"
-//           >
-//             <div>
-//               <h2 className="font-semibold">{job.title}</h2>
-//               <p className="text-sm text-gray-600">{job.description}</p>
-//             </div>
-
-//             <span
-//               className={`px-3 py-1 rounded text-sm ${
-//                 job.enabled ? "bg-green-200" : "bg-red-200"
-//               }`}
-//             >
-//               {job.enabled ? "ENABLED" : "DISABLED"}
-//             </span>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }

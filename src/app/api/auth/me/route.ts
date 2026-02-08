@@ -6,8 +6,6 @@ export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   let token = cookieStore.get("authToken")?.value;
  
-  // console.log("token in api/auth/me", token)
-
   if (!token) {
     return NextResponse.json({ user: null }, { status: 401 });
   }

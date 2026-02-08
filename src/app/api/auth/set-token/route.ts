@@ -4,13 +4,11 @@ import { cookies } from "next/headers";
 export async function POST(req: NextRequest) {
   try {
     const { token } = await req.json();
-    // console.log("token in settoken", token)
 
     if (!token) {
       return NextResponse.json({ success: false }, { status: 400 });
     }
 
-    // Set httpOnly cookie
     const cookieStore = await cookies();
     cookieStore.set("authToken", token, {
       httpOnly: true,
