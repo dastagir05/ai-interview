@@ -5,50 +5,47 @@ export function filterJobs(
   searchQuery: string,
   activeFilters: string[]
 ): Job[] {
-  let filtered = [...jobs];
+  return jobs.filter((job) => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        job.title?.toLowerCase().includes(q) ||
+        job.subCategory?.toLowerCase().includes(q) ||
+        job.tech?.some((t) => t.toLowerCase().includes(q));
 
-  // Search filter
-  if (searchQuery) {
-    const query = searchQuery.toLowerCase();
-    filtered = filtered.filter(
-      (job) =>
-        job.title.toLowerCase().includes(query) ||
-        job.tech.some((t) => t.toLowerCase().includes(query)) ||
-        job.subCategory.toLowerCase().includes(query)
-    );
-  }
+      if (!matchesSearch) return false;
+    }
 
-  // Active filters
-  if (activeFilters.length > 0) {
-    filtered = filtered.filter((job) => {
-      return activeFilters.every((filter) => {
-        switch (filter) {
-          case "Junior":
-            return job.level === "JUNIOR";
-          case "Senior":
-            return job.level === "SENIOR";
-          case "Programming":
-            return job.category === "PROGRAMMING";
-          case "Framework":
-            return job.category === "FRAMEWORK";
-          case "System Design":
-            return job.category === "SYSTEM_DESIGN";
-          case "Java":
-            return job.subCategory === "JAVA";
-          case "Python":
-            return job.subCategory === "PYTHON";
-          case "JavaScript":
-            return job.subCategory === "JAVASCRIPT";
-          case "Spring Boot":
-            return job.subCategory === "SPRING_BOOT";
-          case "MERN":
-            return job.subCategory === "MERN";
-          default:
-            return true;
+    if (activeFilters.length > 0) {
+      const matchesAll = activeFilters.every((filter) => {
+        const f = filter.toLowerCase();
+
+        if (f === "junior" || f === "senior") {
+          return job.level?.toLowerCase() === f;
         }
-      });
-    });
-  }
 
-  return filtered;
+        if (["programming", "framework", "system design"].includes(f)) {
+          return (
+            job.category
+              ?.toLowerCase()
+              .replace("_", " ") === f
+          );
+        }
+
+        if (job.subCategory?.toLowerCase() === f.replace(" ", "_")) {
+          return true;
+        }
+
+        if (job.tech?.some((t) => t.toLowerCase() === f)) {
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!matchesAll) return false;
+    }
+
+    return true;
+  });
 }

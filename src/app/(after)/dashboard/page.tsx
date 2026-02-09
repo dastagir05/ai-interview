@@ -1,79 +1,95 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DashboardHeader } from "@/features/dashboard/components/DashHeader";
 import { JobSection } from "@/features/dashboard/components/JobSection";
 import { EmptyState } from "@/features/dashboard/components/EmptyState";
 import { useDashboardJobs } from "@/features/dashboard/components/useDashboardJobs";
 import { filterJobs } from "@/features/dashboard/components/filterJobs";
-import { Code, TrendingUp, Briefcase, Layers } from "lucide-react";
+import {
+  Code,
+  TrendingUp,
+  Briefcase,
+  Layers,
+  LucideIcon,
+} from "lucide-react";
+import { Job } from "@/data/type/job";
+import { LANGUAGE_SECTIONS, LABEL_MAP} from "@/data/type/dashboard"
+
+export type Section = {
+  title: string;
+  icon: LucideIcon;
+  jobs: Job[];
+};
 
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
-  const { data: jobs = [], isLoading } = useDashboardJobs();
+  const { data: jobs = [], isLoading, isError } = useDashboardJobs();
 
-  const filteredJobs = filterJobs(jobs, searchQuery, activeFilters);
+  const filteredJobs = useMemo(
+    () => filterJobs(jobs, searchQuery, activeFilters),
+    [jobs, searchQuery, activeFilters]
+  );
 
-  // Define sections with their filters
-  const sections = [
-    {
+  const sections: Section[] = [];
+
+  const continueJobs = filteredJobs.filter((j) => j.progress > 0);
+  if (continueJobs.length > 0) {
+    sections.push({
       title: "Continue Practicing",
       icon: TrendingUp,
-      jobs: filteredJobs.filter(j => j.progress > 0),
-    },
-    {
-      title: "Java Interviews - Senior",
-      icon: Code,
-      jobs: filteredJobs.filter(j => j.subCategory === "JAVA" && j.level === "SENIOR"),
-    },
-    {
-      title: "Java Interviews - Junior",
-      icon: Code,
-      jobs: filteredJobs.filter(j => j.subCategory === "JAVA" && j.level === "JUNIOR"),
-    },
-    {
-      title: "Python Interviews - Senior",
-      icon: Code,
-      jobs: filteredJobs.filter(j => j.subCategory === "PYTHON" && j.level === "SENIOR"),
-    },
-    {
-      title: "Python Interviews - Junior",
-      icon: Code,
-      jobs: filteredJobs.filter(j => j.subCategory === "PYTHON" && j.level === "JUNIOR"),
-    },
-    {
-      title: "JavaScript Interviews - Senior",
-      icon: Code,
-      jobs: filteredJobs.filter(j => j.subCategory === "JAVASCRIPT" && j.level === "SENIOR"),
-    },
-    {
-      title: "JavaScript Interviews - Junior",
-      icon: Code,
-      jobs: filteredJobs.filter(j => j.subCategory === "JAVASCRIPT" && j.level === "JUNIOR"),
-    },
-    {
+      jobs: continueJobs,
+    });
+  }
+
+  LANGUAGE_SECTIONS.forEach((lang) => {
+    const langJobs = filteredJobs.filter(
+      (j) => j.subCategory === lang
+    );
+
+    if (langJobs.length > 0) {
+      sections.push({
+        title: `${LABEL_MAP[lang]} Interviews`,
+        icon: Code,
+        jobs: langJobs,
+      });
+    }
+  });
+
+  const springJobs = filteredJobs.filter(
+    (j) => j.subCategory === "SPRING_BOOT"
+  );
+  if (springJobs.length > 0) {
+    sections.push({
       title: "Spring Boot Practice",
       icon: Briefcase,
-      jobs: filteredJobs.filter(j => j.subCategory === "SPRING_BOOT"),
-    },
-    {
+      jobs: springJobs,
+    });
+  }
+
+  const mernJobs = filteredJobs.filter(
+    (j) => j.subCategory === "MERN"
+  );
+  if (mernJobs.length > 0) {
+    sections.push({
       title: "MERN Stack Practice",
       icon: Layers,
-      jobs: filteredJobs.filter(j => j.subCategory === "MERN"),
-    },
-    {
-      title: "System Design - Senior",
+      jobs: mernJobs,
+    });
+  }
+
+  const systemDesignJobs = filteredJobs.filter(
+    (j) => j.category === "SYSTEM_DESIGN"
+  );
+  if (systemDesignJobs.length > 0) {
+    sections.push({
+      title: "System Design",
       icon: Briefcase,
-      jobs: filteredJobs.filter(j => j.category === "SYSTEM_DESIGN" && j.level === "SENIOR"),
-    },
-    {
-      title: "System Design - Junior",
-      icon: Briefcase,
-      jobs: filteredJobs.filter(j => j.category === "SYSTEM_DESIGN" && j.level === "JUNIOR"),
-    },
-  ];
+      jobs: systemDesignJobs,
+    });
+  }
 
   const handleClearFilters = () => {
     setSearchQuery("");
@@ -91,6 +107,14 @@ export default function DashboardPage() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-destructive">Failed to load jobs.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader
@@ -101,13 +125,13 @@ export default function DashboardPage() {
       />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {filteredJobs.length === 0 ? (
+        {sections.length === 0 ? (
           <EmptyState onClearFilters={handleClearFilters} />
         ) : (
           <div className="space-y-10">
-            {sections.map((section, index) => (
+            {sections.map((section) => (
               <JobSection
-                key={index}
+                key={section.title}
                 title={section.title}
                 jobs={section.jobs}
                 icon={section.icon}

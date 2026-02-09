@@ -44,5 +44,4 @@ yarn-error.log*
 next-env.d.ts
 
 /src/bin
-/src/lib
 /src/services
