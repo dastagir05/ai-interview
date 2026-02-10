@@ -46,6 +46,7 @@ export function JobCard({ job }: JobCardProps) {
   };
 
   const levelColors: Record<string, string> = {
+    INTERNSHIP:"bg-blue-500 hover:bg-blue-600",
     JUNIOR: "bg-green-500 hover:bg-green-600",
     SENIOR: "bg-orange-500 hover:bg-orange-600",
   };

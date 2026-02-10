@@ -75,7 +75,6 @@ function UserSettingsContent() {
   const [isEmailChangeDialogOpen, setIsEmailChangeDialogOpen] = useState(false);
   const [emailOtpSent, setEmailOtpSent] = useState(false);
 
-  // Form states
   const [profileForm, setProfileForm] = useState({
     name: "",
   });

@@ -1,3 +1,5 @@
+import { boolean } from "zod";
+
 export enum ExperienceLevel {
   JUNIOR = "JUNIOR",
   MID_LEVEL = "MID_LEVEL",
@@ -23,6 +25,10 @@ export interface PersonalJobDetails {
   questionCount: number;
   createdAt: string;
   updatedAt: string;
+  practiceJobId: string;
+  fromTemplate : boolean;
+  interviewSessionsCount: number;
+  lastActivityDate: string;
 }
 
 export type JobCategory = "PROGRAMMING" | "SYSTEM_DESIGN" | "FRAMEWORK";

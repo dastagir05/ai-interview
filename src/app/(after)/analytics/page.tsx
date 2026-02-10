@@ -33,6 +33,8 @@ import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRouteProps";
 import { useQuery } from "@tanstack/react-query";
 import { UserAnalytics } from "@/data/type/analytics";
+import { useAuth } from "@/lib/useAuth";
+
 export default function UserAnalyticsPage() {
   return (
     <ProtectedRoute>
@@ -42,8 +44,10 @@ export default function UserAnalyticsPage() {
 }
 
 function UserAnalyticsContent() {
-  // Mock data - user is on BASIC tier
-  const userTier : any = "FREE"; 
+  
+  const user = useAuth();
+  console.log("user in analy", user)
+  const userTier : any = user.user?.tier; 
   const timeRange = "30d";
 
   const { data: stats  } = useQuery<UserAnalytics>({
@@ -153,66 +157,6 @@ function UserAnalyticsContent() {
     },
   };
 
-  // const dailyActivity = [
-  //   { date: "2024-03-01", interviews: 2, avgScore: 7.0 },
-  //   { date: "2024-03-02", interviews: 1, avgScore: 6.5 },
-  //   { date: "2024-03-03", interviews: 3, avgScore: 7.8 },
-  //   { date: "2024-03-04", interviews: 2, avgScore: 8.1 },
-  //   { date: "2024-03-05", interviews: 1, avgScore: 7.2 },
-  // ];
-
-  // const recentInterviews = [
-  //   {
-  //     role: "React Developer",
-  //     score: 8.5,
-  //     status: "Passed",
-  //     date: "2024-03-05",
-  //     skills: {
-  //       technical: 8.5,
-  //       problemSolving: 8.0,
-  //       codeQuality: 7.5,
-  //       communication: 9.0,
-  //     },
-  //   },
-  //   {
-  //     role: "Python Backend Developer",
-  //     score: 6.3,
-  //     status: "Failed",
-  //     date: "2024-03-04",
-  //     skills: {
-  //       technical: 7.0,
-  //       problemSolving: 6.5,
-  //       codeQuality: 5.0,
-  //       communication: 6.8,
-  //     },
-  //   },
-  //   {
-  //     role: "Full Stack Developer",
-  //     score: 7.9,
-  //     status: "Passed",
-  //     date: "2024-03-03",
-  //     skills: {
-  //       technical: 8.0,
-  //       problemSolving: 7.5,
-  //       codeQuality: 7.2,
-  //       communication: 8.5,
-  //     },
-  //   },
-  //   {
-  //     role: "Data Analyst",
-  //     score: 7.1,
-  //     status: "Passed",
-  //     date: "2024-03-02",
-  //     skills: {
-  //       technical: 7.5,
-  //       problemSolving: 7.0,
-  //       codeQuality: 6.5,
-  //       communication: 7.5,
-  //     },
-  //   },
-  // ];
-
-  // Helper function to render spider chart (simplified with CSS)
   const renderSkillChart = () => {
     const skills = [
       { name: "Technical Knowledge", score: skillScores?.technical, color: "bg-blue-500" },
@@ -399,6 +343,108 @@ function UserAnalyticsContent() {
         </Card>
       </div>
 
+      {/* Score Distribution + Recent Interviews */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Score Distribution</CardTitle>
+            <CardDescription>
+              How your interview scores are distributed
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {/* Excellent (9-10) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-green-700">Excellent (9-10)</span>
+                  <span className="text-muted-foreground">3 interviews (12%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-green-600 h-2 rounded-full" style={{ width: "12%" }} />
+                </div>
+              </div>
+
+              {/* Good (7-8) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-blue-700">Good (7-8)</span>
+                  <span className="text-muted-foreground">11 interviews (46%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: "46%" }} />
+                </div>
+              </div>
+
+              {/* Fair (5-6) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-orange-700">Fair (5-6)</span>
+                  <span className="text-muted-foreground">7 interviews (29%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-orange-600 h-2 rounded-full" style={{ width: "29%" }} />
+                </div>
+              </div>
+
+              {/* Needs Work (0-4) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-red-700">Needs Work (0-4)</span>
+                  <span className="text-muted-foreground">3 interviews (13%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-red-600 h-2 rounded-full" style={{ width: "13%" }} />
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t">
+                <p className="text-xs text-muted-foreground text-center">
+                  💡 Most of your scores fall in the "Good" range. Keep practicing to reach "Excellent"!
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Interviews</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentInterviews != undefined && recentInterviews.slice(0, 4).map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">{item.role}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.date}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold">
+                      {item.score}/10
+                    </span>
+                    <Badge
+                      className={
+                        item.status === "Passed"
+                          ? "bg-green-100 text-green-700 hover:bg-green-100"
+                          : "bg-red-100 text-red-700 hover:bg-red-100"
+                      }
+                    >
+                      {item.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Skill Breakdown - Available for BASIC+ */}
       <Card>
         <CardHeader>
@@ -460,79 +506,6 @@ function UserAnalyticsContent() {
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Achievements */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5" />
-            Achievements
-          </CardTitle>
-          <p className="text-sm text-muted-foreground mt-1">
-            Unlock badges by reaching milestones
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {achievements.map((achievement) => (
-              <div
-                key={achievement.id}
-                className={`relative p-4 border rounded-lg transition-all ${
-                  achievement.unlocked
-                    ? "bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200"
-                    : "bg-muted/30 opacity-60"
-                }`}
-              >
-                <div className="flex flex-col items-center text-center space-y-2">
-                  <div
-                    className={`p-3 rounded-full ${
-                      achievement.unlocked
-                        ? "bg-yellow-100"
-                        : "bg-muted"
-                    }`}
-                  >
-                    <achievement.icon
-                      className={`h-6 w-6 ${
-                        achievement.unlocked
-                          ? "text-yellow-600"
-                          : "text-muted-foreground"
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{achievement.name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {achievement.description}
-                    </p>
-                    {!achievement.unlocked && achievement.progress && (
-                      <div className="mt-2">
-                        <div className="w-full bg-muted rounded-full h-1.5">
-                          <div
-                            className="bg-primary h-1.5 rounded-full"
-                            style={{
-                              width: `${
-                                (achievement.progress / achievement.total) * 100
-                              }%`,
-                            }}
-                          />
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {achievement.progress}/{achievement.total}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  {achievement.unlocked && (
-                    <Badge variant="secondary" className="text-xs">
-                      Unlocked
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
 
@@ -669,108 +642,6 @@ function UserAnalyticsContent() {
           )}
         </CardContent>
       </Card>
-
-      {/* Score Distribution + Recent Interviews */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Score Distribution</CardTitle>
-            <CardDescription>
-              How your interview scores are distributed
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {/* Excellent (9-10) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-green-700">Excellent (9-10)</span>
-                  <span className="text-muted-foreground">3 interviews (12%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: "12%" }} />
-                </div>
-              </div>
-
-              {/* Good (7-8) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-blue-700">Good (7-8)</span>
-                  <span className="text-muted-foreground">11 interviews (46%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: "46%" }} />
-                </div>
-              </div>
-
-              {/* Fair (5-6) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-orange-700">Fair (5-6)</span>
-                  <span className="text-muted-foreground">7 interviews (29%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-orange-600 h-2 rounded-full" style={{ width: "29%" }} />
-                </div>
-              </div>
-
-              {/* Needs Work (0-4) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-red-700">Needs Work (0-4)</span>
-                  <span className="text-muted-foreground">3 interviews (13%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-red-600 h-2 rounded-full" style={{ width: "13%" }} />
-                </div>
-              </div>
-
-              <div className="pt-3 mt-3 border-t">
-                <p className="text-xs text-muted-foreground text-center">
-                  💡 Most of your scores fall in the "Good" range. Keep practicing to reach "Excellent"!
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Interviews</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentInterviews != undefined && recentInterviews.slice(0, 4).map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">{item.role}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {item.date}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold">
-                      {item.score}/10
-                    </span>
-                    <Badge
-                      className={
-                        item.status === "Passed"
-                          ? "bg-green-100 text-green-700 hover:bg-green-100"
-                          : "bg-red-100 text-red-700 hover:bg-red-100"
-                      }
-                    >
-                      {item.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Daily Activity */}
       <Card>

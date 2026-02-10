@@ -70,7 +70,7 @@ export function DashboardHeader({
             <Badge
               key={filter}
               variant={isActive(filter) ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/90 transition-colors px-4 py-1.5"
+              className="cursor-pointer hover:bg-gray-700 hover:text-white transition-colors px-4 py-1.5"
               onClick={() => toggleFilter(filter)}
             >
               {filter}

@@ -8,6 +8,7 @@ interface User {
   email: string;
   name: string;
   role: string;
+  tier: string;
 }
 
 export function useAuth() {
@@ -35,5 +36,5 @@ export function useAuth() {
     router.push("/signin");
   };
 
-  return { user, isLoading, logout, isAdmin: user?.role === "ADMIN" };
+  return { user, isLoading, logout, isAdmin: user?.role === "ADMIN"  };
 }

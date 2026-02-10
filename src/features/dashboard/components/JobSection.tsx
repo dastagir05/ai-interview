@@ -39,16 +39,14 @@ export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
         </span>
       </div>
 
-      {/* Scrollable Job Cards */}
       <div className="relative group">
-        {/* Left Scroll Button */}
         <Button
           variant="ghost"
           size="icon"
           onClick={() => scroll("left")}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background shadow-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-6 w-6 " />
         </Button>
 
         {/* Cards Container */}

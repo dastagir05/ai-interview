@@ -11,15 +11,34 @@ import {
   TrendingUp,
   Briefcase,
   Layers,
+  Layout,
+  Server,
+  Coffee,
+  Box,
   LucideIcon,
 } from "lucide-react";
 import { Job } from "@/data/type/job";
-import { LANGUAGE_SECTIONS, LABEL_MAP} from "@/data/type/dashboard"
+import {
+  ROLE_SECTIONS,
+  SECTION_LABELS,
+  SUB_CATEGORY_TO_SECTION,
+} from "@/data/type/dashboard";
 
 export type Section = {
   title: string;
   icon: LucideIcon;
   jobs: Job[];
+};
+
+// Icon mapping
+const ICON_MAP: Record<string, LucideIcon> = {
+  layout: Layout,
+  server: Server,
+  coffee: Coffee,
+  code: Code,
+  box: Box,
+  layers: Layers,
+  briefcase: Briefcase,
 };
 
 export default function DashboardPage() {
@@ -33,63 +52,35 @@ export default function DashboardPage() {
     [jobs, searchQuery, activeFilters]
   );
 
-  const sections: Section[] = [];
+  const sections: Section[] = useMemo(() => {
+    const result: Section[] = [];
 
-  const continueJobs = filteredJobs.filter((j) => j.progress > 0);
-  if (continueJobs.length > 0) {
-    sections.push({
-      title: "Continue Practicing",
-      icon: TrendingUp,
-      jobs: continueJobs,
-    });
-  }
-
-  LANGUAGE_SECTIONS.forEach((lang) => {
-    const langJobs = filteredJobs.filter(
-      (j) => j.subCategory === lang
-    );
-
-    if (langJobs.length > 0) {
-      sections.push({
-        title: `${LABEL_MAP[lang]} Interviews`,
-        icon: Code,
-        jobs: langJobs,
+    const continueJobs = filteredJobs.filter((j) => j.progress > 0);
+    if (continueJobs.length > 0) {
+      result.push({
+        title: "Continue Practicing",
+        icon: TrendingUp,
+        jobs: continueJobs,
       });
     }
-  });
 
-  const springJobs = filteredJobs.filter(
-    (j) => j.subCategory === "SPRING_BOOT"
-  );
-  if (springJobs.length > 0) {
-    sections.push({
-      title: "Spring Boot Practice",
-      icon: Briefcase,
-      jobs: springJobs,
-    });
-  }
+    ROLE_SECTIONS.forEach((sectionKey) => {
+      const sectionJobs = filteredJobs.filter((job) => {
+        const mappedSection = SUB_CATEGORY_TO_SECTION[job.subCategory || ""];
+        return mappedSection === sectionKey;
+      });
 
-  const mernJobs = filteredJobs.filter(
-    (j) => j.subCategory === "MERN"
-  );
-  if (mernJobs.length > 0) {
-    sections.push({
-      title: "MERN Stack Practice",
-      icon: Layers,
-      jobs: mernJobs,
+      if (sectionJobs.length > 0) {
+        result.push({
+          title: SECTION_LABELS[sectionKey],
+          icon: ICON_MAP[getIconName(sectionKey)] || Code,
+          jobs: sectionJobs,
+        });
+      }
     });
-  }
 
-  const systemDesignJobs = filteredJobs.filter(
-    (j) => j.category === "SYSTEM_DESIGN"
-  );
-  if (systemDesignJobs.length > 0) {
-    sections.push({
-      title: "System Design",
-      icon: Briefcase,
-      jobs: systemDesignJobs,
-    });
-  }
+    return result;
+  }, [filteredJobs]);
 
   const handleClearFilters = () => {
     setSearchQuery("");
@@ -142,4 +133,18 @@ export default function DashboardPage() {
       </div>
     </div>
   );
+}
+
+// Helper function to get icon name from section key
+function getIconName(sectionKey: string): string {
+  const iconMap: Record<string, string> = {
+    FRONTEND: "layout",
+    BACKEND_NODE: "server",
+    BACKEND_JAVA: "coffee",
+    BACKEND_PYTHON: "code",
+    BACKEND_DOTNET: "box",
+    FULLSTACK: "layers",
+    SYSTEM_DESIGN: "briefcase",
+  };
+  return iconMap[sectionKey] || "code";
 }
