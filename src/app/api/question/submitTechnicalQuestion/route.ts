@@ -25,7 +25,7 @@ const { question, answer } = body;
     }
 
     const res = await fetch(
-      `${env.BACKEND_URL}/api/questions/submit`,
+      `${env.BACKEND_URL}/questions/submit`,
       {
         method: "POST",
         headers: {
@@ -40,6 +40,7 @@ const { question, answer } = body;
         }),
       }
     );
+    console.log("res of technical", res)
 
     if (!res.ok) {
       const text = await res.text();

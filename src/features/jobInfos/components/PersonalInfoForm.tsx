@@ -192,9 +192,9 @@ export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
           type="submit"
           className="w-full"
         >
-          <LoadingSwap isLoading={form.formState.isSubmitting}>
+          {/* <LoadingSwap isLoading={form.formState.isSubmitting}> */}
             Save Job Information
-          </LoadingSwap>
+          {/* </LoadingSwap> */}
         </Button>
       </form>
     </Form>

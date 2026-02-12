@@ -50,7 +50,7 @@ export default function AptitudeHistoryPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Aptitude Test</h1>
+      <h1 className="text-2xl font-bold">Quick Quiz Test</h1>
 
       {/* ACTIVE ATTEMPT */}
       {activeAttempt && (

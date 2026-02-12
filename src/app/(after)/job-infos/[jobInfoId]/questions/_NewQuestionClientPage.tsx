@@ -87,8 +87,8 @@ export function NewQuestionClientPage({
       });
 
       if (!res.ok) throw new Error("Failed to get feedback");
-
-      const text = await res.json();
+      const text = await res.text(); 
+      console.log("res in question page", text);
       setFeedback(text);
       setStatus("awaiting-difficulty");
     } catch (err: any) {
