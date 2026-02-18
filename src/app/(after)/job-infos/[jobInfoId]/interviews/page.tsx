@@ -32,7 +32,7 @@ export default async function InterviewsPage({
   const { jobInfoId } = await params;
 
   return (
-    <div className="container py-4 gap-4 h-screen-header flex flex-col items-start">
+    <div className="container py-2 gap-2 h-screen-header flex flex-col items-start">
       <JobInfoBackLink jobInfoId={jobInfoId} />
       <Suspense
         fallback={<Loader2Icon className="size-24 animate-spin m-auto" />}
@@ -53,16 +53,10 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
   );
 
   return (
-    <div className="space-y-8 w-full">
+    <div className="space-y-6 w-full">
       {/* Page Header */}
       <div className="flex gap-2 justify-between items-center">
         <h1 className="text-3xl lg:text-4xl font-medium">Interviews</h1>
-        {/* <Button asChild variant="outline">
-          <Link href={`/job-infos/${jobInfoId}/interviews/new`}>
-            <PlusIcon />
-            New Topic Session
-          </Link>
-        </Button> */}
       </div>
 
       {/* ── Section 1: General Interview ── */}
@@ -73,7 +67,7 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
         </div>
 
         <Card className="border-primary/30 bg-primary/5">
-          <div className="flex items-center justify-between px-6">
+          <div className="flex items-center justify-between px-6 py-4">
             <div className="space-y-1">
               <p className="font-semibold text-base">General Interview</p>
               <p className="text-sm text-muted-foreground">
@@ -132,7 +126,7 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
                 key={interview.configurationId}
               >
                 <Card className="h-full hover:border-primary/40 transition-colors">
-                  <CardHeader className="pb-3">
+                  <CardHeader className="pb-0">
                     <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-base leading-snug">
                         {interview.interviewTitle}
@@ -161,7 +155,7 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
                     )}
 
                     {/* Meta row */}
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 mb-4 text-xs text-muted-foreground">
                       {interview.durationMinutes && (
                         <span className="flex items-center gap-1">
                           <ClockIcon className="size-3" />

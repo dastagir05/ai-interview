@@ -24,12 +24,12 @@ import { Settings } from "lucide-react";
 const navLinks = [
   { name: "JD", href: "/", Icon: FileSlidersIcon },
   { name: "Interviews", href: "interviews", Icon: SpeechIcon },
+  { name: "Resume", href: "resume", Icon: FileSlidersIcon },
   { name: "Questions", href: "questions", Icon: BookOpenIcon },
 ];
 const navLinks1 = [
   { name: "Dashboard", href: "/dashboard", Icon: SpeechIcon },
   { name: "Personal Jobs", href: "/personalJob", Icon: BookOpenIcon },
-  { name: "Resume", href: "/resume", Icon: FileSlidersIcon },
   { name: "Analytics", href: "/analytics", Icon: BarChart3Icon },
   { name: "User", href: "/user", Icon: UserIcon },
 ];

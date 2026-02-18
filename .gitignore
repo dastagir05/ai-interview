@@ -46,3 +46,4 @@ next-env.d.ts
 /src/bin
 /src/services
 /src/dump
+CODE_REVIEW_REPORT.md

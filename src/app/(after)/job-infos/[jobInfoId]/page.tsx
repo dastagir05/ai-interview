@@ -17,7 +17,6 @@ import { env } from "@/data/env/server";
 import { PersonalJobDetails } from "@/data/type/job";
 import { cookies } from "next/headers";
 
-
 const options = [
   {
     label: "Quick Quiz",
@@ -82,7 +81,7 @@ export default async function JobInfoPage({
 
   return (
     <div className="container my-4 space-y-4">
-      <BackLink href="/dashboard">Dashboard</BackLink>
+      <BackLink href="/personalJob">Dashboard</BackLink>
 
       <div className="space-y-6">
         <header className="space-y-4">
@@ -106,10 +105,23 @@ export default async function JobInfoPage({
                 item={Promise.resolve(jobInfo)}
                 fallback={null}
                 result={(j) => {
+                  if (!j.skillsRequired || j.skillsRequired.length === 0) {
+                    return null;
+                  }
+
                   return (
-                    j.title && (
-                      <Badge variant="secondary">{j.skillsRequired}</Badge>
-                    )
+                    <div className="flex flex-wrap gap-2">
+                      {j.skillsRequired.slice(0, 5).map((skill, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                      {j.skillsRequired.length > 5 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{j.skillsRequired.length - 5} more
+                        </Badge>
+                      )}
+                    </div>
                   );
                 }}
               />
@@ -137,7 +149,7 @@ export default async function JobInfoPage({
                   <CardDescription>{option.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ArrowRightIcon className="size-6" />
+                  <ArrowRightIcon className="size-6 mt-8" />
                 </CardContent>
               </Card>
             </Link>

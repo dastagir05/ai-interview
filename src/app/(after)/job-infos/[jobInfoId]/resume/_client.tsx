@@ -80,7 +80,7 @@ export function ResumePageClient({ jobInfoId }: { jobInfoId: string }) {
   }
 
   return (
-    <div className="space-y-8 w-full">
+    <div className="space-y-4 w-full">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -96,7 +96,7 @@ export function ResumePageClient({ jobInfoId }: { jobInfoId: string }) {
           <LoadingSwap isLoading={isLoading}>
             <div
               className={cn(
-                "mt-2 border-2 border-dashed rounded-lg p-6 transition-colors relative",
+                "mt-2 border-2 border-dashed rounded-lg p-6 transition-colors relative mb-4",
                 isDragOver
                   ? "border-primary bg-primary/5"
                   : "border-muted-foreground/50 bg-muted/10"

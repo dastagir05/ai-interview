@@ -29,7 +29,7 @@ export function LoadingSwap({
           className,
         )}
       >
-        <Loader2Icon className="animate-spin" />
+       { isLoading && <Loader2Icon className="animate-spin" /> }
       </div>
     </div>
   )
