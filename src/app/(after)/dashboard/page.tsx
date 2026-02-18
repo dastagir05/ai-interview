@@ -135,7 +135,6 @@ export default function DashboardPage() {
   );
 }
 
-// Helper function to get icon name from section key
 function getIconName(sectionKey: string): string {
   const iconMap: Record<string, string> = {
     FRONTEND: "layout",

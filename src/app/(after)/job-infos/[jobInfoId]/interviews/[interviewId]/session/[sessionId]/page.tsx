@@ -829,7 +829,7 @@ export default function AIInterviewSessionPage({
           <div className="flex gap-4">
             <Button
               variant="outline"
-              onClick={() => router.push(`/interviews/${jobId}`)}
+              onClick={() => router.push(`/job-infos/${jobInfoId}/interviews/${interviewId}`)}
               className="flex-1"
             >
               Back to Sessions
@@ -1070,7 +1070,7 @@ export default function AIInterviewSessionPage({
           </TabsContent>
 
           {/* Text Input */}
-          <TabsContent value="text" className="space-y-4">
+          <TabsContent value="text" className="space-y-6">
             <div className="flex gap-2">
               <Textarea
                 value={textInput}
@@ -1088,7 +1088,7 @@ export default function AIInterviewSessionPage({
                     ? "Interview is paused. Click 'Resume' to continue"
                     : "Type your answer here... (Press Enter to send, Shift+Enter for new line)"
                 }
-                className="min-h-[100px]"
+                className="min-h-[210px]"
                 disabled={loading || interviewState === "NOT_STARTED" || interviewState === "PAUSED"}
               />
               <Button

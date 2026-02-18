@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Clock, CheckCircle, PlayCircle, Pause } from "lucide-react";
@@ -71,6 +72,7 @@ export default function InterviewSessionsPage({
       setLoading(false);
     }
   };
+  
   const fetchInterviewDetails = async () => {
     try {
       const response = await fetch(`/api/personalJobs/${jobId}/interviews/${interviewId}`, {

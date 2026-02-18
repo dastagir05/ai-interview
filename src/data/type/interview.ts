@@ -1,4 +1,5 @@
 export interface SessionCardDTO {
+  isGeneralInterview: boolean;
   configurationId: string;
   sessionId: string;
   interviewTitle: string;
@@ -11,6 +12,8 @@ export interface SessionCardDTO {
   completedAt: string | null;
   durationMinutes: number | null;
   expectedQuestions: number;
+  completedSessions:number;
+  totalSessions: number;
   actualQuestions: number;
   overallScore: number | null;
   difficulty: DifficultyLevel;

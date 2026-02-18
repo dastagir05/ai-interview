@@ -1,7 +1,4 @@
-// import { canRunResumeAnalysis } from "@/features/resumeAnalyses/permissions";
 import { getCurrentUserId } from "@/lib/auth";
-// import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast";
-import { analyzeResumeForJob } from "@/services/ai/resumes/ai";
 import { env } from "@/data/env/server";
 import { cookies } from "next/headers";
 
@@ -37,40 +34,56 @@ export async function POST(req: Request) {
     });
   }
 
-  const jobInfo = await getJobInfo(jobInfoId, userId);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
+  if (!token) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const jobInfo = await getJobInfo(jobInfoId, token);
   if (jobInfo == null) {
     return new Response("You do not have permission to do this", {
       status: 403,
     });
   }
 
-  // if (!(await canRunResumeAnalysis())) {
-  //   return new Response(PLAN_LIMIT_MESSAGE, { status: 403 });
-  // }
+  // Forward to Spring Boot backend
+  const backendFormData = new FormData();
+  backendFormData.append("resumeFile", resumeFile);
+  backendFormData.append("jobDescription", jobInfo.description ?? "");
+  backendFormData.append("experienceLevel", jobInfo.experienceLevel ?? "");
+  if (jobInfo.title) {
+    backendFormData.append("jobTitle", jobInfo.title);
+  }
 
-  const res = await analyzeResumeForJob({
-    resumeFile,
-    jobInfo,
+  const backendRes = await fetch(`${env.BACKEND_URL}/resume/analyze`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: backendFormData,
   });
 
-  return res.toTextStreamResponse();
+  if (!backendRes.ok) {
+    const errorText = await backendRes.text();
+    return new Response(errorText || "Resume analysis failed", {
+      status: backendRes.status,
+    });
+  }
+
+  const data = await backendRes.json();
+  return Response.json(data);
 }
 
-async function getJobInfo(id: string, userId: string) {
-  const cookieStore = await cookies();
-    const token = cookieStore.get("authToken")?.value;
-    if (!token) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-  // const token = localStorage.getItem("accessToken");
-  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`,{
-    headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`},
-    credentials: "include",
-    cache: "no-cache"
-  },
+async function getJobInfo(id: string, token: string) {
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-cache",
+  });
 
-  ).then(
-    (res) => res.json()
-  );
-  return res;
+  if (!res.ok) return null;
+  return res.json();
 }

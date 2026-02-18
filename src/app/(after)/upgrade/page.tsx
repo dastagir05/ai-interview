@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Zap, Crown, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Zap } from "lucide-react";
+import { useAuth } from "@/lib/useAuth";
 import Script from "next/script";
 import { getCurrentUserId } from "@/lib/auth";
 import { toast } from "sonner";
@@ -21,11 +22,11 @@ export default function UpgradePage() {
     basic: {
       name: "Basic",
       price: 499,
-      period: "montly",
+      period: "monthly",
       savings: null,
     },
     pro: {
-      name: "PRO",
+      name: "Pro",
       price: 4999,
       period: "yearly",
       savings: "Save ₹1,000",
@@ -43,52 +44,48 @@ export default function UpgradePage() {
 
   const handlePayment = async () => {
     if (!razorpayLoaded) {
-      alert("Payment system is loading. Please wait... Or you can reload page and try again");
+      alert("Payment system is loading. Please wait or reload and try again.");
       return;
     }
     setLoading(true);
 
     try {
-      // Step 1: Create order in backend
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/create-order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: JSON.stringify({
-          userId: await getCurrentUserId(), // Replace with actual user ID
-          planType: selectedPlan.toUpperCase(),
-          amount: plans[selectedPlan as keyof typeof plans].price,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({
+            userId: await getCurrentUserId(),
+            planType: selectedPlan.toUpperCase(),
+            amount: plans[selectedPlan as keyof typeof plans].price,
+          }),
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error("Failed to create order");
-      }
+      if (!response.ok) throw new Error("Failed to create order");
 
       const orderData = await response.json();
 
-      // Step 2: Initialize Razorpay
       const options = {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "AI Interview Pro",
+        name: "AI Interview",
         description: `${plans[selectedPlan as keyof typeof plans].name} Subscription`,
         order_id: orderData.orderId,
         handler: async function (response: any) {
-          // Step 3: Verify payment
           await verifyPayment(response);
         },
         prefill: {
-          name: "User Name", 
-          email: "user@example.com", 
-          contact: "9999999999", 
+          name: "User Name",
+          email: "user@example.com",
+          contact: "9999999999",
         },
-        theme: {
-          color: "#3399cc",
-        },
+        theme: { color: "#000000" },
         modal: {
           ondismiss: function () {
             setLoading(false);
@@ -126,15 +123,11 @@ export default function UpgradePage() {
       if (data.success) {
         const refreshResponse = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/refresh`,
-          {
-            method: "POST",
-            credentials: "include", 
-          }
+          { method: "POST", credentials: "include" }
         );
-    
+
         if (refreshResponse.ok) {
           const refreshData = await refreshResponse.json();
-          
           localStorage.setItem("accessToken", refreshData.accessToken);
           await fetch("/api/auth/set-token", {
             method: "POST",
@@ -142,17 +135,10 @@ export default function UpgradePage() {
             body: JSON.stringify({ token: refreshData.accessToken }),
           });
 
-          toast.success("🎉 Payment successful! Your account has been upgraded.")
+          toast.success("Payment successful. Your account has been upgraded.");
           window.location.href = "/dashboard";
         }
       }
-    
-      // if (data.success) {
-      //   toast.success("🎉 Payment successful! Your account has been upgraded.")
-      //   window.location.href = "/dashboard"; 
-      // } else {
-      //   alert("Payment verification failed. Please contact support.");
-      // }
     } catch (error) {
       console.error("Verification error:", error);
       alert("Payment verification failed. Please contact support.");
@@ -161,149 +147,119 @@ export default function UpgradePage() {
     }
   };
 
+  const currentPlan = plans[selectedPlan as keyof typeof plans];
+
   return (
     <>
-      <Script 
+      <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         onLoad={() => setRazorpayLoaded(true)}
-        onError={() => {
-          console.error("Failed to load Razorpay script");
-          alert("Payment system failed to load. Please refresh the page.");
-        }}
+        onError={() => alert("Payment system failed to load. Please refresh.")}
       />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
-              <Crown className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Upgrade to Premium
+
+      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-lg">
+
+          {/* Header */}
+          <div className="mb-12">
+            <p className="text-xs uppercase tracking-[0.2em] text-zinc-400 mb-3">
+              Premium Access
+            </p>
+            <h1 className="text-4xl font-bold text-black leading-tight tracking-tight">
+              Unlock everything.
             </h1>
-            <p className="text-gray-600">
-              Unlock unlimited access and advanced features
+            <p className="text-zinc-500 mt-2 text-sm">
+              One plan. Full access. Cancel anytime.
             </p>
           </div>
 
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex bg-gray-100 rounded-lg p-1">
+          {/* Plan Toggle */}
+          <div className="flex gap-2 mb-8">
+            {(["basic", "pro"] as const).map((plan) => (
               <button
-                onClick={() => setSelectedPlan("basic")}
-                className={`px-6 py-2 rounded-md font-medium transition-all ${
-                  selectedPlan === "basic"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
+                key={plan}
+                onClick={() => setSelectedPlan(plan)}
+                className={`relative flex-1 py-2.5 text-sm font-medium border transition-all duration-150 ${
+                  selectedPlan === plan
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400"
                 }`}
               >
-                Basic
-              </button>
-              <button
-                onClick={() => setSelectedPlan("pro")}
-                className={`px-6 py-2 rounded-md font-medium transition-all relative ${
-                  selectedPlan === "pro"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                PRO
-                {plans.pro.savings && (
-                  <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-                    Save
+                {plans[plan].name}
+                {plans[plan].savings && selectedPlan !== plan && (
+                  <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] px-1.5 py-0.5 leading-none">
+                    SAVE
                   </span>
                 )}
               </button>
-            </div>
+            ))}
           </div>
 
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-blue-100">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold mb-1">Premium Plan</h2>
-                  <p className="text-blue-100">Everything you need to succeed</p>
-                </div>
-                <Sparkles className="w-12 h-12 opacity-80" />
-              </div>
-              <div className="mt-6">
-                <div className="flex items-baseline">
-                  <span className="text-5xl font-bold">
-                    ₹{plans[selectedPlan as keyof typeof plans].price}
+          {/* Price */}
+          <div className="border border-zinc-100 p-8 mb-6">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-5xl font-bold text-black tracking-tight">
+                    ₹{currentPlan.price}
                   </span>
-                  <span className="ml-2 text-blue-100">
-                    / {plans[selectedPlan as keyof typeof plans].period}
+                  <span className="text-zinc-400 text-sm mb-1">
+                    / {currentPlan.period}
                   </span>
                 </div>
-                {plans[selectedPlan as keyof typeof plans].savings && (
-                  <div className="mt-2 inline-block bg-green-500 text-white text-sm px-3 py-1 rounded-full">
-                    {plans[selectedPlan as keyof typeof plans].savings}
-                  </div>
+                {currentPlan.savings && (
+                  <p className="text-xs text-zinc-500 mt-1">{currentPlan.savings}</p>
                 )}
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-zinc-400 uppercase tracking-widest">
+                  {currentPlan.name}
+                </p>
               </div>
             </div>
 
-            <div className="p-8">
-              <div className="space-y-4 mb-8">
-                <h3 className="font-semibold text-gray-900 mb-4">
-                  What's included:
-                </h3>
-                {features.map((feature, index) => (
-                  <div key={index} className="flex items-start">
-                    <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="ml-3 text-gray-700">{feature}</span>
-                  </div>
-                ))}
-              </div>
+            {/* Divider */}
+            <div className="border-t border-zinc-100 mb-6" />
 
-              <button
-                onClick={handlePayment}
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
-              >
-                {loading ? (
-                  <div className="flex items-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Processing...
-                  </div>
-                ) : (
-                  <>
-                    <Zap className="w-5 h-5 mr-2" />
-                    Upgrade Now
-                  </>
-                )}
-              </button>
+            {/* Features */}
+            <ul className="space-y-3 mb-8">
+              {features.map((feature, i) => (
+                <li key={i} className="flex items-center gap-3 text-sm text-zinc-700">
+                  <Check className="size-3.5 text-black shrink-0" strokeWidth={2.5} />
+                  {feature}
+                </li>
+              ))}
+            </ul>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    Secure Payment
-                  </div>
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    Cancel Anytime
-                  </div>
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    24/7 Support
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* CTA */}
+            <button
+              onClick={handlePayment}
+              disabled={loading}
+              className="w-full bg-black text-white text-sm font-semibold py-4 hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Zap className="size-4" />
+                  Upgrade Now
+                </>
+              )}
+            </button>
           </div>
 
-          <div className="text-center mt-8">
-            <p className="text-gray-600">
-              💯 30-day money-back guarantee. No questions asked.
-            </p>
+          {/* Trust row */}
+          <div className="flex items-center justify-between text-xs text-zinc-400">
+            <span>Secure payment</span>
+            <span>·</span>
+            <span>Cancel anytime</span>
+            <span>·</span>
+            <span>30-day guarantee</span>
           </div>
+
         </div>
       </div>
     </>

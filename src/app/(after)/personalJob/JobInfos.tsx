@@ -65,7 +65,11 @@ export default async function JobInfos() {
             <p className="text-muted-foreground">
               Manage your job descriptions and track your interview practice progress
             </p>
-          <p>Total Job: {totalJobs}  Active Jobs: {activeJobs}</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Total Jobs: <span className="font-semibold text-foreground">{totalJobs}</span>
+              &nbsp;&nbsp;·&nbsp;&nbsp;
+              Active: <span className="font-semibold text-foreground">{activeJobs}</span>
+            </p>         
           </div>
           <Button asChild>
             <Link href="/job-infos/new">

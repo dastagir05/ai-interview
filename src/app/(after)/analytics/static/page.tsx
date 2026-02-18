@@ -397,6 +397,106 @@ function UserAnalyticsContent() {
         </Card>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Score Distribution</CardTitle>
+            <CardDescription>
+              How your interview scores are distributed
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {/* Excellent (9-10) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-green-700">Excellent (9-10)</span>
+                  <span className="text-muted-foreground">3 interviews (12%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-green-600 h-2 rounded-full" style={{ width: "12%" }} />
+                </div>
+              </div>
+
+              {/* Good (7-8) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-blue-700">Good (7-8)</span>
+                  <span className="text-muted-foreground">11 interviews (46%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: "46%" }} />
+                </div>
+              </div>
+
+              {/* Fair (5-6) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-orange-700">Fair (5-6)</span>
+                  <span className="text-muted-foreground">7 interviews (29%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-orange-600 h-2 rounded-full" style={{ width: "29%" }} />
+                </div>
+              </div>
+
+              {/* Needs Work (0-4) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-red-700">Needs Work (0-4)</span>
+                  <span className="text-muted-foreground">3 interviews (13%)</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className="bg-red-600 h-2 rounded-full" style={{ width: "13%" }} />
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t">
+                <p className="text-xs text-muted-foreground text-center">
+                  💡 Most of your scores fall in the "Good" range. Keep practicing to reach "Excellent"!
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Interviews</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentInterviews.slice(0, 4).map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">{item.role}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.date}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold">
+                      {item.score}/10
+                    </span>
+                    <Badge
+                      className={
+                        item.status === "Passed"
+                          ? "bg-green-100 text-green-700 hover:bg-green-100"
+                          : "bg-red-100 text-red-700 hover:bg-red-100"
+                      }
+                    >
+                      {item.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       {/* Skill Breakdown - Available for BASIC+ */}
       <Card>
         <CardHeader>
@@ -669,106 +769,7 @@ function UserAnalyticsContent() {
       </Card>
 
       {/* Score Distribution + Recent Interviews */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Score Distribution</CardTitle>
-            <CardDescription>
-              How your interview scores are distributed
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {/* Excellent (9-10) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-green-700">Excellent (9-10)</span>
-                  <span className="text-muted-foreground">3 interviews (12%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: "12%" }} />
-                </div>
-              </div>
-
-              {/* Good (7-8) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-blue-700">Good (7-8)</span>
-                  <span className="text-muted-foreground">11 interviews (46%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: "46%" }} />
-                </div>
-              </div>
-
-              {/* Fair (5-6) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-orange-700">Fair (5-6)</span>
-                  <span className="text-muted-foreground">7 interviews (29%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-orange-600 h-2 rounded-full" style={{ width: "29%" }} />
-                </div>
-              </div>
-
-              {/* Needs Work (0-4) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-red-700">Needs Work (0-4)</span>
-                  <span className="text-muted-foreground">3 interviews (13%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-red-600 h-2 rounded-full" style={{ width: "13%" }} />
-                </div>
-              </div>
-
-              <div className="pt-3 mt-3 border-t">
-                <p className="text-xs text-muted-foreground text-center">
-                  💡 Most of your scores fall in the "Good" range. Keep practicing to reach "Excellent"!
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Interviews</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentInterviews.slice(0, 4).map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">{item.role}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {item.date}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold">
-                      {item.score}/10
-                    </span>
-                    <Badge
-                      className={
-                        item.status === "Passed"
-                          ? "bg-green-100 text-green-700 hover:bg-green-100"
-                          : "bg-red-100 text-red-700 hover:bg-red-100"
-                      }
-                    >
-                      {item.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+    
 
       {/* Daily Activity */}
       <Card>
