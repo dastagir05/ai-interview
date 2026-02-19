@@ -18,7 +18,7 @@ import Link from "next/link";
 import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { useParams, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/lib/AuthContext";
 import { Settings } from "lucide-react";
 
 const navLinks = [

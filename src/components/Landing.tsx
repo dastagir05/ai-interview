@@ -17,7 +17,7 @@ import Link from "next/link";
 import { UserAvatar } from "@/features/users/components/UserAvatar";
 import { ThemeToggle } from "./ThemeToggle";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/lib/AuthContext";
 
 
 export default function LandingPage() {
