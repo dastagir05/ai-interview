@@ -1,9 +1,12 @@
 import { NextRequest } from "next/server";
 import { env } from "@/data/env/server";
 import { getCurrentUserId } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 export async function GET(req: NextRequest) {
   const jobId = req.nextUrl.searchParams.get("jobId");
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
 
   if (!jobId) {
     return new Response("Job ID required", { status: 400 });
@@ -15,13 +18,16 @@ export async function GET(req: NextRequest) {
   }
 
   const res = await fetch(`${env.BACKEND_URL}/aptitude/history?jobId=${jobId}`, {
-    // headers: {
-    //   Authorization: `Bearer ${userId}`,
-    // },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    credentials: "include", 
     cache: "no-store",
   });
 
   if (!res.ok) {
+    console.log("res of apt history", await res.json())
     return new Response("Failed to start aptitude test", { status: 500 });
   }
 

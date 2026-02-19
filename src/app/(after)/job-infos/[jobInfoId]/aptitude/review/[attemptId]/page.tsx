@@ -44,7 +44,14 @@ export default function AptitudeReviewPage() {
   }, [attemptId]);
 
   if (loading) {
-    return <p className="p-6">Loading review...</p>;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading quiz review...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

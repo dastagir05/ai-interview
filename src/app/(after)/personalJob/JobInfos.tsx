@@ -78,37 +78,6 @@ export default async function JobInfos() {
             </Link>
           </Button>
         </div>
-
-        {/* Insights Cards */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background border-blue-200 dark:border-blue-900">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Jobs</p>
-                  <p className="text-3xl font-bold mt-1">{totalJobs}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <BriefcaseIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/20 dark:to-background border-purple-200 dark:border-purple-900">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Profiles</p>
-                  <p className="text-3xl font-bold mt-1">{activeJobs}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <TrendingUpIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div> */}
       </div>
 
       {/* Job Cards Grid */}
@@ -120,7 +89,7 @@ export default async function JobInfos() {
             key={jobInfo.id}
           >
             <Card className="h-full hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-0">
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-xl font-bold">{jobInfo.title}</CardTitle>
                   <Badge
@@ -164,7 +133,7 @@ export default async function JobInfos() {
                 )}
               </CardContent>
 
-              <CardFooter className="flex items-center justify-between pt-4 border-t">
+              <CardFooter className="flex items-center justify-between border-t py-3">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <TargetIcon className="h-4 w-4" />
@@ -185,7 +154,7 @@ export default async function JobInfos() {
         ))}
 
         {/* Add New Card */}
-        <Link className="transition-opacity" href="/job-infos/new">
+        {/* <Link className="transition-opacity" href="/job-infos/new">
           <Card className="h-full flex items-center justify-center border-dashed border-2 bg-transparent hover:border-primary/50 hover:bg-accent/5 transition-colors shadow-none min-h-[280px]">
             <div className="text-center p-6">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -197,7 +166,7 @@ export default async function JobInfos() {
               </p>
             </div>
           </Card>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );
@@ -211,7 +180,7 @@ function NoJobInfos() {
           <BriefcaseIcon className="h-10 w-10 text-primary" />
         </div>
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-          Welcome to Landr
+          Welcome to IPrepWithAI
         </h1>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
           To get started, enter information about the type of job you are wanting
