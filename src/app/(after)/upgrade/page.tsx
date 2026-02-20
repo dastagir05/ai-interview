@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Check, Zap } from "lucide-react";
-import { useAuth } from "@/lib/useAuth";
 import Script from "next/script";
 import { getCurrentUserId } from "@/lib/auth";
 import { toast } from "sonner";
@@ -104,19 +103,22 @@ export default function UpgradePage() {
 
   const verifyPayment = async (paymentResponse: any) => {
     try {
-      const response = await fetch("http://localhost:8080/api/payments/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: JSON.stringify({
-          razorpayOrderId: paymentResponse.razorpay_order_id,
-          razorpayPaymentId: paymentResponse.razorpay_payment_id,
-          razorpaySignature: paymentResponse.razorpay_signature,
-          userId: await getCurrentUserId(),
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/verify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({
+            razorpayOrderId: paymentResponse.razorpay_order_id,
+            razorpayPaymentId: paymentResponse.razorpay_payment_id,
+            razorpaySignature: paymentResponse.razorpay_signature,
+            userId: await getCurrentUserId(),
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -157,18 +159,18 @@ export default function UpgradePage() {
         onError={() => alert("Payment system failed to load. Please refresh.")}
       />
 
-      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-lg">
 
           {/* Header */}
           <div className="mb-12">
-            <p className="text-xs uppercase tracking-[0.2em] text-zinc-400 mb-3">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">
               Premium Access
             </p>
-            <h1 className="text-4xl font-bold text-black leading-tight tracking-tight">
+            <h1 className="text-4xl font-bold text-foreground leading-tight tracking-tight">
               Unlock everything.
             </h1>
-            <p className="text-zinc-500 mt-2 text-sm">
+            <p className="text-muted-foreground mt-2 text-sm">
               One plan. Full access. Cancel anytime.
             </p>
           </div>
@@ -181,13 +183,13 @@ export default function UpgradePage() {
                 onClick={() => setSelectedPlan(plan)}
                 className={`relative flex-1 py-2.5 text-sm font-medium border transition-all duration-150 ${
                   selectedPlan === plan
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400"
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-background text-muted-foreground border-border hover:border-foreground/50"
                 }`}
               >
                 {plans[plan].name}
                 {plans[plan].savings && selectedPlan !== plan && (
-                  <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] px-1.5 py-0.5 leading-none">
+                  <span className="absolute -top-2 -right-2 bg-foreground text-background text-[10px] px-1.5 py-0.5 leading-none">
                     SAVE
                   </span>
                 )}
@@ -195,51 +197,59 @@ export default function UpgradePage() {
             ))}
           </div>
 
-          {/* Price */}
-          <div className="border border-zinc-100 p-8 mb-6">
+          {/* Price Card */}
+          <div className="border border-border bg-background p-8 mb-6">
             <div className="flex items-end justify-between mb-6">
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-bold text-black tracking-tight">
+                  <span className="text-5xl font-bold text-foreground tracking-tight">
                     ₹{currentPlan.price}
                   </span>
-                  <span className="text-zinc-400 text-sm mb-1">
+                  <span className="text-muted-foreground text-sm mb-1">
                     / {currentPlan.period}
                   </span>
                 </div>
                 {currentPlan.savings && (
-                  <p className="text-xs text-zinc-500 mt-1">{currentPlan.savings}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {currentPlan.savings}
+                  </p>
                 )}
               </div>
               <div className="text-right">
-                <p className="text-xs text-zinc-400 uppercase tracking-widest">
+                <p className="text-xs text-muted-foreground uppercase tracking-widest">
                   {currentPlan.name}
                 </p>
               </div>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-zinc-100 mb-6" />
+            <div className="border-t border-border mb-6" />
 
             {/* Features */}
             <ul className="space-y-3 mb-8">
               {features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm text-zinc-700">
-                  <Check className="size-3.5 text-black shrink-0" strokeWidth={2.5} />
+                <li
+                  key={i}
+                  className="flex items-center gap-3 text-sm text-foreground"
+                >
+                  <Check
+                    className="size-3.5 text-foreground shrink-0"
+                    strokeWidth={2.5}
+                  />
                   {feature}
                 </li>
               ))}
             </ul>
 
-            {/* CTA */}
+            {/* CTA Button */}
             <button
               onClick={handlePayment}
               disabled={loading}
-              className="w-full bg-black text-white text-sm font-semibold py-4 hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-foreground text-background text-sm font-semibold py-4 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
                   Processing...
                 </>
               ) : (
@@ -252,7 +262,7 @@ export default function UpgradePage() {
           </div>
 
           {/* Trust row */}
-          <div className="flex items-center justify-between text-xs text-zinc-400">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Secure payment</span>
             <span>·</span>
             <span>Cancel anytime</span>

@@ -3,8 +3,23 @@ export interface UserAnalytics {
     skills: SkillBreakdownDTO;
     dailyActivity: DailyActivityDTO[];
     recentInterviews: RecentInterviewDTO[];
+    aptitudeStats: AptitudeDTO;
+    interviewAnalytics: InterviewAnalytics;
   }
 
+  export interface InterviewAnalytics{
+    excellent: number;
+    good: number;
+    decent:number;
+    fail:number;
+    totalCompleted: number
+  }
+
+  export interface AptitudeDTO{
+    totalAptitudeAttempts: number;
+    avgAptitudeScore: number;
+  }
+  
   export interface AnalyticsMetricsDTO {
     totalInterviews: number;
     passRate: number;
@@ -18,7 +33,7 @@ export interface UserAnalytics {
   export interface SkillBreakdownDTO {
     technical: number;
     problemSolving: number;
-    codeQuality: number;
+    confidence: number;
     communication: number;
   }
   

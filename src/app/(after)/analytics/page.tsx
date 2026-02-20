@@ -33,7 +33,15 @@ import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRouteProps";
 import { useQuery } from "@tanstack/react-query";
 import { UserAnalytics } from "@/data/type/analytics";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/lib/AuthContext";
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  Radar,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 export default function UserAnalyticsPage() {
   return (
@@ -52,8 +60,7 @@ function UserAnalyticsContent() {
 
   const { data: stats  } = useQuery<UserAnalytics>({
     queryKey: ["user-analytics"],
-    queryFn: () =>
-      fetch("/api/analytics/stats").then(r => r.json()),
+    queryFn: () => fetch("/api/analytics/stats").then(r => r.json()),
   });
 
   console.log("stats", stats);
@@ -61,76 +68,8 @@ function UserAnalyticsContent() {
   const skillScores = stats?.skills
   const dailyActivity = stats?.dailyActivity
   const recentInterviews = stats?.recentInterviews
-
-  // const metrics = {
-  //   totalInterviews: 24,
-  //   passRate: 62,
-  //   failRate: 38,
-  //   averageScore: 7.4,
-  //   activeDays: 12,
-  //   currentStreak: 5,
-  //   longestStreak: 9,
-  // };
-
-  // const skillScores = {
-  //   technical: 8.2,
-  //   problemSolving: 7.5,
-  //   codeQuality: 6.8,
-  //   communication: 7.9,
-  // };
-
-  const achievements = [
-    {
-      id: 1,
-      name: "First Interview",
-      description: "Completed your first mock interview",
-      icon: Star,
-      unlocked: true,
-      unlockedDate: "2024-02-15",
-    },
-    {
-      id: 2,
-      name: "On Fire",
-      description: "Maintained a 5-day streak",
-      icon: Flame,
-      unlocked: true,
-      unlockedDate: "2024-03-01",
-    },
-    {
-      id: 3,
-      name: "Perfectionist",
-      description: "Scored 9+ in an interview",
-      icon: Trophy,
-      unlocked: true,
-      unlockedDate: "2024-02-28",
-    },
-    {
-      id: 4,
-      name: "Dedicated",
-      description: "Complete 20+ interviews",
-      icon: Target,
-      unlocked: true,
-      unlockedDate: "2024-03-04",
-    },
-    {
-      id: 5,
-      name: "Week Warrior",
-      description: "Maintain a 7-day streak",
-      icon: Zap,
-      unlocked: false,
-      progress: 5,
-      total: 7,
-    },
-    {
-      id: 6,
-      name: "Master",
-      description: "Achieve 90% pass rate over 10 interviews",
-      icon: Crown,
-      unlocked: false,
-      progress: 62,
-      total: 90,
-    },
-  ];
+  const aptitudeStats = stats?.aptitudeStats
+  const interviewAnalytics = stats?.interviewAnalytics
 
   const insights = {
     strengths: [
@@ -157,52 +96,81 @@ function UserAnalyticsContent() {
     },
   };
 
-  const renderSkillChart = () => {
-    const skills = [
-      { name: "Technical Knowledge", score: skillScores?.technical, color: "bg-blue-500" },
-      {
-        name: "Problem Solving",
-        score: skillScores?.problemSolving,
-        color: "bg-purple-500",
-      },
-      {
-        name: "Code Quality",
-        score: skillScores?.codeQuality,
-        color: "bg-orange-500",
-      },
-      {
-        name: "Communication",
-        score: skillScores?.communication,
-        color: "bg-green-500",
-      },
-    ];
-
+  const getPercentage = (value?: number, total?: number) => {
+    if (!value || !total) return 0;
+    return Math.round((value / total) * 100);
+  };
+  const ScoreBar = ({
+    label,
+    count = 0,
+    total = 0,
+    color,
+  }: {
+    label: string;
+    count?: number;
+    total?: number;
+    color: string;
+  }) => {
+    const percentage = getPercentage(count, total);
+  
     return (
-      <div className="space-y-4">
-        {skills.map((skill) => (
-          <div key={skill.name} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{skill.name}</span>
-              <span className="text-sm font-bold">{skill.score}/10</span>
-            </div>
-            {/* Block-style progress bar */}
-            <div className="flex items-center gap-1">
-              {Array.from({ length: 10 }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-2.5 flex-1 rounded-sm ${
-                    index < Math.round(skill.score != undefined ?skill.score : 0)
-                      ? skill.color
-                      : "bg-muted"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-sm">
+          <span className={`font-medium ${color.replace("bg", "text")}`}>
+            {label}
+          </span>
+          <span className="text-muted-foreground">
+            {count} interviews ({percentage}%)
+          </span>
+        </div>
+        <div className="w-full bg-muted rounded-full h-2">
+          <div
+            className={`${color} h-2 rounded-full transition-all`}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
       </div>
     );
   };
+
+
+const renderSkillChart = () => {
+  const data = [
+    { skill: "Technical", score: skillScores?.technical ?? 0 },
+    { skill: "Problem Solving", score: skillScores?.problemSolving ?? 0 },
+    { skill: "Communication", score: skillScores?.communication ?? 0 },
+    { skill: "Confidence", score: skillScores?.confidence ?? 0 },
+  ];
+
+  return (
+    <ResponsiveContainer width="100%" height={280}>
+      <RadarChart data={data}>
+        <PolarGrid stroke="#e2e8f0" />
+        <PolarAngleAxis
+          dataKey="skill"
+          tick={{ fontSize: 12, fill: "#64748b", fontWeight: 500 }}
+        />
+        <Radar
+          name="Score"
+          dataKey="score"
+          stroke="#6366f1"
+          fill="#6366f1"
+          fillOpacity={0.25}
+          strokeWidth={2}
+          dot={{ fill: "#6366f1", r: 4 }}
+        />
+        <Tooltip
+          formatter={(value: any) => [`${value}/100`, "Score"]}
+          contentStyle={{
+            borderRadius: "8px",
+            border: "1px solid #e2e8f0",
+            fontSize: "12px",
+          }}
+        />
+      </RadarChart>
+    </ResponsiveContainer>
+  );
+};
 
   return (
     <div className="container my-6 space-y-6">
@@ -247,7 +215,7 @@ function UserAnalyticsContent() {
 
       {/* Key metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               My Interviews
@@ -262,66 +230,35 @@ function UserAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="gap-3">
           <CardHeader>
             <CardTitle>Quick Quiz Performance</CardTitle>
-            <CardDescription>
-              Your performance on 15-minute knowledge checks
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {/* Total quizzes */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Total Quizzes</span>
-                <span className="text-lg font-bold">12 completed</span>
+                <span className="text-lg font-bold">{aptitudeStats?.totalAptitudeAttempts} completed</span>
               </div>
-              
-              {/* Pass/Fail for quizzes */}
-              {/* <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-medium">Passed (6+/10)</span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  8 quizzes (67%)
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <XCircle className="h-4 w-4 text-red-600" />
-                  <span className="text-sm font-medium">Failed (&gt6/10)</span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  4 quizzes (33%)
-                </span>
-              </div>
-              
-              <div className="w-full bg-muted rounded-full h-3 flex overflow-hidden">
-                <div className="bg-green-600 h-3" style={{ width: "67%" }} />
-                <div className="bg-red-600 h-3" style={{ width: "33%" }} />
-              </div>
-               */}
-              {/* Average quiz score */}
-              <div className="pt-2 border-t">
+              <div className="p-2 border-t">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Average Score</span>
-                  <span className="text-lg font-bold">7.2/10</span>
+                  <span className="text-sm text-muted-foreground">Average Percentage</span>
+                  <span className="text-lg font-bold">{aptitudeStats?.avgAptitudeScore}%</span>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Score</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {metrics?.averageScore}/10
+              {metrics?.averageScore}/100
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               Average rating across all interviews
@@ -329,7 +266,7 @@ function UserAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Current Streak</CardTitle>
             <Flame className="h-4 w-4 text-orange-500" />
@@ -345,7 +282,7 @@ function UserAnalyticsContent() {
 
       {/* Score Distribution + Recent Interviews */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+        <Card className="gap-0">
           <CardHeader>
             <CardTitle>Score Distribution</CardTitle>
             <CardDescription>
@@ -354,53 +291,40 @@ function UserAnalyticsContent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {/* Excellent (9-10) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-green-700">Excellent (9-10)</span>
-                  <span className="text-muted-foreground">3 interviews (12%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: "12%" }} />
-                </div>
-              </div>
-
-              {/* Good (7-8) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-blue-700">Good (7-8)</span>
-                  <span className="text-muted-foreground">11 interviews (46%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: "46%" }} />
-                </div>
-              </div>
-
-              {/* Fair (5-6) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-orange-700">Fair (5-6)</span>
-                  <span className="text-muted-foreground">7 interviews (29%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-orange-600 h-2 rounded-full" style={{ width: "29%" }} />
-                </div>
-              </div>
-
-              {/* Needs Work (0-4) */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-red-700">Needs Work (0-4)</span>
-                  <span className="text-muted-foreground">3 interviews (13%)</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-red-600 h-2 rounded-full" style={{ width: "13%" }} />
-                </div>
-              </div>
+              {[
+                {
+                  label: "Excellent (85-100)",
+                  value: interviewAnalytics?.excellent,
+                  color: "bg-foreground",
+                },
+                {
+                  label: "Good (70-85)",
+                  value: interviewAnalytics?.good,
+                  color: "bg-foreground",
+                },
+                {
+                  label: "Decent (50-70)",
+                  value: interviewAnalytics?.decent,
+                  color: "bg-foreground",
+                },
+                {
+                  label: "Needs Work (0-50)",
+                  value: interviewAnalytics?.fail,
+                  color: "bg-foreground",
+                },
+              ].map((item) => (
+                <ScoreBar
+                  key={item.label}
+                  label={item.label}
+                  count={item.value}
+                  total={interviewAnalytics?.totalCompleted}
+                  color={item.color}
+                />
+              ))}
 
               <div className="pt-3 mt-3 border-t">
                 <p className="text-xs text-muted-foreground text-center">
-                  💡 Most of your scores fall in the "Good" range. Keep practicing to reach "Excellent"!
+                  💡 Track your performance distribution and improve consistently!
                 </p>
               </div>
             </div>
@@ -426,7 +350,7 @@ function UserAnalyticsContent() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold">
-                      {item.score}/10
+                      {item.score}/100
                     </span>
                     <Badge
                       className={
@@ -644,7 +568,7 @@ function UserAnalyticsContent() {
       </Card>
 
       {/* Daily Activity */}
-      <Card>
+      <Card className="gap-0 pb-4">
         <CardHeader>
           <CardTitle>Recent Activity</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
@@ -673,7 +597,7 @@ function UserAnalyticsContent() {
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-sm font-bold">
-                      {activity.avgScore.toFixed(1)}/10
+                      {activity.avgScore.toFixed(1)}/100
                     </span>
                     <span className="text-xs text-muted-foreground">
                       avg score
