@@ -57,7 +57,7 @@ export function ThemeToggle() {
             onClick={() => setTheme(value)}
             className={cn(
               "cursor-pointer",
-              theme === value && "bg-accent text-accent-foreground"
+              theme === value && "bg-popover opacity-100 backdrop-blur-none"
             )}
           >
             <Icon className="size-4" />

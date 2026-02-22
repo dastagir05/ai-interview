@@ -1,7 +1,22 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Job } from "@/data/type/job";
+import { Job, JobCategory, ExperienceLevel } from "@/data/type/job";
+
+interface ApiJobResponse {
+  id: string;
+  title: string;
+  imgUrl?: string;
+  skillsRequired?: string[];
+  estimatedTime?: number;
+  experienceLevel: ExperienceLevel;
+  category: JobCategory;
+  subCategory?: string;
+  progress?: number;
+  description?: string;
+  started?: boolean;
+  personalJobId?: string | null;
+}
 
 export function useDashboardJobs() {
   return useQuery<Job[]>({
@@ -16,14 +31,14 @@ export function useDashboardJobs() {
       const data = await res.json();
 
       // Transform API response to Job type
-      return data.map((job: any): Job => ({
+      return data.map((job: ApiJobResponse): Job => ({
         id: job.id,
         title: job.title,
         logo: job.imgUrl ?? "💼",
         tech: job.skillsRequired ?? [],
         time: job.estimatedTime ?? 45,
         level: job.experienceLevel,
-        category: job.category === "PROGRAMING" ? "PROGRAMMING" : job.category,
+        category: job.category,
         subCategory: job.subCategory?.toUpperCase() ?? "GENERAL",
         progress: job.progress ?? 0,
         description: job.description ?? "",

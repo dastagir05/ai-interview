@@ -11,7 +11,6 @@ export default function JobInfoNewPage() {
 
       <Card>
         <CardContent>
-          <CardContent>
             <PersonalJobInfoForm
               jobInfo={{
                 title: "",
@@ -21,7 +20,6 @@ export default function JobInfoNewPage() {
                 name: "",
               }}
             />
-          </CardContent>
         </CardContent>
       </Card>
     </div>

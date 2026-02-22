@@ -426,7 +426,7 @@ const renderSkillChart = () => {
                 and get personalized insights on what to improve.
               </p>
               <Button asChild>
-                <Link href="/dashboard/settings">Upgrade to BASIC</Link>
+                <Link href="/upgrade">Upgrade to BASIC</Link>
               </Button>
             </div>
           )}
@@ -560,7 +560,7 @@ const renderSkillChart = () => {
                 after every interview.
               </p>
               <Button asChild>
-                <Link href="/dashboard/settings">Upgrade to PRO</Link>
+                <Link href="/upgrade">Upgrade to PRO</Link>
               </Button>
             </div>
           )}

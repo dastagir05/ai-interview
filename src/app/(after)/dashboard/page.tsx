@@ -23,7 +23,17 @@ import {
   SECTION_LABELS,
   SUB_CATEGORY_TO_SECTION,
 } from "@/data/type/dashboard";
+import type { Metadata } from "next";
 
+const metadata: Metadata = {
+  title: "Dashboard | IPrepWithAI",
+  description: "Manage your interview preparation and practice sessions",
+  openGraph: {
+    title: "Dashboard | IPrepWithAI",
+    description: "Manage your interview preparation",
+    type: "website",
+  },
+};
 export type Section = {
   title: string;
   icon: LucideIcon;

@@ -478,6 +478,8 @@ function DetailedFeatures() {
 }
 
 function Stats() {
+  const [openDialog, setOpenDialog] = useState(false);
+
   const stats = [
     {
       value: "2.3×",
@@ -541,20 +543,28 @@ function Stats() {
           <p className="text-sm text-muted-foreground mb-8">
             * Based on data from 2,500+ successful placements in 2024
           </p>
-          <Button 
-            size="lg" 
-            className="h-12 px-8 font-semibold shadow-lg hover:shadow-xl" 
-            asChild
-          >
-            <Link href="/app">Join Successful Job Seekers</Link>
-          </Button>
+            <Button 
+              size="lg" 
+              className="h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+              onClick={() => setOpenDialog(true)}
+            >
+              Join Successful Job Seekers            
+            </Button>
+            
         </div>
       </div>
+      <Login
+            openDialog={openDialog}
+            closeDialog={() => setOpenDialog(false)}
+      />
     </section>
   );
 }
 
 function Testimonials() {
+
+  const [openDialog, setOpenDialog] = useState(false);
+
   const testimonials = [
     {
       name: "Sarah Chen",
@@ -678,14 +688,18 @@ function Testimonials() {
             Ready to write your success story?
           </p>
           <Button 
-            size="lg" 
-            className="h-12 px-8 font-semibold shadow-lg hover:shadow-xl" 
-            asChild
-          >
-            <Link href="/app">Begin Your Journey</Link>
-          </Button>
+              size="lg" 
+              className="h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+              onClick={() => setOpenDialog(true)}
+            >
+              Begin Your Journey           
+            </Button>
         </div>
       </div>
+      <Login
+            openDialog={openDialog}
+            closeDialog={() => setOpenDialog(false)}
+      />
     </section>
   );
 }

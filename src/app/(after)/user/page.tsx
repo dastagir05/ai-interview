@@ -58,6 +58,7 @@ import ProtectedRoute from "@/components/ProtectedRouteProps";
 import { toast } from "sonner";
 import { UserDetails } from "@/data/type/user";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loading } from "@/components/Loading";
 
 export default function UserSettingsPage() {
   return (
@@ -412,11 +413,7 @@ function UserSettingsContent() {
   };
 
   if (isLoadingUser) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loading name="Loading User Data" />;
   }
 
   if (userError || !user) {

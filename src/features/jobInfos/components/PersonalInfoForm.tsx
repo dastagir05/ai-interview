@@ -149,7 +149,7 @@ export function PersonalJobInfoForm({ jobInfo }: { jobInfo: JobInfoFormData }) {
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue />
+                      <SelectValue className=""/>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
