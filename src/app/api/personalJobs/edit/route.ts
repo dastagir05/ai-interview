@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/data/env/server";
-import { getCurrentUserId } from "@/lib/authFromJava";
+import { getCurrentUserId } from "@/lib/auth";
 
 const { BACKEND_URL } = env;
 

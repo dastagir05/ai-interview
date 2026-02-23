@@ -5,10 +5,8 @@ import { cookies } from "next/headers";
 // POST - Create interview
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ jobId: string }> }
 ) {
   const body = await req.json();
-  const { jobId } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken")?.value;
   if (!token) {

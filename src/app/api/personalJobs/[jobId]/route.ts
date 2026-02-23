@@ -3,9 +3,9 @@ import { env } from "@/data/env/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
-  const { jobId } = params;
+  const { jobId } = await params;
 
   const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${jobId}`, {
     headers: {

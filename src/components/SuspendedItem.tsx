@@ -1,4 +1,4 @@
-import { ReactNode, Suspense } from "react";
+import { ReactNode, Suspense, use } from "react";
 
 export function SuspendedItem<T>({
   item,
@@ -16,12 +16,13 @@ export function SuspendedItem<T>({
   );
 }
 
-async function InnerComponent<T>({
+function InnerComponent<T>({
   item,
   result,
 }: {
   item: Promise<T>;
   result: (item: T) => ReactNode;
 }) {
-  return result(await item);
+  const value = use(item);
+  return <>{result(value)}</>;
 }
