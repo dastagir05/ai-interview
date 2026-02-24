@@ -40,10 +40,11 @@ export function NewQuestionClientPage({
   const [language, setLanguage] = useState("java");
   const [questionType, setQuestionType] = useState<string>("");
   const [currentDifficulty, setCurrentDifficulty] = useState<QuestionDifficulty | null>(null);
-
+  const [loadingDifficulty, setLoadingDifficulty] = useState<QuestionDifficulty | null>(null);
   const handleGenerateQuestion = async (difficulty: QuestionDifficulty) => {
     setLoading(true);
     setQuestion("");
+    setLoadingDifficulty(difficulty);
     setFeedback("");
     setAnswer("");
     setStatus("init");
@@ -62,7 +63,6 @@ export function NewQuestionClientPage({
       setLanguage(text.language);
       setQuestionType(text.questionType);
       setQuestion(text.question);
-      // ✅ Pre-fill editor with boilerplate
       setAnswer(text.boilerplate ?? "");
       setBoilerplate(text.boilerplate ?? "");
       setStatus("awaiting-answer");
@@ -70,6 +70,7 @@ export function NewQuestionClientPage({
       errorToast(err.message || "Something went wrong");
     } finally {
       setLoading(false);
+      setLoadingDifficulty(null);
     }
   };
 
@@ -119,6 +120,7 @@ export function NewQuestionClientPage({
             setAnswer("");
             setCurrentDifficulty(null);
           }}
+          loadingDifficulty={loadingDifficulty}
           generateQuestion={handleGenerateQuestion}
           generateFeedback={handleSubmitAnswer}
         />
@@ -237,6 +239,7 @@ function QuestionContainer({
 function Controls({
   status,
   isLoading,
+  loadingDifficulty,
   disableAnswerButton,
   generateQuestion,
   generateFeedback,
@@ -244,6 +247,7 @@ function Controls({
 }: {
   status: Status;
   isLoading: boolean;
+  loadingDifficulty: QuestionDifficulty | null;
   disableAnswerButton: boolean;
   generateQuestion: (difficulty: QuestionDifficulty) => void;
   generateFeedback: () => void;
@@ -265,17 +269,22 @@ function Controls({
           </Button>
         </>
       ) : (
-        questionDifficulties.map((difficulty) => (
-          <Button
-            key={difficulty}
-            size="sm"
-            variant={status === "awaiting-difficulty" ? "outline" : "default"}
-            onClick={() => generateQuestion(difficulty)}
-            disabled={isLoading}
-          >
-            {isLoading ? "Loading..." : formatQuestionDifficulty(difficulty)}
-          </Button>
-        ))
+        questionDifficulties.map((difficulty) => {
+          const isThisLoading = loadingDifficulty === difficulty;
+
+          return (
+            <Button
+              key={difficulty}
+              size="sm"
+              onClick={() => generateQuestion(difficulty)}
+              disabled={isLoading && !isThisLoading}
+            >
+              {isThisLoading
+                ? "Loading..."
+                : formatQuestionDifficulty(difficulty)}
+            </Button>
+          );
+        })
       )}
     </div>
   );

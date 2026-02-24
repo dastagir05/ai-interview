@@ -62,9 +62,9 @@ export function JobCard({ job }: JobCardProps) {
       />
       </div>
 
-      <CardContent className="p-4">
-        {/* Title */}
-        <h3 className="font-semibold text-base mb-1 mt-2 truncate group-hover:text-primary transition-colors">
+      <CardContent className="px-4 py-0">
+
+        <h3 className="font-semibold text-base mb-1 truncate group-hover:text-primary transition-colors">
           {job.title}
         </h3>
 
@@ -108,7 +108,7 @@ export function JobCard({ job }: JobCardProps) {
 
       <CardFooter className="p-4 pt-0">
         {/* Action Button */}
-        {job.progress > 0 ? (
+        {(job.progress > 0 || job.started === true) ? (
           <Button
             variant="outline"
             className="w-full"

@@ -176,18 +176,11 @@ function NoJobInfos() {
   return (
     <div className="container my-4 max-w-5xl">
       <div className="text-center mb-8 mt-8">
-        <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-          <BriefcaseIcon className="h-10 w-10 text-primary" />
-        </div>
+        
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
           Welcome to IPrepWithAI
         </h1>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          To get started, enter information about the type of job you are wanting
-          to apply for. This can be specific information copied directly from a
-          job listing or general information such as the tech stack you want to
-          work in.
-        </p>
+       
       </div>
 
       <Card className="border-2">

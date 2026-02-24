@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { NewQuestionClientPage } from "./_NewQuestionClientPage";
 import { requireUserId } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { Loading } from "@/components/Loading";
 
 export default async function QuestionsPage({
   params,
@@ -16,9 +17,7 @@ export default async function QuestionsPage({
   return (
     <Suspense
       fallback={
-        <div className="h-screen-header flex items-center justify-center">
-          <Loader2Icon className="animate-spin size-24" />
-        </div>
+        <Loading name="Loading Techical Question"/>
       }
     >
       <SuspendedComponent jobInfoId={jobInfoId} />

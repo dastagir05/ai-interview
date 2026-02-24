@@ -173,11 +173,16 @@ export function EditPersonalJobInfoForm({
         <Button
           disabled={form.formState.isSubmitting}
           type="submit"
-          className="w-full"
+          className="w-full h-10"
         >
-          <LoadingSwap isLoading={form.formState.isSubmitting}>
-            Save Job Information
-          </LoadingSwap>
+         {form.formState.isSubmitting ? (
+            <>
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              Saving…
+            </>
+          ) : (
+            "Save Job Information"
+          )}
         </Button>
       </form>
     </Form>

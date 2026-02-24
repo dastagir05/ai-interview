@@ -4,9 +4,11 @@ import { env } from "@/data/env/server";
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
 import { getCurrentUserId } from "@/lib/auth";
 import { EditPersonalJobInfoForm } from "@/features/jobInfos/components/EditPersonalJobInfoForm";
-import { Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { cookies } from "next/headers";
+import { Loading } from "@/components/Loading";
+
 
 export default async function JobInfoNewPage({
   params,
@@ -24,7 +26,9 @@ export default async function JobInfoNewPage({
       <Card>
         <CardContent>
           <Suspense
-            fallback={<Loader2 className="size-24 animate-spin mx-auto" />}
+            fallback={
+            <Loading name="Loading Job info" />
+          }
           >
             <SuspendedForm jobInfoId={jobInfoId} />
           </Suspense>
@@ -46,8 +50,21 @@ async function SuspendedForm({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`).then(
-    (res) => res.json()
-  );
-  return res;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken")?.value;
+  if (!token) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const res = await fetch(`${env.BACKEND_URL}/personal-jobs/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
+  const data = await res.json();
+
+  return data;
 }
