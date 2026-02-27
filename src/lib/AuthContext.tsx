@@ -1,5 +1,6 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -26,47 +27,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter(); 
+  const hasFetched = useRef(false); 
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
     fetchCurrentUser();
   }, []);
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await fetch(
-        `/api/auth/me`,
-        {
-          // headers: {
-          //   Authorization: `Bearer ${token}`,
-          // },
-          credentials: "include", 
-        }
-      );
-      
+      const response = await fetch("/api/auth/me", {
+        credentials: "include",
+      });
+
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
       } else {
         setUser(null);
       }
-    } catch (error) {
+    } catch {
       setUser(null);
-    }finally {
+    } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (userData: User) => {
+  const login = (userData: User) => {
     setUser(userData);
   };
 
   const logout = async () => {
-      await fetch(`/api/auth/logout`, {
-        method: 'POST',
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
         credentials: "include",
       });
+    } catch {
+      // still clear user even if logout request fails
+    } finally {
       setUser(null);
+      router.push("/");
+      router.refresh();
     }
+  };
 
   return (
     <AuthContext.Provider
@@ -76,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         isAuthenticated: !!user,
         isLoading,
-        isAdmin: user?.role === "ADMIN"
+        isAdmin: user?.role === "ADMIN",
       }}
     >
       {children}

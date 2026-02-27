@@ -7,9 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, PlayIcon, ArrowRight, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { Job } from "@/data/type/job";
+import { Job, levelColors } from "@/data/type/job";
 import { toast } from "sonner";
-// import Image from "next/image";
 
 interface JobCardProps {
   job: Job;
@@ -45,21 +44,15 @@ export function JobCard({ job }: JobCardProps) {
     router.push(`/personalJob`);
   };
 
-  const levelColors: Record<string, string> = {
-    INTERNSHIP:"bg-blue-500 hover:bg-blue-600",
-    JUNIOR: "bg-green-500 hover:bg-green-600",
-    SENIOR: "bg-orange-500 hover:bg-orange-600",
-  };
-
   return (
     <Card className="pt-0 pb-2 flex-shrink-0 w-72 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
       {/* IMG Section */}
       <div className="h-32 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center border-b">
-      <img
-        src={job.logo}
-        alt={job.title}
-        className="h-28 w-28 object-contain"
-      />
+        <img
+          src={job.logo}
+          alt={job.title}
+          className="h-28 w-28 object-contain"
+        />
       </div>
 
       <CardContent className="px-4 py-0">
@@ -89,11 +82,11 @@ export function JobCard({ job }: JobCardProps) {
         </div>
 
         <p className="text-sm text-muted-foreground leading-relaxed">
-        {job.description.length > 120 
-          ? `${job.description.slice(0, 120)}...` 
-          : job.description
-        }
-      </p>
+          {job.description.length > 120
+            ? `${job.description.slice(0, 120)}...`
+            : job.description
+          }
+        </p>
 
         {/* Progress Bar (if started) */}
         {job.progress > 0 && (

@@ -29,7 +29,7 @@ const options = [
     label: "Quick Quiz",
     description:
       "Sharpen your problem-solving skills with tailored aptitude tests.",
-    href: "aptitude",
+    href: "quiz",
     icon: ZapIcon,
   },
   {

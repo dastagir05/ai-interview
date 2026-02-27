@@ -1,5 +1,4 @@
 import JobInfos from "./JobInfos";
-import { Loader2Icon } from "lucide-react";
 import { Suspense } from "react";
 
 export default function Dashboard() {

@@ -15,18 +15,14 @@ import {
   Calendar,
   Download,
   ArrowLeft,
-  XCircle,
   CheckCircle2,
   BarChart3,
   TrendingUp,
-  Award,
   Target,
   Lightbulb,
   Lock,
   Crown,
-  Zap,
   Trophy,
-  Star,
   Flame,
 } from "lucide-react";
 import Link from "next/link";
@@ -52,13 +48,13 @@ export default function UserAnalyticsPage() {
 }
 
 function UserAnalyticsContent() {
-  
+
   const user = useAuth();
   console.log("user in analy", user)
-  const userTier : any = user.user?.tier; 
+  const userTier: any = user.user?.tier;
   const timeRange = "30d";
 
-  const { data: stats  } = useQuery<UserAnalytics>({
+  const { data: stats } = useQuery<UserAnalytics>({
     queryKey: ["user-analytics"],
     queryFn: () => fetch("/api/analytics/stats").then(r => r.json()),
   });
@@ -71,29 +67,13 @@ function UserAnalyticsContent() {
   const aptitudeStats = stats?.aptitudeStats
   const interviewAnalytics = stats?.interviewAnalytics
 
-  const insights = {
-    strengths: [
-      "Strong technical knowledge with consistent 8+ scores",
-      "Excellent communication skills during problem explanation",
-      "Good improvement trend in problem-solving over last 10 interviews",
-    ],
-    improvements: [
-      "Code quality needs attention - focus on clean code principles",
-      "Time management in coding challenges could be better",
-      "Edge case handling in solutions needs improvement",
-    ],
-    recommendations: [
-      "Practice writing unit tests for your solutions",
-      "Review SOLID principles and design patterns",
-      "Work on optimizing algorithm complexity",
-      "Try timed coding challenges to improve speed",
-    ],
-    nextMilestone: {
-      title: "Reach 90% pass rate",
-      current: 62,
-      target: 90,
-      interviewsNeeded: 8,
-    },
+  const insights = stats?.insights || {
+    strengths: [],
+    improvements: [],
+    recommendations: [],
+    patterns: [],
+    strongestSkill: "",
+    focusArea: ""
   };
 
   const getPercentage = (value?: number, total?: number) => {
@@ -112,7 +92,7 @@ function UserAnalyticsContent() {
     color: string;
   }) => {
     const percentage = getPercentage(count, total);
-  
+
     return (
       <div className="space-y-1">
         <div className="flex items-center justify-between text-sm">
@@ -134,43 +114,43 @@ function UserAnalyticsContent() {
   };
 
 
-const renderSkillChart = () => {
-  const data = [
-    { skill: "Technical", score: skillScores?.technical ?? 0 },
-    { skill: "Problem Solving", score: skillScores?.problemSolving ?? 0 },
-    { skill: "Communication", score: skillScores?.communication ?? 0 },
-    { skill: "Confidence", score: skillScores?.confidence ?? 0 },
-  ];
+  const renderSkillChart = () => {
+    const data = [
+      { skill: "Technical", score: skillScores?.technical ?? 0 },
+      { skill: "Problem Solving", score: skillScores?.problemSolving ?? 0 },
+      { skill: "Communication", score: skillScores?.communication ?? 0 },
+      { skill: "Confidence", score: skillScores?.confidence ?? 0 },
+    ];
 
-  return (
-    <ResponsiveContainer width="100%" height={280}>
-      <RadarChart data={data}>
-        <PolarGrid stroke="#e2e8f0" />
-        <PolarAngleAxis
-          dataKey="skill"
-          tick={{ fontSize: 12, fill: "#64748b", fontWeight: 500 }}
-        />
-        <Radar
-          name="Score"
-          dataKey="score"
-          stroke="#6366f1"
-          fill="#6366f1"
-          fillOpacity={0.25}
-          strokeWidth={2}
-          dot={{ fill: "#6366f1", r: 4 }}
-        />
-        <Tooltip
-          formatter={(value: any) => [`${value}/100`, "Score"]}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid #e2e8f0",
-            fontSize: "12px",
-          }}
-        />
-      </RadarChart>
-    </ResponsiveContainer>
-  );
-};
+    return (
+      <ResponsiveContainer width="100%" height={280}>
+        <RadarChart data={data}>
+          <PolarGrid stroke="#e2e8f0" />
+          <PolarAngleAxis
+            dataKey="skill"
+            tick={{ fontSize: 12, fill: "#64748b", fontWeight: 500 }}
+          />
+          <Radar
+            name="Score"
+            dataKey="score"
+            stroke="#6366f1"
+            fill="#6366f1"
+            fillOpacity={0.25}
+            strokeWidth={2}
+            dot={{ fill: "#6366f1", r: 4 }}
+          />
+          <Tooltip
+            formatter={(value: any) => [`${value}/100`, "Score"]}
+            contentStyle={{
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+              fontSize: "12px",
+            }}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
+    );
+  };
 
   return (
     <div className="container my-6 space-y-6">
@@ -398,8 +378,7 @@ const renderSkillChart = () => {
                     Strongest Skill
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Technical Knowledge</strong> - You consistently
-                    score high in technical assessments. Keep up the great work!
+                    {insights.strongestSkill}
                   </p>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
@@ -408,9 +387,7 @@ const renderSkillChart = () => {
                     Focus Area
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Code Quality</strong> - This area has room for
-                    improvement. Consider practicing clean code principles and
-                    design patterns.
+                    {insights.focusArea}
                   </p>
                 </div>
               </div>
@@ -464,7 +441,7 @@ const renderSkillChart = () => {
                   Your Strengths
                 </h4>
                 <ul className="space-y-2">
-                  {insights.strengths.map((strength, index) => (
+                  {insights.strengths.map((strength: string, index: number) => (
                     <li
                       key={index}
                       className="flex items-start gap-2 text-sm p-3 bg-green-50 rounded-lg"
@@ -483,7 +460,7 @@ const renderSkillChart = () => {
                   Areas to Improve
                 </h4>
                 <ul className="space-y-2">
-                  {insights.improvements.map((improvement, index) => (
+                  {insights.improvements.map((improvement: string, index: number) => (
                     <li
                       key={index}
                       className="flex items-start gap-2 text-sm p-3 bg-orange-50 rounded-lg"
@@ -502,7 +479,7 @@ const renderSkillChart = () => {
                   Recommended Actions
                 </h4>
                 <ul className="space-y-2">
-                  {insights.recommendations.map((recommendation, index) => (
+                  {insights.recommendations.map((recommendation: string, index: number) => (
                     <li
                       key={index}
                       className="flex items-start gap-2 text-sm p-3 bg-blue-50 rounded-lg"
@@ -514,38 +491,23 @@ const renderSkillChart = () => {
                 </ul>
               </div>
 
-              {/* Next Milestone */}
-              <div className="p-4 border-2 border-dashed rounded-lg">
-                <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-yellow-600" />
-                  Next Milestone
+              {/* Patterns */}
+              <div>
+                <h4 className="font-semibold mb-3 flex items-center gap-2 text-blue-700">
+                  <Lightbulb className="h-4 w-4" />
+                  Patterns
                 </h4>
-                <p className="text-sm mb-3">{insights.nextMilestone.title}</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span className="font-semibold">
-                      {insights.nextMilestone.current}% /{" "}
-                      {insights.nextMilestone.target}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
-                      style={{
-                        width: `${
-                          (insights.nextMilestone.current /
-                            insights.nextMilestone.target) *
-                          100
-                        }%`,
-                      }}
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Approximately {insights.nextMilestone.interviewsNeeded} more
-                    successful interviews needed
-                  </p>
-                </div>
+                <ul className="space-y-2">
+                  {insights.patterns.map((pattern: string, index: number) => (
+                    <li
+                      key={index}
+                      className="flex items-start gap-2 text-sm p-3 bg-blue-50 rounded-lg"
+                    >
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      <span>{pattern}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           ) : (

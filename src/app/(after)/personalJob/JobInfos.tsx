@@ -8,10 +8,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { ArrowRightIcon, PlusIcon, BriefcaseIcon, TrendingUpIcon, ClockIcon, TargetIcon } from "lucide-react";
+import { ArrowRightIcon, PlusIcon, ClockIcon, TargetIcon } from "lucide-react";
 import Link from "next/link";
 import { requireUserId } from "@/lib/auth";
-import { ExperienceLevel, PersonalJobDetails } from "@/data/type/job";
+import { PersonalJobDetails } from "@/data/type/job";
 import { env } from "@/data/env/server";
 import { PersonalJobInfoForm } from "@/features/jobInfos/components/PersonalInfoForm";
 import { cookies } from "next/headers";

@@ -33,7 +33,7 @@ export default function AptitudeHistoryPage() {
   useEffect(() => {
     async function loadHistory() {
       try {
-        const res = await fetch(`/api/aptitude/history?jobId=${jobInfoId}`);
+        const res = await fetch(`/api/quiz/history?jobId=${jobInfoId}`);
         if (!res.ok) throw new Error("Failed to load history");
         const data = await res.json();
         setAttempts(data);
@@ -77,7 +77,7 @@ export default function AptitudeHistoryPage() {
               {attempts.length} attempt{attempts.length !== 1 ? "s" : ""} completed
             </p>
           </div>
-          <Button onClick={() => router.push(`/job-infos/${jobInfoId}/aptitude/start`)}>
+          <Button onClick={() => router.push(`/job-infos/${jobInfoId}/quiz/start`)}>
             <PlusIcon className="size-4 mr-2" />
             New Attempt
           </Button>
@@ -145,7 +145,7 @@ export default function AptitudeHistoryPage() {
               </div>
               <Button
                 size="sm"
-                onClick={() => router.push(`/job-infos/${jobInfoId}/aptitude/start`)}
+                onClick={() => router.push(`/job-infos/${jobInfoId}/quiz/start`)}
               >
                 Resume
               </Button>
@@ -228,7 +228,7 @@ export default function AptitudeHistoryPage() {
                         size="sm"
                         onClick={() =>
                           router.push(
-                            `/job-infos/${jobInfoId}/aptitude/review/${a.attemptId}`
+                            `/job-infos/${jobInfoId}/quiz/review/${a.attemptId}`
                           )
                         }
                       >

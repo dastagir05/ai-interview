@@ -1,6 +1,5 @@
 import arcjet, { detectBot, shield, slidingWindow } from "@arcjet/next";
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { env } from "./data/env/server";
 
 const aj = arcjet({
@@ -18,6 +17,7 @@ const aj = arcjet({
     }),
   ],
 });
+
 const arcjetMiddleware = async (req: Request) => {
   const decision = await aj.protect(req);
 
@@ -27,44 +27,29 @@ const arcjetMiddleware = async (req: Request) => {
       { status: 429 }
     );
   }
-
-  return NextResponse.next();
+  return null; 
+  //return NextResponse.next();
 };
 
-export default withAuth(
-  async function middleware(req) {
-    const protectedResponse = await arcjetMiddleware(req);
-    if (protectedResponse.status !== 200) {
-      return protectedResponse;
+export default async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Run Arcjet protection
+  const arcjetResult = await arcjetMiddleware(req);
+  if (arcjetResult) return arcjetResult;
+
+  // Protect /dashboard routes
+  if (pathname.startsWith("/dashboard")) {
+    const token = req.cookies.get("authToken")?.value;
+
+    if (!token) {
+      // Redirect to home/login if no token
+      return NextResponse.redirect(new URL("/", req.url));
     }
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const pathname = req.nextUrl.pathname;
-
-        // // Check if the user is trying to access admin routes
-        // if (req.nextUrl.pathname.startsWith("/admin")) {
-        //   // Allow access to admin login page
-        //   if (req.nextUrl.pathname === "/admin/login") {
-        //     return true;
-        //   }
-
-        //   // For other admin routes, check if user has admin email
-        //   return token?.email === "pinjaridastageer@gmail.com";
-        // }
-
-        if (pathname.startsWith("/dashboard")) {
-          return !!token; 
-        }
-        return true;
-      },
-    },
-    pages: {
-      signIn: "/",
-    },
   }
-);
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ["/dashboard/:path*"],
