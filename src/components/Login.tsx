@@ -160,8 +160,8 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
       }
 
       const data = await response.json();
-      console.log("token from registration", data.accessToken);
-      localStorage.setItem("accessToken", data.accessToken);
+      // console.log("token from registration", data.accessToken);
+      // localStorage.setItem("accessToken", data.accessToken);
       setSuccess("Login successful! Redirecting...");
 
       window.location.href = `/api/auth/email/callback?token=${data.accessToken}`;

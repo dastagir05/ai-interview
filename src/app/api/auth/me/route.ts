@@ -5,8 +5,10 @@ import { env } from "@/data/env/server";
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   let token = cookieStore.get("authToken")?.value;
+  console.log("token", token);
  
   if (!token) {
+    console.log("token not found in cookieStore")
     return NextResponse.json({ user: null }, { status: 401 });
   }
 
