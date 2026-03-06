@@ -27,7 +27,7 @@ export default function AptitudeReviewPage() {
   useEffect(() => {
     async function loadReview() {
       try {
-        const res = await fetch(`/api/aptitude/review?attemptId=${attemptId}`);
+        const res = await fetch(`/api/quiz/review?attemptId=${attemptId}`);
         if (!res.ok) throw new Error("Failed to load review");
 
         const data = await res.json();
@@ -58,12 +58,12 @@ export default function AptitudeReviewPage() {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Aptitude Review</h1>
+        <h1 className="text-2xl font-semibold">Quiz Review</h1>
 
         <Button
           variant="outline"
           onClick={() =>
-            router.push(`/job-infos/${jobInfoId}/aptitude`)
+            router.push(`/job-infos/${jobInfoId}/quiz`)
           }
         >
           <ArrowLeft className="w-4 h-4 mr-2" />

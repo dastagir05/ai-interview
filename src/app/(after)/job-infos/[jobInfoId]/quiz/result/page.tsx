@@ -116,7 +116,7 @@ export default function AptitudeResultPage() {
           <Button
             variant="outline"
             className="flex-1"
-            onClick={() => router.push(`/job-infos/${jobInfoId}/aptitude`)}
+            onClick={() => router.push(`/job-infos/${jobInfoId}/quiz`)}
           >
             <ListIcon className="size-4 mr-2" />
             Back to History
@@ -125,7 +125,7 @@ export default function AptitudeResultPage() {
             variant="outline"
             className="flex-1"
             onClick={() =>
-              router.push(`/job-infos/${jobInfoId}/aptitude/review/${attemId}`)
+              router.push(`/job-infos/${jobInfoId}/quiz/review/${attemId}`)
             }
           >
             <ArrowRightIcon className="size-4 mr-2" />
@@ -133,7 +133,7 @@ export default function AptitudeResultPage() {
           </Button>
           <Button
             className="flex-1"
-            onClick={() => router.push(`/job-infos/${jobInfoId}/aptitude/start`)}
+            onClick={() => router.push(`/job-infos/${jobInfoId}/quiz/start`)}
           >
             <RotateCcwIcon className="size-4 mr-2" />
             Try Again

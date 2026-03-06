@@ -37,8 +37,8 @@ export default function AptitudeTestPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`/api/aptitude/start?jobId=${jobId}`);
-        if (!res.ok) throw new Error("Failed to load aptitude test");
+        const res = await fetch(`/api/quiz/start?jobId=${jobId}`);
+        if (!res.ok) throw new Error("Failed to load quiz test");
         const data = await res.json();
         setAttemptId(data.attemptId);
         setQuestions(data.questions);
@@ -61,7 +61,7 @@ export default function AptitudeTestPage() {
   async function submitTest() {
     if (!attemptId) return;
     try {
-      const res = await fetch(`/api/aptitude/submit`, {
+      const res = await fetch(`/api/quiz/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ attemptId, answers }),
@@ -74,7 +74,7 @@ export default function AptitudeTestPage() {
       if (!res.ok) throw new Error("Submission failed");
       const result = await res.json();
       router.push(
-        `/job-infos/${jobId}/aptitude/result?score=${result.score}&total=${result.total}&attemptId=${attemptId}`
+        `/job-infos/${jobId}/quiz/result?score=${result.score}&total=${result.total}&attemptId=${attemptId}`
       );
     } catch (e: any) {
       errorToast(e.message);
@@ -86,7 +86,7 @@ export default function AptitudeTestPage() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-muted border-t-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground text-sm">Generating your aptitude test...</p>
+          <p className="text-muted-foreground text-sm">Generating your Quiz test...</p>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ export default function AptitudeTestPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Aptitude Test</h2>
+            <h2 className="text-2xl font-bold tracking-tight">Quiz Test</h2>
             <p className="text-sm text-muted-foreground mt-0.5">
               {answeredCount} of {questions.length} answered
             </p>
@@ -127,7 +127,7 @@ export default function AptitudeTestPage() {
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Question {current + 1} of {questions.length}</span>
-            <span>{Math.round(progressPercent)}% complete</span>
+            <span>{Math.round(progressPercent)}% process</span>
           </div>
           <Progress value={progressPercent} className="h-2" />
         </div>
