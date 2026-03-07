@@ -66,7 +66,22 @@ export default function AIInterviewSessionPage({
   const countdownIntervalRef = useRef<number | null>(null);
   const interviewStateRef = useRef(interviewState);
   const finalTranscriptRef = useRef("");
-  const toSend = finalTranscriptRef.current.trim();
+  const interimTranscriptRef = useRef("");
+  const transcriptSentRef = useRef(false);
+
+  const sendTranscript = () => {
+    if (transcriptSentRef.current) return;
+
+    const toSend = (finalTranscriptRef.current + interimTranscriptRef.current).trim();
+    if (!toSend) return;
+
+    transcriptSentRef.current = true;
+    finalTranscriptRef.current = "";
+    interimTranscriptRef.current = "";
+    setTranscript("");
+
+    handleSendMessage(toSend);
+  };
 
   // Keep interviewState ref in sync
   useEffect(() => {
@@ -314,37 +329,32 @@ export default function AIInterviewSessionPage({
   
     recognitionRef.current.onresult = (event) => {
       let interimTranscript = "";
-  
+
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const text = event.results[i][0].transcript;
-  
+
         if (event.results[i].isFinal) {
           finalTranscriptRef.current += text + " ";
         } else {
           interimTranscript += text;
         }
       }
-  
+
+      interimTranscriptRef.current = interimTranscript;
+
       setTranscript(
-        (finalTranscriptRef.current + interimTranscript).trim()
+        (finalTranscriptRef.current + interimTranscriptRef.current).trim()
       );
     };
-  
+
     recognitionRef.current.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
       setIsListening(false);
     };
-  
+
     recognitionRef.current.onend = () => {
       setIsListening(false);
-  
-      const toSend = finalTranscriptRef.current.trim();
-  
-      if (toSend) {
-        finalTranscriptRef.current = "";
-        setTranscript("");
-        handleSendMessage(toSend);
-      }
+      sendTranscript();
     };
   };
 //  const initializeSpeechRecognition = () => {
@@ -425,20 +435,15 @@ export default function AIInterviewSessionPage({
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
-  
-      // Wait a bit to ensure the final transcript is received
-      setTimeout(() => {
-        const toSend = finalTranscriptRef.current.trim();
-  
-        if (toSend) {
-          finalTranscriptRef.current = "";
-          setTranscript("");
-          handleSendMessage(toSend);
-        }
-      }, 300); // small delay fixes Web Speech API timing
+
+      // In some browsers, onend may not fire reliably, so also attempt to send
+      // the current transcript after a short delay.
+      setTimeout(sendTranscript, 300);
     } else {
       stopSpeaking();
       finalTranscriptRef.current = "";
+      interimTranscriptRef.current = "";
+      transcriptSentRef.current = false;
       setTranscript("");
   
       try {
