@@ -301,36 +301,91 @@ export default function AIInterviewSessionPage({
 
   const initializeSpeechRecognition = () => {
     if (typeof window === "undefined") return;
-
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+  
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
-
+  
     recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = false;
+    recognitionRef.current.continuous = true;       // ← was false
     recognitionRef.current.interimResults = true;
     recognitionRef.current.lang = "en-US";
-
+  
+    let finalTranscript = "";                        // ← accumulates across pauses
+  
     recognitionRef.current.onresult = (event) => {
-      const current = event.resultIndex;
-      const transcriptText = event.results[current][0].transcript;
-      setTranscript(transcriptText);
-
-      if (event.results[current].isFinal) {
-        handleSendMessage(transcriptText);
-        setTranscript("");
+      let interimTranscript = "";
+  
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const text = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += text + " ";             // ← keep building full answer
+        } else {
+          interimTranscript += text;
+        }
       }
+  
+      setTranscript((finalTranscript + interimTranscript).trim());
     };
-
+  
     recognitionRef.current.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
       setIsListening(false);
     };
-
+  
     recognitionRef.current.onend = () => {
       setIsListening(false);
+      // Only send once mic is fully stopped
+      if (finalTranscript.trim()) {
+        handleSendMessage(finalTranscript.trim());
+        finalTranscript = "";
+        setTranscript("");
+      }
     };
   };
+//  const initializeSpeechRecognition = () => {
+//   if (typeof window === "undefined") return;
+
+//   const SpeechRecognition =
+//     window.SpeechRecognition || window.webkitSpeechRecognition;
+//   if (!SpeechRecognition) return;
+
+//   recognitionRef.current = new SpeechRecognition();
+//   recognitionRef.current.continuous = true;       // ← was false
+//   recognitionRef.current.interimResults = true;
+//   recognitionRef.current.lang = "en-US";
+
+//   let finalTranscript = "";                        // ← accumulates across pauses
+
+//   recognitionRef.current.onresult = (event) => {
+//     let interimTranscript = "";
+
+//     for (let i = event.resultIndex; i < event.results.length; i++) {
+//       const text = event.results[i][0].transcript;
+//       if (event.results[i].isFinal) {
+//         finalTranscript += text + " ";             // ← keep building full answer
+//       } else {
+//         interimTranscript += text;
+//       }
+//     }
+
+//     setTranscript((finalTranscript + interimTranscript).trim());
+//   };
+
+//   recognitionRef.current.onerror = (event) => {
+//     console.error("Speech recognition error:", event.error);
+//     setIsListening(false);
+//   };
+
+//   recognitionRef.current.onend = () => {
+//     setIsListening(false);
+//     // Only send once mic is fully stopped
+//     if (finalTranscript.trim()) {
+//       handleSendMessage(finalTranscript.trim());
+//       finalTranscript = "";
+//       setTranscript("");
+//     }
+//   };
+// };
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
