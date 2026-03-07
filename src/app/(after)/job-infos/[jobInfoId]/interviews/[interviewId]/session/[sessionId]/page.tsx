@@ -67,6 +67,7 @@ export default function AIInterviewSessionPage({
   const pollIntervalRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
   const interviewStateRef = useRef(interviewState);
+  const finalTranscriptRef = useRef("");
 
   // Keep interviewState ref in sync
   useEffect(() => {
@@ -306,11 +307,9 @@ export default function AIInterviewSessionPage({
     if (!SpeechRecognition) return;
   
     recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = true;       // ← was false
+    recognitionRef.current.continuous = true;
     recognitionRef.current.interimResults = true;
     recognitionRef.current.lang = "en-US";
-  
-    let finalTranscript = "";                        // ← accumulates across pauses
   
     recognitionRef.current.onresult = (event) => {
       let interimTranscript = "";
@@ -318,13 +317,13 @@ export default function AIInterviewSessionPage({
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const text = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += text + " ";             // ← keep building full answer
+          finalTranscriptRef.current += text + " "; // ← ref, not local var
         } else {
           interimTranscript += text;
         }
       }
   
-      setTranscript((finalTranscript + interimTranscript).trim());
+      setTranscript((finalTranscriptRef.current + interimTranscript).trim());
     };
   
     recognitionRef.current.onerror = (event) => {
@@ -334,12 +333,7 @@ export default function AIInterviewSessionPage({
   
     recognitionRef.current.onend = () => {
       setIsListening(false);
-      // Only send once mic is fully stopped
-      if (finalTranscript.trim()) {
-        handleSendMessage(finalTranscript.trim());
-        finalTranscript = "";
-        setTranscript("");
-      }
+      // No-op here — send is triggered manually via toggleListening
     };
   };
 //  const initializeSpeechRecognition = () => {
@@ -387,20 +381,51 @@ export default function AIInterviewSessionPage({
 //   };
 // };
 
+  // const toggleListening = () => {
+  //   if (!recognitionRef.current) {
+  //     alert(
+  //       "Speech recognition not supported in this browser. Please use text input instead."
+  //     );
+  //     setInputMode("text");
+  //     return;
+  //   }
+
+  //   if (isListening) {
+  //     recognitionRef.current.stop();
+  //     setIsListening(false);
+  //   } else {
+  //     stopSpeaking();
+  //     try {
+  //       recognitionRef.current.start();
+  //       setIsListening(true);
+  //     } catch (error) {
+  //       console.error("Failed to start recognition:", error);
+  //     }
+  //   }
+  // };
+
   const toggleListening = () => {
     if (!recognitionRef.current) {
-      alert(
-        "Speech recognition not supported in this browser. Please use text input instead."
-      );
+      alert("Speech recognition not supported. Please use text input instead.");
       setInputMode("text");
       return;
     }
-
+  
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
+  
+      // Send whatever was accumulated
+      const toSend = finalTranscriptRef.current.trim();
+      if (toSend) {
+        finalTranscriptRef.current = "";
+        setTranscript("");
+        handleSendMessage(toSend); // ← called here, so interviewState is fresh
+      }
     } else {
       stopSpeaking();
+      finalTranscriptRef.current = ""; // reset before new session
+      setTranscript("");
       try {
         recognitionRef.current.start();
         setIsListening(true);
@@ -409,7 +434,7 @@ export default function AIInterviewSessionPage({
       }
     }
   };
-
+  
   const speakText = (text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
 
