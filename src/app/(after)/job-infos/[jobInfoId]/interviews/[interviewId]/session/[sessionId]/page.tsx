@@ -45,9 +45,7 @@ export default function AIInterviewSessionPage({
 
   const [session, setSession] = useState<SessionDetailResponse>();
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
-  const [interviewState, setInterviewState] = useState<
-    "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "PAUSED"
-  >("NOT_STARTED");
+  const [interviewState, setInterviewState] = useState<"IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "PAUSED">("NOT_STARTED");
   const [results, setResults] = useState<CompleteInterviewResponse>();
 
   const [isListening, setIsListening] = useState(false);
@@ -68,6 +66,7 @@ export default function AIInterviewSessionPage({
   const countdownIntervalRef = useRef<number | null>(null);
   const interviewStateRef = useRef(interviewState);
   const finalTranscriptRef = useRef("");
+  const toSend = finalTranscriptRef.current.trim();
 
   // Keep interviewState ref in sync
   useEffect(() => {
@@ -303,7 +302,9 @@ export default function AIInterviewSessionPage({
   const initializeSpeechRecognition = () => {
     if (typeof window === "undefined") return;
   
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+  
     if (!SpeechRecognition) return;
   
     recognitionRef.current = new SpeechRecognition();
@@ -316,14 +317,17 @@ export default function AIInterviewSessionPage({
   
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const text = event.results[i][0].transcript;
+  
         if (event.results[i].isFinal) {
-          finalTranscriptRef.current += text + " "; // ← ref, not local var
+          finalTranscriptRef.current += text + " ";
         } else {
           interimTranscript += text;
         }
       }
   
-      setTranscript((finalTranscriptRef.current + interimTranscript).trim());
+      setTranscript(
+        (finalTranscriptRef.current + interimTranscript).trim()
+      );
     };
   
     recognitionRef.current.onerror = (event) => {
@@ -333,7 +337,14 @@ export default function AIInterviewSessionPage({
   
     recognitionRef.current.onend = () => {
       setIsListening(false);
-      // No-op here — send is triggered manually via toggleListening
+  
+      const toSend = finalTranscriptRef.current.trim();
+  
+      if (toSend) {
+        finalTranscriptRef.current = "";
+        setTranscript("");
+        handleSendMessage(toSend);
+      }
     };
   };
 //  const initializeSpeechRecognition = () => {
@@ -415,17 +426,21 @@ export default function AIInterviewSessionPage({
       recognitionRef.current.stop();
       setIsListening(false);
   
-      // Send whatever was accumulated
-      const toSend = finalTranscriptRef.current.trim();
-      if (toSend) {
-        finalTranscriptRef.current = "";
-        setTranscript("");
-        handleSendMessage(toSend); // ← called here, so interviewState is fresh
-      }
+      // Wait a bit to ensure the final transcript is received
+      setTimeout(() => {
+        const toSend = finalTranscriptRef.current.trim();
+  
+        if (toSend) {
+          finalTranscriptRef.current = "";
+          setTranscript("");
+          handleSendMessage(toSend);
+        }
+      }, 300); // small delay fixes Web Speech API timing
     } else {
       stopSpeaking();
-      finalTranscriptRef.current = ""; // reset before new session
+      finalTranscriptRef.current = "";
       setTranscript("");
+  
       try {
         recognitionRef.current.start();
         setIsListening(true);
@@ -434,7 +449,7 @@ export default function AIInterviewSessionPage({
       }
     }
   };
-  
+
   const speakText = (text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
 
