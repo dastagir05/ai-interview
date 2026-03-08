@@ -486,8 +486,9 @@ export default function AIInterviewSessionPage({
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim() || interviewState === "NOT_STARTED" || interviewState === "PAUSED") {
+      alert("Please start or resume the interview before sending your answer.");
       console.log("HSM interview state", interviewState) ; 
-      return
+      setInterviewState("IN_PROGRESS");
     }
 
     setLoading(true);
