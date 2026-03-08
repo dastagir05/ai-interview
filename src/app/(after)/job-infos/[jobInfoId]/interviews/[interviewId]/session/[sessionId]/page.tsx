@@ -83,8 +83,9 @@ export default function AIInterviewSessionPage({
     if (!toSend) return;
 
     if (interviewState === "NOT_STARTED" || interviewState === "PAUSED") {
-      alert("Please start or resume the interview before sending your answer.");
-      return;
+      // alert("Please start or resume the interview before sending your answer.");
+      // return;
+      setInterviewState("IN_PROGRESS");
     }
 
     transcriptSentRef.current = true;
@@ -484,7 +485,10 @@ export default function AIInterviewSessionPage({
   };
 
   const handleSendMessage = async (message: string) => {
-    if (!message.trim() || interviewState === "NOT_STARTED" || interviewState === "PAUSED") return;
+    if (!message.trim() || interviewState === "NOT_STARTED" || interviewState === "PAUSED") {
+      console.log("HSM interview state", interviewState) ; 
+      return
+    }
 
     setLoading(true);
     setConversation((prev) => [...prev, { role: "user", content: message }]);
