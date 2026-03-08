@@ -73,13 +73,21 @@ export default function AIInterviewSessionPage({
     if (transcriptSentRef.current) return;
 
     const toSend = (finalTranscriptRef.current + interimTranscriptRef.current).trim();
-    if (!toSend) return;
 
-    transcriptSentRef.current = true;
+    // Always clear the current transcript when recognition ends to avoid
+    // showing stale text repeatedly (even if there was no valid transcript).
     finalTranscriptRef.current = "";
     interimTranscriptRef.current = "";
     setTranscript("");
 
+    if (!toSend) return;
+
+    if (interviewState === "NOT_STARTED" || interviewState === "PAUSED") {
+      alert("Please start or resume the interview before sending your answer.");
+      return;
+    }
+
+    transcriptSentRef.current = true;
     handleSendMessage(toSend);
   };
 
@@ -1129,19 +1137,37 @@ export default function AIInterviewSessionPage({
             )}
 
             <div className="flex flex-col items-center gap-4">
-              <Button
-                onClick={toggleListening}
-                disabled={isSpeaking || loading || interviewState === "NOT_STARTED" || interviewState === "PAUSED"}
-                size="lg"
-                variant={isListening ? "destructive" : "default"}
-                className="h-16 w-16 rounded-full"
-              >
-                {isListening ? (
-                  <MicOff className="w-6 h-6" />
-                ) : (
-                  <Mic className="w-6 h-6" />
-                )}
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={toggleListening}
+                  disabled={isSpeaking || loading || interviewState === "NOT_STARTED" || interviewState === "PAUSED"}
+                  size="lg"
+                  variant={isListening ? "destructive" : "default"}
+                  className="h-16 w-16 rounded-full"
+                >
+                  {isListening ? (
+                    <MicOff className="w-6 h-6" />
+                  ) : (
+                    <Mic className="w-6 h-6" />
+                  )}
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    if (recognitionRef.current) recognitionRef.current.stop();
+                    sendTranscript();
+                  }}
+                  disabled={
+                    loading ||
+                    interviewState === "NOT_STARTED" ||
+                    interviewState === "PAUSED" ||
+                    !transcript.trim()
+                  }
+                  size="lg"
+                >
+                  <Send className="w-5 h-5" />
+                </Button>
+              </div>
 
               <div className="flex gap-3">
                 {isSpeaking && (
