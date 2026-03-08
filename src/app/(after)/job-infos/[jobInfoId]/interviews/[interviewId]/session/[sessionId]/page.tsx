@@ -65,32 +65,39 @@ export default function AIInterviewSessionPage({
   const pollIntervalRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
   const interviewStateRef = useRef(interviewState);
-  // const finalTranscriptRef = useRef("");
-  // const interimTranscriptRef = useRef("");
+  const finalTranscriptRef = useRef("");
+  const interimTranscriptRef = useRef("");
   const transcriptSentRef = useRef(false);
 
   const sendTranscript = () => {
     if (transcriptSentRef.current) return;
-
-    // const toSend = (finalTranscriptRef.current + interimTranscriptRef.current).trim();
-
-    // // Always clear the current transcript when recognition ends to avoid
-    // // showing stale text repeatedly (even if there was no valid transcript).
-    // finalTranscriptRef.current = "";
-    // interimTranscriptRef.current = "";
-    
-    // if (!toSend) return;
-    
-    if (interviewState === "NOT_STARTED" || interviewState === "PAUSED") {
-      // alert("Please start or resume the interview before sending your answer.");
-      // return;
-      setInterviewState("IN_PROGRESS");
-    }
-    
-    transcriptSentRef.current = true;
-    handleSendMessage(transcript);
+  
+    // Only use final — interim is unreliable at onend time
+    const toSend = finalTranscriptRef.current.trim();
+  
+    finalTranscriptRef.current = "";
+    interimTranscriptRef.current = "";
     setTranscript("");
+  
+    if (!toSend) return;
+  
+    transcriptSentRef.current = true;
+    handleSendMessage(toSend);
   };
+  // const sendTranscript = () => {
+  //   if (transcriptSentRef.current) return;
+
+  //   const toSend = (finalTranscriptRef.current + interimTranscriptRef.current).trim();
+  //   finalTranscriptRef.current = "";
+  //   interimTranscriptRef.current = "";
+  //   setTranscript("");
+
+  //   if (!toSend) return;
+  //   if (interviewState === "NOT_STARTED" || interviewState === "PAUSED") {setInterviewState("IN_PROGRESS")}
+
+  //   transcriptSentRef.current = true;
+  //   handleSendMessage(toSend);
+  // };
 
   // Keep interviewState ref in sync
   useEffect(() => {
@@ -335,36 +342,24 @@ export default function AIInterviewSessionPage({
     recognitionRef.current.continuous = true;
     recognitionRef.current.interimResults = true;
     recognitionRef.current.lang = "en-US";
-
+  
     recognitionRef.current.onresult = (event) => {
-      const current = event.resultIndex;
-      const transcriptText = event.results[current][0].transcript;
-      setTranscript(transcriptText);
+      let interimTranscript = "";
 
-      if (event.results[current].isFinal) {
-        handleSendMessage(transcriptText);
-        setTranscript("");
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const text = event.results[i][0].transcript;
+
+        if (event.results[i].isFinal) {
+          finalTranscriptRef.current += text + " ";
+          interimTranscriptRef.current = "";
+        } else {
+          interimTranscript += text;
+        }
       }
+
+      interimTranscriptRef.current = interimTranscript;
+      setTranscript((finalTranscriptRef.current + interimTranscriptRef.current).trim());
     };
-    // recognitionRef.current.onresult = (event) => {
-    //   let interimTranscript = "";
-
-    //   for (let i = event.resultIndex; i < event.results.length; i++) {
-    //     const text = event.results[i][0].transcript;
-
-    //     if (event.results[i].isFinal) {
-    //       finalTranscriptRef.current += text + " ";
-    //     } else {
-    //       interimTranscript += text;
-    //     }
-    //   }
-
-    //   interimTranscriptRef.current = interimTranscript;
-
-    //   setTranscript(
-    //     (finalTranscriptRef.current + interimTranscriptRef.current).trim()
-    //   );
-    // };
 
     recognitionRef.current.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
@@ -460,8 +455,8 @@ export default function AIInterviewSessionPage({
       setTimeout(sendTranscript, 300);
     } else {
       stopSpeaking();
-      // finalTranscriptRef.current = "";
-      // interimTranscriptRef.current = "";
+      finalTranscriptRef.current = "";
+      interimTranscriptRef.current = "";
       transcriptSentRef.current = false;
       setTranscript("");
   
@@ -496,6 +491,7 @@ export default function AIInterviewSessionPage({
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim() || interviewState === "NOT_STARTED" || interviewState === "PAUSED") {
+      alert("Please start or resume the interview before sending your answer.");
       console.log("HSM interview state", interviewState) ; 
       setInterviewState("IN_PROGRESS");
     }
@@ -526,6 +522,7 @@ export default function AIInterviewSessionPage({
         { role: "assistant", content: data.aiResponse },
       ]);
 
+      // Update question number if provided in response
       if (data.currentQuestion) {
         setQuestionNumber(data.currentQuestion);
       }
@@ -534,6 +531,8 @@ export default function AIInterviewSessionPage({
         speakText(data.aiResponse);
       }
 
+      // Backend will manage completion based on time and session state
+      // Check if backend marked session as completed after this message
       if (data.status === "COMPLETED") {
         // Backend has marked the session as completed
         setInterviewState("COMPLETED");
