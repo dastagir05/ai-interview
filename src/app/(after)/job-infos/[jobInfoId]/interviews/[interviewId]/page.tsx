@@ -388,7 +388,7 @@ export default function InterviewSessionsPage({
           {sessions.map((session) => (
             <Card
               key={session.sessionId}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
+              className="cursor-pointer hover:shadow-lg transition-shadow pb-4"
               onClick={() => handleCardClick(session.sessionId)}
             >
               <CardHeader>

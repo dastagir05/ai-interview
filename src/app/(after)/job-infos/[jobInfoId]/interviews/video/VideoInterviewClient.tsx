@@ -46,7 +46,7 @@ export function VideoInterviewClient({
       }
       const data = await response.json();
       router.push(
-        `/job-infos/${jobInfoId}/interviews/${data.configurationId}/session/${data.sessionId}?video=1`
+        `/job-infos/${jobInfoId}/interviews/video/session/${data.sessionId}?configurationId=${data.configurationId}&video=1`
       );
     } catch (e) {
       toast.error("Something went wrong.");
