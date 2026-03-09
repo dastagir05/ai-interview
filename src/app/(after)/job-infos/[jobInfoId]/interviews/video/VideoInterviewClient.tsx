@@ -56,11 +56,12 @@ export function VideoInterviewClient({
 
   return (
     <div className="container py-2 gap-2 flex flex-col items-start max-w-2xl">
+      <h1 className="text-2xl font-semibold">
       <JobInfoBackLink jobInfoId={jobInfoId} />
-      <h1 className="text-2xl font-semibold">Video mock interview</h1>
-      <p className="text-muted-foreground text-sm">{jobTitle}</p>
+        Video mock interview</h1>
+      <p className="mb-3 text-2xl font-bold">{jobTitle}</p>
 
-      <Card className="w-full">
+      <Card className="w-full pb-4">
         <CardHeader>
           <div className="flex items-center gap-2">
             <VideoIcon className="size-5 text-muted-foreground" />

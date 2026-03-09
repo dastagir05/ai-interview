@@ -96,7 +96,7 @@ export function ResumePageClient({ jobInfoId }: { jobInfoId: string }) {
           <LoadingSwap isLoading={isLoading}>
             <div
               className={cn(
-                "mt-2 border-2 border-dashed rounded-lg p-6 transition-colors relative mb-4",
+                "border-2 border-dashed rounded-lg p-6 transition-colors relative mb-4",
                 isDragOver
                   ? "border-primary bg-primary/5"
                   : "border-muted-foreground/50 bg-muted/10"
@@ -180,7 +180,7 @@ function AnalysisResults({
           )}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <Accordion type="multiple">
           {Object.entries(sections).map(([key, title]) => {
             const category = aiAnalysis?.[key as Keys];

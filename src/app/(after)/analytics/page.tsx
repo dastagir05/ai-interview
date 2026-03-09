@@ -157,11 +157,6 @@ function UserAnalyticsContent() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/dashboard">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl md:text-4xl font-bold">My Analytics</h1>
@@ -195,14 +190,14 @@ function UserAnalyticsContent() {
 
       {/* Key metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="gap-3">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               My Interviews
             </CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="text-2xl font-bold">{metrics?.totalInterviews}</div>
             <p className="text-xs text-muted-foreground">
               Total AI mock interviews completed
@@ -210,12 +205,12 @@ function UserAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card className="gap-3">
+        <Card>
           <CardHeader>
             <CardTitle>Quick Quiz Performance</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="pt-0">
+            <div className="space-y-2">
               {/* Total quizzes */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Total Quizzes</span>
@@ -231,14 +226,14 @@ function UserAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card className="gap-3">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Score</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="text-2xl font-bold">
-              {metrics?.averageScore}/100
+              {metrics?.averageScore.toFixed(2)}/100
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               Average rating across all interviews
@@ -246,12 +241,12 @@ function UserAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card className="gap-3">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Current Streak</CardTitle>
             <Flame className="h-4 w-4 text-orange-500" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="text-2xl font-bold">{metrics?.currentStreak} days</div>
             <p className="mt-1 text-xs text-muted-foreground">
               Longest: {metrics?.longestStreak} days
@@ -269,7 +264,7 @@ function UserAnalyticsContent() {
               How your interview scores are distributed
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className="space-y-3">
               {[
                 {
@@ -311,7 +306,7 @@ function UserAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="pb-4">
           <CardHeader>
             <CardTitle>Recent Interviews</CardTitle>
           </CardHeader>

@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { FILTER_OPTIONS } from "@/data/type/dashboard";
 
 interface DashboardHeaderProps {
   searchQuery: string;
@@ -11,19 +12,6 @@ interface DashboardHeaderProps {
   setActiveFilters: (filters: string[] | ((prev: string[]) => string[])) => void;
 }
 
-const FILTER_OPTIONS = [
-  "All",
-  "Junior",
-  "Senior",
-  "Programming",
-  "Framework",
-  "System Design",
-  "Java",
-  "Python",
-  "JavaScript",
-  "Spring Boot",
-  "MERN",
-];
 
 export function DashboardHeader({
   searchQuery,
@@ -51,7 +39,7 @@ export function DashboardHeader({
 
   return (
     <div className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-      <div className="container mx-auto px-4 py-4 max-w-7xl">
+      <div className="container mx-auto px-4 py-4">
         {/* Search Bar */}
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />

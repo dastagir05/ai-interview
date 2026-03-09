@@ -11,11 +11,6 @@ import {
 } from "@/components/ui/card";
 import {
   ArrowRightIcon,
-  ZapIcon,
-  CodeIcon,
-  MicIcon,
-  FileTextIcon,
-  PencilIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
@@ -24,42 +19,8 @@ import { env } from "@/data/env/server";
 import { PersonalJobDetails } from "@/data/type/job";
 import { cookies } from "next/headers";
 import { VideoMockInterviewCard } from "@/features/jobInfos/components/VideoMockInterviewCard";
+import { options } from "@/data/type/job-infos";
 
-const options = [
-  {
-    label: "Quick Quiz",
-    description:
-      "Sharpen your problem-solving skills with tailored quiz tests.",
-    href: "quiz",
-    icon: ZapIcon,
-  },
-  {
-    label: "Answer Technical Questions",
-    description:
-      "Challenge yourself with practice questions tailored to your job description.",
-    href: "questions",
-    icon: CodeIcon,
-  },
-  {
-    label: "Practice Interviewing",
-    description: "Simulate a real interview with AI-powered mock interviews.",
-    href: "interviews",
-    icon: MicIcon,
-  },
-  {
-    label: "Refine Your Resume",
-    description:
-      "Get expert feedback on your resume and improve your chances of landing an interview.",
-    href: "resume",
-    icon: FileTextIcon,
-  },
-  {
-    label: "Update Job Description",
-    description: "This should only be used for minor updates.",
-    href: "edit",
-    icon: PencilIcon,
-  },
-];
 
 export default async function JobInfoPage({
   params,
@@ -94,12 +55,11 @@ export default async function JobInfoPage({
 
   return (
     <div className="container my-4 space-y-4">
-      <BackLink href="/personalJob">Dashboard</BackLink>
-
       <div className="space-y-6">
         <header className="space-y-4">
           <div className="space-y-2">
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+            <BackLink href="/personalJob">{""}</BackLink>
               <SuspendedItem
                 item={Promise.resolve(jobInfo)}
                 fallback={<Skeleton className="w-48" />}

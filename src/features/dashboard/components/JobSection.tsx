@@ -29,7 +29,7 @@ export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
   if (jobs.length === 0) return null;
 
   return (
-    <div className="mb-10">
+    <div className="mb-6">
       {/* Section Header */}
       <div className="flex items-center mb-4">
         {Icon && <Icon size={24} className="mr-2 text-muted-foreground" />}
@@ -46,7 +46,7 @@ export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
           onClick={() => scroll("left")}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background shadow-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
         >
-          <ChevronLeft className="h-6 w-6 " />
+          <ChevronLeft className="h-10 w-10 text-muted-foreground" />
         </Button>
 
         {/* Cards Container */}
@@ -70,7 +70,7 @@ export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
           onClick={() => scroll("right")}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background shadow-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-10 w-10" />
         </Button>
       </div>
 

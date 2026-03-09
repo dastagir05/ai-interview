@@ -1,9 +1,7 @@
 import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
-// import { canRunResumeAnalysis } from "@/features/resumeAnalyses/permissions";
-import { Loader2Icon } from "lucide-react";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ResumePageClient } from "./_client";
+import { Loading } from "@/components/Loading";
 
 export default async function ResumePage({
   params,
@@ -16,7 +14,7 @@ export default async function ResumePage({
     <div className="container py-4 space-y-4 h-screen-header flex flex-col items-start">
       <JobInfoBackLink jobInfoId={jobInfoId} />
       <Suspense
-        fallback={<Loader2Icon className="animate-spin size-24 m-auto" />}
+        fallback={<Loading name="Loading Resume" />}
       >
         <SuspendedComponent jobInfoId={jobInfoId} />
       </Suspense>
@@ -25,7 +23,5 @@ export default async function ResumePage({
 }
 
 async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
-  // if (!(await canRunResumeAnalysis())) return redirect("/upgrade");
-
   return <ResumePageClient jobInfoId={jobInfoId} />;
 }

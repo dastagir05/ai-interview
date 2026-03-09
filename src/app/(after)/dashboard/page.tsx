@@ -41,7 +41,6 @@ export type Section = {
   jobs: Job[];
 };
 
-// Icon mapping
 const ICON_MAP: Record<string, LucideIcon> = {
   layout: Layout,
   server: Server,
@@ -113,7 +112,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <DashboardHeader
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -121,11 +120,11 @@ export default function DashboardPage() {
         setActiveFilters={setActiveFilters}
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 ">
         {sections.length === 0 ? (
           <EmptyState onClearFilters={handleClearFilters} />
         ) : (
-          <div className="space-y-10">
+          <div className="space-y-5">
             {sections.map((section) => (
               <JobSection
                 key={section.title}

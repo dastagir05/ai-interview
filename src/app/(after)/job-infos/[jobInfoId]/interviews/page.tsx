@@ -24,6 +24,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { env } from "@/data/env/server";
 import { Suspense } from "react";
+import { Loading } from "@/components/Loading";
 import { StartGeneralInterviewButton } from "./StartGeneralInterviewButton";
 
 export default async function InterviewsPage({
@@ -34,9 +35,11 @@ export default async function InterviewsPage({
   const { jobInfoId } = await params;
 
   return (
-    <div className="container py-2 gap-2 h-screen-header flex flex-col items-start">
+    <div className="container py-2 gap-2 h-screen-header flex flex-col ">
       <Suspense
-        fallback={<Loader2Icon className="size-24 animate-spin m-auto" />}
+        fallback={
+        <Loading name="Loading Interviews" />
+      }
       >
         <SuspendedPage jobInfoId={jobInfoId} />
       </Suspense>
@@ -88,9 +91,9 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
             <JobInfoBackLink jobInfoId={jobInfoId} />
             Interviews
           </h1>
-          <div className="px-4 md:px-6 hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="mb-4 px-4 md:px-6 hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
             <HistoryIcon className="size-3" />
-            <span className="text-muted-foreground text-sm font-medium">
+            <span className=" text-muted-foreground text-sm font-medium">
             Last practiced{" "}
               {lastPracticedRelative ?? "not yet started"}
             </span>

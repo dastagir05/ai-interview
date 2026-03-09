@@ -157,6 +157,7 @@ export function EditPersonalJobInfoForm({
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
+                  className="h-80"
                   placeholder="A Next.js 15 and React 19 full stack web developer job that uses Drizzle ORM and Postgres for database management."
                   {...field}
                 />

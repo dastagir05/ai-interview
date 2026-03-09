@@ -19,12 +19,12 @@ export default async function JobInfoNewPage({
 
   return (
     <div className="container my-4 max-w-5xl space-y-4">
+      <h1 className="text-3xl md:text-4xl">       
       <JobInfoBackLink jobInfoId={jobInfoId} />
-
-      <h1 className="text-3xl md:text-4xl">Edit Job Description</h1>
+       Edit Job Description</h1>
 
       <Card>
-        <CardContent>
+        <CardContent className="px-4 md:px-6 py-4 md:py-6">
           <Suspense
             fallback={
             <Loading name="Loading Job info" />
