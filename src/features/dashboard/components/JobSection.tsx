@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobCard } from "./JobCard";
@@ -14,6 +14,7 @@ interface JobSectionProps {
 
 export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isSectionHovered, setIsSectionHovered] = useState(false);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -25,8 +26,9 @@ export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
     }
   };
 
-  // Don't render if no jobs
   if (jobs.length === 0) return null;
+
+  const showScrollButtons = jobs.length > 5;
 
   return (
     <div className="mb-6">
@@ -39,20 +41,28 @@ export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
         </span>
       </div>
 
-      <div className="relative group">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background shadow-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
-        >
-          <ChevronLeft className="h-10 w-10 text-muted-foreground" />
-        </Button>
+      <div
+        className="flex items-center w-full"
+        onMouseEnter={() => setIsSectionHovered(true)}
+        onMouseLeave={() => setIsSectionHovered(false)}
+      >
+        {showScrollButtons && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll("left")}
+            className={`shrink-0 -ml-14 bg-background hover:bg-muted shadow-md rounded-full h-10 w-10 z-10 border border-border/50 transition-opacity ${
+              isSectionHovered ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+          </Button>
+        )}
 
-        {/* Cards Container */}
+        {/* Cards Container - full width section, scrolls inside */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 w-full min-w-0"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
@@ -63,15 +73,18 @@ export function JobSection({ title, jobs, icon: Icon }: JobSectionProps) {
           ))}
         </div>
 
-        {/* Right Scroll Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background shadow-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
-        >
-          <ChevronRight className="h-10 w-10" />
-        </Button>
+        {showScrollButtons && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll("right")}
+            className={`shrink-0 -mr-14 bg-background hover:bg-muted shadow-md rounded-full h-10 w-10 z-10 border border-border/50 transition-opacity ${
+              isSectionHovered ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          </Button>
+        )}
       </div>
 
       {/* Hide scrollbar */}
