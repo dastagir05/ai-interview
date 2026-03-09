@@ -45,7 +45,7 @@ export function JobCard({ job }: JobCardProps) {
   };
 
   return (
-    <Card className="pt-0 pb-2 flex-shrink-0 w-72 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+    <Card className="pb-2 flex-shrink-0 w-72 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
       {/* IMG Section */}
       <div className="h-32 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center border-b">
         <img
@@ -55,7 +55,7 @@ export function JobCard({ job }: JobCardProps) {
         />
       </div>
 
-      <CardContent className="px-4 py-0">
+      <CardContent className="px-4">
 
         <h3 className="font-semibold text-base mb-1 truncate group-hover:text-primary transition-colors">
           {job.title}
@@ -99,7 +99,7 @@ export function JobCard({ job }: JobCardProps) {
         )}
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4">
         {/* Action Button */}
         {(job.progress > 0 || job.started === true) ? (
           <Button

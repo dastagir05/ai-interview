@@ -39,7 +39,7 @@ export function JobInfoBackLink({
       href={`/job-infos/${jobInfoId}`}
       className={cn("mb-3", className)}
     >
-      {jobName ?? ""}
+      {jobName ?? "Job Description"}
     </BackLink>
   );
 }

@@ -25,7 +25,7 @@ export interface InterviewCardDTO {
   jobTitle: string;
   jobDescription: string;
   focusDomains: string[];
-  difficulty:string;
+  difficulty: string;
   isActive: Boolean;
   createdAt: string; // ISO string from backend
   durationMinutes: number | null;
@@ -33,7 +33,12 @@ export interface InterviewCardDTO {
   includeCodeChallenges: Boolean;
   totalSessions: number;
   completedSessions: number;
-  averageScore: number;
+  isGeneralInterview: boolean;
+  averageScore: number | null;
+  /** When the user last completed a session (ISO string). */
+  lastSessionAt: string | null;
+  /** Overall score of the most recent completed session. */
+  lastSessionScore: number | null;
 }
 
 export enum InterviewStatus {

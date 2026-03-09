@@ -114,7 +114,6 @@ function UserSettingsContent() {
         name: user.name || "",
       });
     }
-    console.log("user in effect", user)
   }, [user]);
 
   // Update profile mutation (name only)
@@ -368,7 +367,7 @@ function UserSettingsContent() {
     },
     BASIC: {
       name: "Basic",
-      price: "₹299",
+      price: "₹499",
       period: "per month",
       features: [
         "10 mock interviews per month",
@@ -381,7 +380,7 @@ function UserSettingsContent() {
     },
     PRO: {
       name: "Pro",
-      price: "₹999",
+      price: "₹4999",
       period: "per month",
       features: [
         "Unlimited mock interviews",
@@ -427,7 +426,7 @@ function UserSettingsContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="container mx-auto px-4 py-2 max-w-5xl">
       {/* Header */}
       <div className="mb-8">
         <Link href="/dashboard">
@@ -436,10 +435,17 @@ function UserSettingsContent() {
             Back to Dashboard
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your account settings and subscription
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary text-xl font-semibold ring-2 ring-primary/20">
+            {user?.name?.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Account Settings</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage your profile, security, and subscription
+            </p>
+          </div>
+        </div>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
@@ -470,7 +476,7 @@ function UserSettingsContent() {
         {/* Profile Tab */}
         <TabsContent value="profile" className="space-y-6">
           {/* Profile Information */}
-          <Card>
+          <Card className="gap-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div>
                 <CardTitle>Profile Information</CardTitle>
@@ -627,9 +633,9 @@ function UserSettingsContent() {
 
           {/* Change Password */}
           <Collapsible open={isPasswordOpen} onOpenChange={setIsPasswordOpen}>
-            <Card>
-              <CollapsibleTrigger className="w-full">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <Card className="gap-0 ">
+              <CollapsibleTrigger className="w-full space-y-0 pb-0">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-2">
                   <div className="text-left">
                     <CardTitle>Change Password</CardTitle>
                     <CardDescription>
@@ -643,10 +649,10 @@ function UserSettingsContent() {
                   )}
                 </CardHeader>
               </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CardContent className="space-y-4 pt-4">
+              <CollapsibleContent className="pt-0">
+                <CardContent className="space-y-4">
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 text-sm">
-                    <Shield className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                    <Shield className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-amber-900 dark:text-amber-100">
                         Security Verification Required
@@ -738,14 +744,14 @@ function UserSettingsContent() {
           </Collapsible>
 
           {/* Danger Zone */}
-          <Card className="border-destructive">
-            <CardHeader>
+          <Card className="border-destructive gap-0">
+            <CardHeader className="px-6 pb-2">
               <CardTitle className="text-destructive">Danger Zone</CardTitle>
               <CardDescription>
                 Irreversible actions for your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-6 pt-0">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" className="w-full">
@@ -788,210 +794,260 @@ function UserSettingsContent() {
         </TabsContent>
 
         {/* Subscription Tab */}
-        <TabsContent value="subscription" className="space-y-6">
-          {/* Current Plan */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Plan</CardTitle>
-              <CardDescription>
-                Manage your subscription and view usage
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-6 rounded-lg bg-primary/5 border-2 border-primary/20">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-2xl font-bold">
-                      {tiers[user.tier as keyof typeof tiers]?.name || "Free"}
-                    </h3>
-                    <Badge variant="secondary">Current Plan</Badge>
-                  </div>
-                  <p className="text-muted-foreground">
-                    {tiers[user.tier as keyof typeof tiers]?.price || "₹0"} /{" "}
-                    {tiers[user.tier as keyof typeof tiers]?.period || "forever"}
-                  </p>
-                </div>
-                <Crown className="h-12 w-12 text-primary" />
-              </div>
+        {/* Subscription Tab - DROP IN REPLACEMENT for TabsContent value="subscription" */}
+<TabsContent value="subscription" className="space-y-6">
 
-              {/* Usage Stats */}
-              <div className="mt-6 space-y-4">
-                <h4 className="font-semibold">Usage This Month</h4>
+{/* Current Plan - Hero Card */}
+<div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-0.5">
+  <div className="relative rounded-[14px] bg-background overflow-hidden">
+    {/* Decorative background blobs */}
+    <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+    <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
 
-                {/* Interviews */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Mock Interviews</span>
-                    <span className="font-medium">
-                      {usage.interviews.used} /{" "}
-                      {usage.interviews.limit === 999 ? "∞" : usage.interviews.limit}
-                    </span>
-                  </div>
-                  <Progress
-                    value={
-                      (usage.interviews.used / usage.interviews.limit) * 100
-                    }
-                  />
-                </div>
+    <div className="relative p-6 space-y-6">
+      {/* Plan header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">Active Plan</p>
+          <div className="flex items-center gap-3">
+            <h3 className="text-3xl font-bold tracking-tight">
+              {tiers[user.tier as keyof typeof tiers]?.name || "Free"}
+            </h3>
+            <Badge className="bg-primary/15 text-primary border-primary/20 hover:bg-primary/20">
+              Active
+            </Badge>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            <span className="text-xl font-bold text-foreground">
+              {tiers[user.tier as keyof typeof tiers]?.price || "₹0"}
+            </span>
+            {" "}/ {tiers[user.tier as keyof typeof tiers]?.period || "forever"}
+          </p>
+        </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Job Postings</span>
-                    <span className="font-medium">
-                      {usage.jobPosts.used} /{" "}
-                      {usage.jobPosts.limit === 999 ? "∞" : usage.jobPosts.limit}
-                    </span>
-                  </div>
-                  <Progress
-                    value={(usage.jobPosts.used / usage.jobPosts.limit) * 100}
-                  />
-                </div>
+        {/* Plan icon visual */}
+        <div className="relative flex-shrink-0">
+          <div className="h-16 w-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-inner">
+            <Crown className="h-8 w-8 text-primary" />
+          </div>
+          {user.tier === "PRO" && (
+            <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-primary items-center justify-center">
+                <Sparkles className="h-2.5 w-2.5 text-white" />
+              </span>
+            </span>
+          )}
+        </div>
+      </div>
 
-                {/* AI Minutes */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">AI Minutes</span>
-                    <span className="font-medium">
-                      {usage.aiMinutes.used} /{" "}
-                      {usage.aiMinutes.limit === 999 ? "∞" : usage.aiMinutes.limit}
-                    </span>
-                  </div>
-                  <Progress
-                    value={(usage.aiMinutes.used / usage.aiMinutes.limit) * 100}
-                  />
-                </div>
+      {/* Divider */}
+      <Separator className="opacity-50" />
 
-                {user.tier !== "PRO" && (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 text-sm">
-                    <Sparkles className="h-4 w-4 flex-shrink-0" />
-                    <p>💡 Usage resets on the 1st of every month</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Upgrade Plans */}
+      {/* Usage Stats */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-semibold">This Month's Usage</h4>
           {user.tier !== "PRO" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Upgrade Your Plan {user.tier}</CardTitle>
-                <CardDescription>Choose a plan that fits your needs</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {user.tier === "FREE" && (
-                    <>
-                      {/* BASIC Plan */}
-                      <div className="border rounded-lg p-6 space-y-4">
-                        <div>
-                          <h3 className="text-xl font-bold">Basic</h3>
-                          <div className="mt-2">
-                            <span className="text-3xl font-bold">₹299</span>
-                            <span className="text-muted-foreground">/month</span>
-                          </div>
-                        </div>
-                        <ul className="space-y-2">
-                          {tiers.BASIC.features.map((feature, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                              <span className="text-sm">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <Button
-                          onClick={() => handleUpgrade("BASIC")}
-                          className="w-full mt-6"
-                          variant="outline"
-                        >
-                          Upgrade to Basic
-                        </Button>
-                      </div>
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              Resets on 1st
+            </span>
+          )}
+        </div>
 
-                      {/* PRO Plan */}
-                      <div className="border-2 border-primary rounded-lg p-6 space-y-4 relative">
-                        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                          Popular
-                        </Badge>
-                        <div>
-                          <h3 className="text-xl font-bold">Pro</h3>
-                          <div className="mt-2">
-                            <span className="text-3xl font-bold">₹999</span>
-                            <span className="text-muted-foreground">/month</span>
-                          </div>
-                        </div>
-                        <ul className="space-y-2">
-                          {tiers.PRO.features.map((feature, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                              <span className="text-sm">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <Button
-                          onClick={() => handleUpgrade("PRO")}
-                          className="w-full mt-6"
-                        >
-                          Upgrade to Pro
-                        </Button>
-                      </div>
-                    </>
-                  )}
+        {/* Interview usage */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-sm items-center">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-blue-500" />
+              <span className="text-muted-foreground">Mock Interviews</span>
+            </div>
+            <span className="font-semibold tabular-nums">
+              {usage.interviews.used}
+              <span className="text-muted-foreground font-normal">
+                {" "}/ {usage.interviews.limit === 999 ? "∞" : usage.interviews.limit}
+              </span>
+            </span>
+          </div>
+          <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-700"
+              style={{ width: `${Math.min((usage.interviews.used / usage.interviews.limit) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
 
-                  {user.tier === "BASIC" && (
-                    <div className="border-2 border-primary rounded-lg p-6 space-y-4 relative max-w-md mx-auto w-full">
-                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        Recommended
-                      </Badge>
-                      <div>
-                        <h3 className="text-xl font-bold">Pro</h3>
-                        <div className="mt-2">
-                          <span className="text-3xl font-bold">₹999</span>
-                          <span className="text-muted-foreground">/month</span>
-                        </div>
-                      </div>
-                      <ul className="space-y-2">
-                        {tiers.PRO.features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                            <span className="text-sm">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <Button
-                        onClick={() => handleUpgrade("PRO")}
-                        className="w-full mt-6"
-                      >
-                        Upgrade to Pro
-                      </Button>
-                    </div>
-                  )}
+        {/* Job postings usage */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-sm items-center">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-violet-500" />
+              <span className="text-muted-foreground">Job Postings</span>
+            </div>
+            <span className="font-semibold tabular-nums">
+              {usage.jobPosts.used}
+              <span className="text-muted-foreground font-normal">
+                {" "}/ {usage.jobPosts.limit === 999 ? "∞" : usage.jobPosts.limit}
+              </span>
+            </span>
+          </div>
+          <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-violet-400 transition-all duration-700"
+              style={{ width: `${Math.min((usage.jobPosts.used / usage.jobPosts.limit) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* AI minutes usage */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-sm items-center">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="text-muted-foreground">AI Minutes</span>
+            </div>
+            <span className="font-semibold tabular-nums">
+              {usage.aiMinutes.used}
+              <span className="text-muted-foreground font-normal">
+                {" "}/ {usage.aiMinutes.limit === 999 ? "∞" : usage.aiMinutes.limit}
+              </span>
+            </span>
+          </div>
+          <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700"
+              style={{ width: `${Math.min((usage.aiMinutes.used / usage.aiMinutes.limit) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Upgrade CTA inside card if not PRO */}
+      {user.tier !== "PRO" && (
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+          <Sparkles className="h-4 w-4 text-primary flex-shrink-0" />
+          <p className="text-sm text-muted-foreground flex-1">
+            Upgrade to <span className="font-semibold text-foreground">Pro</span> for unlimited access
+          </p>
+          <Button size="sm" onClick={() => handleUpgrade("PRO")} className="shrink-0 h-7 text-xs">
+            Upgrade
+          </Button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+{/* Upgrade Plans */}
+{user.tier !== "PRO" && (
+  <Card className="gap-0">
+    <CardHeader className="px-6 pb-2">
+      <CardTitle>Upgrade Your Plan</CardTitle>
+      <CardDescription>Choose a plan that fits your needs</CardDescription>
+    </CardHeader>
+    <CardContent className="px-6 pt-0">
+      <div className="grid md:grid-cols-2 gap-4">
+        {user.tier === "FREE" && (
+          <>
+            {/* BASIC Plan */}
+            <div className="border rounded-xl p-5 space-y-4 hover:border-primary/40 hover:shadow-sm transition-all">
+              <div>
+                <h3 className="text-lg font-bold">Basic</h3>
+                <div className="mt-1 flex items-end gap-1">
+                  <span className="text-3xl font-bold">₹299</span>
+                  <span className="text-muted-foreground text-sm mb-1">/month</span>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+              <ul className="space-y-2">
+                {tiers.BASIC.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button onClick={() => handleUpgrade("BASIC")} className="w-full" variant="outline">
+                Upgrade to Basic
+              </Button>
+            </div>
 
-          {/* Manage Subscription - Placeholder for future API */}
-          {user.tier !== "FREE" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Subscription</CardTitle>
-                <CardDescription>
-                  Payment and subscription management coming soon
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full" disabled>
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Update Payment Method
-                </Button>
-                <Button variant="outline" className="w-full" disabled>
-                  Cancel Subscription
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+            {/* PRO Plan */}
+            <div className="relative border-2 border-primary rounded-xl p-5 space-y-4 bg-primary/[0.02] hover:shadow-md transition-all">
+              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                Most Popular
+              </Badge>
+              <div>
+                <h3 className="text-lg font-bold">Pro</h3>
+                <div className="mt-1 flex items-end gap-1">
+                  <span className="text-3xl font-bold">₹999</span>
+                  <span className="text-muted-foreground text-sm mb-1">/month</span>
+                </div>
+              </div>
+              <ul className="space-y-2">
+                {tiers.PRO.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button onClick={() => handleUpgrade("PRO")} className="w-full">
+                Upgrade to Pro
+              </Button>
+            </div>
+          </>
+        )}
+
+        {user.tier === "BASIC" && (
+          <div className="border-2 border-primary rounded-xl p-5 space-y-4 relative bg-primary/[0.02] max-w-md mx-auto w-full">
+            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+              Recommended
+            </Badge>
+            <div>
+              <h3 className="text-lg font-bold">Pro</h3>
+              <div className="mt-1 flex items-end gap-1">
+                <span className="text-3xl font-bold">₹999</span>
+                <span className="text-muted-foreground text-sm mb-1">/month</span>
+              </div>
+            </div>
+            <ul className="space-y-2">
+              {tiers.PRO.features.map((feature, index) => (
+                <li key={index} className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <Button onClick={() => handleUpgrade("PRO")} className="w-full">
+              Upgrade to Pro
+            </Button>
+          </div>
+        )}
+      </div>
+    </CardContent>
+  </Card>
+)}
+
+{/* Manage Subscription */}
+{user.tier !== "FREE" && (
+  <Card>
+    <CardHeader>
+      <CardTitle>Manage Subscription</CardTitle>
+      <CardDescription>Payment and subscription management coming soon</CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-3">
+      <Button variant="outline" className="w-full" disabled>
+        <CreditCard className="h-4 w-4 mr-2" />
+        Update Payment Method
+      </Button>
+      <Button variant="outline" className="w-full" disabled>
+        Cancel Subscription
+      </Button>
+    </CardContent>
+  </Card>
+)}
+</TabsContent>
       </Tabs>
 
       {/* Email Change Dialog */}

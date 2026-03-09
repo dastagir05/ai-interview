@@ -38,7 +38,6 @@ export default async function JobInfos() {
     }
 
     jobInfos = JSON.parse(raw);
-    console.log("job information", jobInfos);
   } catch (error) {
     console.error("Failed to load job descriptions", error);
     return <div>Failed to load job descriptions</div>;
@@ -111,7 +110,7 @@ export default async function JobInfos() {
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pb-4">
                 <p className="text-sm text-muted-foreground line-clamp-3">
                   {jobInfo.description}
                 </p>

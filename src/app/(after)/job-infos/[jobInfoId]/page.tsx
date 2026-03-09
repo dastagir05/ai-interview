@@ -23,6 +23,7 @@ import { requireUserId } from "@/lib/auth";
 import { env } from "@/data/env/server";
 import { PersonalJobDetails } from "@/data/type/job";
 import { cookies } from "next/headers";
+import { VideoMockInterviewCard } from "@/features/jobInfos/components/VideoMockInterviewCard";
 
 const options = [
   {
@@ -157,7 +158,7 @@ export default async function JobInfoPage({
         <div className="border-t border-border" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 has-hover:*:not-hover:opacity-60">
-          {options.map((option) => {
+          {options.slice(0, 3).map((option) => {
             const Icon = option.icon;
             return (
               <Link
@@ -167,7 +168,34 @@ export default async function JobInfoPage({
               >
                 <Card className="h-full flex items-start justify-between flex-row border-l-[3px] border-l-foreground hover:shadow-md transition-shadow">
                   <CardHeader className="flex-grow flex-row items-start gap-3 space-y-0">
-                    {/* Icon + Title pill box */}
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted border border-border shrink-0">
+                      <Icon className="size-4 text-foreground" />
+                      <CardTitle className="text-base font-semibold tracking-tight whitespace-nowrap">
+                        {option.label}
+                      </CardTitle>
+                    </div>
+                    <CardDescription className="text-sm leading-relaxed pt-2">
+                      {option.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-4 pr-4 pl-0 shrink-0">
+                    <ArrowRightIcon className="size-4 text-muted-foreground mt-1" />
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+          <VideoMockInterviewCard jobInfoId={jobInfoId} />
+          {options.slice(3).map((option) => {
+            const Icon = option.icon;
+            return (
+              <Link
+                className="hover:scale-[1.01] transition-[transform_opacity]"
+                href={`/job-infos/${jobInfoId}/${option.href}`}
+                key={option.href}
+              >
+                <Card className="h-full flex items-start justify-between flex-row border-l-[3px] border-l-foreground hover:shadow-md transition-shadow">
+                  <CardHeader className="flex-grow flex-row items-start gap-3 space-y-0">
                     <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted border border-border shrink-0">
                       <Icon className="size-4 text-foreground" />
                       <CardTitle className="text-base font-semibold tracking-tight whitespace-nowrap">

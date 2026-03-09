@@ -34,3 +34,15 @@ export interface CompleteInterviewResponse {
   totalQuestions: number;
   durationMinutes: number;
 }
+
+export interface VideoPresignedUrlResponse {
+  uploadUrl: string;
+  submissionId: string;
+  s3Key: string;
+}
+
+export interface VideoInterviewProcessResponse extends Omit<CompleteInterviewResponse, "sessionId"> {
+  submissionId: string;
+  sessionId?: string;
+  videoReplayUrl?: string | null;
+}
