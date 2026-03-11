@@ -19,7 +19,7 @@ export default function ProtectedRoute({
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        router.push("/signin");
+        router.push("/");
       } else if (requireAdmin && !isAdmin) {
         router.push("/dashboard");
       }

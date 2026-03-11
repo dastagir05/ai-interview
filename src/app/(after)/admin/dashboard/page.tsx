@@ -145,7 +145,7 @@ export default function AdminDashboardPage() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
+            <Card className="pb-4">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -158,7 +158,7 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="pb-4">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Practice Jobs</CardTitle>
                 <Briefcase className="h-4 w-4 text-muted-foreground" />
@@ -171,7 +171,7 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="pb-4">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Interviews</CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -184,7 +184,7 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="pb-4">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">New Users</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -199,7 +199,7 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
+            <Card className="pb-4">
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
               </CardHeader>
@@ -227,7 +227,7 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="pb-4">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
@@ -279,7 +279,7 @@ export default function AdminDashboardPage() {
             </Button>
           </div>
 
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>Practice Jobs</CardTitle>
             </CardHeader>
@@ -350,7 +350,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>Users</CardTitle>
             </CardHeader>
@@ -411,7 +411,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>Interviews</CardTitle>
             </CardHeader>
@@ -454,13 +454,13 @@ export default function AdminDashboardPage() {
 
         {/* Content Tab */}
         <TabsContent value="content" className="space-y-4">
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>Content Management</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <Card>
+                <Card className="pb-4">
                   <CardHeader>
                     <CardTitle className="text-lg">Question Banks</CardTitle>
                   </CardHeader>
@@ -474,7 +474,7 @@ export default function AdminDashboardPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="pb-4">
                   <CardHeader>
                     <CardTitle className="text-lg">Categories & Skills</CardTitle>
                   </CardHeader>
@@ -488,7 +488,7 @@ export default function AdminDashboardPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="pb-4">
                   <CardHeader>
                     <CardTitle className="text-lg">Interview Templates</CardTitle>
                   </CardHeader>
@@ -502,7 +502,7 @@ export default function AdminDashboardPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="pb-4">
                   <CardHeader>
                     <CardTitle className="text-lg">Bulk Import/Export</CardTitle>
                   </CardHeader>

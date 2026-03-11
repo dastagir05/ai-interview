@@ -476,7 +476,7 @@ function UserSettingsContent() {
         {/* Profile Tab */}
         <TabsContent value="profile" className="space-y-6">
           {/* Profile Information */}
-          <Card className="gap-0">
+          <Card className="gap-0 pb-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div>
                 <CardTitle>Profile Information</CardTitle>
@@ -633,7 +633,7 @@ function UserSettingsContent() {
 
           {/* Change Password */}
           <Collapsible open={isPasswordOpen} onOpenChange={setIsPasswordOpen}>
-            <Card className="gap-0 ">
+            <Card className="gap-0 pb-4">
               <CollapsibleTrigger className="w-full space-y-0 pb-0">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-2">
                   <div className="text-left">
@@ -744,7 +744,7 @@ function UserSettingsContent() {
           </Collapsible>
 
           {/* Danger Zone */}
-          <Card className="border-destructive gap-0">
+          <Card className="border-destructive gap-0 pb-4">
             <CardHeader className="px-6 pb-2">
               <CardTitle className="text-destructive">Danger Zone</CardTitle>
               <CardDescription>
@@ -941,7 +941,7 @@ function UserSettingsContent() {
 
 {/* Upgrade Plans */}
 {user.tier !== "PRO" && (
-  <Card className="gap-0">
+  <Card className="gap-0 pb-4">
     <CardHeader className="px-6 pb-2">
       <CardTitle>Upgrade Your Plan</CardTitle>
       <CardDescription>Choose a plan that fits your needs</CardDescription>
@@ -1031,7 +1031,7 @@ function UserSettingsContent() {
 
 {/* Manage Subscription */}
 {user.tier !== "FREE" && (
-  <Card>
+  <Card className="pb-4">
     <CardHeader>
       <CardTitle>Manage Subscription</CardTitle>
       <CardDescription>Payment and subscription management coming soon</CardDescription>

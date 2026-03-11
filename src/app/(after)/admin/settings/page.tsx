@@ -111,7 +111,7 @@ function AdminSettingsContent() {
 
         {/* Platform Settings */}
         <TabsContent value="platform" className="space-y-4">
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>General Settings</CardTitle>
               <CardDescription>
@@ -199,7 +199,7 @@ function AdminSettingsContent() {
 
         {/* Email Settings */}
         <TabsContent value="email" className="space-y-4">
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>SMTP Configuration</CardTitle>
               <CardDescription>
@@ -290,7 +290,7 @@ function AdminSettingsContent() {
 
         {/* Notification Settings */}
         <TabsContent value="notifications" className="space-y-4">
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>Email Notifications</CardTitle>
               <CardDescription>
@@ -371,7 +371,7 @@ function AdminSettingsContent() {
 
         {/* Security Settings */}
         <TabsContent value="security" className="space-y-4">
-          <Card>
+          <Card className="pb-4">
             <CardHeader>
               <CardTitle>Security Configuration</CardTitle>
               <CardDescription>

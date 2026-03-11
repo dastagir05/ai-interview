@@ -121,7 +121,7 @@ function AdminAnalyticsContent() {
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="pb-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">User Growth</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -148,7 +148,7 @@ function AdminAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="pb-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Interview Growth</CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -177,7 +177,7 @@ function AdminAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="pb-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Job Usage</CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
@@ -204,7 +204,7 @@ function AdminAnalyticsContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="pb-4">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avg Interview Duration</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -236,7 +236,7 @@ function AdminAnalyticsContent() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Top Jobs */}
-        <Card>
+        <Card className="pb-4">
           <CardHeader>
             <CardTitle>Most Popular Practice Jobs</CardTitle>
           </CardHeader>
@@ -274,7 +274,7 @@ function AdminAnalyticsContent() {
         </Card>
 
         {/* Category Distribution */}
-        <Card>
+        <Card className="pb-4">
           <CardHeader>
             <CardTitle>Category Distribution</CardTitle>
           </CardHeader>
@@ -302,7 +302,7 @@ function AdminAnalyticsContent() {
       </div>
 
       {/* Activity Timeline */}
-      <Card>
+      <Card className="pb-4">
         <CardHeader>
           <CardTitle>Daily Activity</CardTitle>
         </CardHeader>
