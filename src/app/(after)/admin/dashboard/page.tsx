@@ -34,6 +34,42 @@ import { adminApi } from "@/lib/admin";
 import { PublicJob } from "@/data/type/job";
 import { UserDetails } from "@/data/type/user";
 
+export interface AdminInterviewRow {
+  id?: string;
+  userId?: string;
+  userName?: string;
+  user?: { name?: string };
+  jobTitle?: string;
+  completedAt?: string;
+  duration?: string;
+  durationMinutes?: number;
+  status?: string;
+}
+
+export interface AdminActivityItem {
+  id?: string;
+  type?: string;
+  message?: string;
+  createdAt?: string;
+}
+
+function formatRelativeTime(dateStr: string | undefined): string {
+  if (!dateStr) return "—";
+  try {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return d.toLocaleDateString();
+  } catch {
+    return dateStr;
+  }
+}
 
 export default function AdminDashboardPage() {
   return (
@@ -57,11 +93,18 @@ export default function AdminDashboardPage() {
 
   const { data: users } = useQuery({
     queryKey: ["admin-users"],
-    queryFn: () =>
-      fetch("/api/admin/dashboard/users").then(r => r.json()),
+    queryFn: () => adminApi.getUsers(),
   });
 
-  console.log("users", users);
+  const { data: interviewsData } = useQuery({
+    queryKey: ["admin-interviews"],
+    queryFn: () => adminApi.getInterviews(50),
+  });
+
+  const { data: activityData } = useQuery({
+    queryKey: ["admin-activity"],
+    queryFn: () => adminApi.getActivity(10),
+  });
 
   const stats = {
     totalUsers: stats2?.totalUsers,
@@ -72,27 +115,8 @@ export default function AdminDashboardPage() {
     interviewsThisMonth: stats2?.interviewsThisMonth,
   };
 
-
-  const interviews = [
-    {
-      id: "1",
-      userId: "1",
-      userName: "John Doe",
-      jobTitle: "Senior Full Stack Developer",
-      completedAt: "2024-03-15",
-      duration: "25 min",
-      status: "completed",
-    },
-    {
-      id: "2",
-      userId: "2",
-      userName: "Jane Smith",
-      jobTitle: "React Developer",
-      completedAt: "2024-03-14",
-      duration: "30 min",
-      status: "completed",
-    },
-  ];
+  const interviews = (Array.isArray(interviewsData) ? interviewsData : []) as AdminInterviewRow[];
+  const recentActivity = (Array.isArray(activityData) ? activityData : []) as AdminActivityItem[];
 
   return (
     <div className="container my-6 space-y-6">
@@ -135,10 +159,6 @@ export default function AdminDashboardPage() {
           <TabsTrigger value="interviews">
             <MessageSquare className="mr-2 h-4 w-4" />
             Interviews
-          </TabsTrigger>
-          <TabsTrigger value="content">
-            <BookOpen className="mr-2 h-4 w-4" />
-            Content
           </TabsTrigger>
         </TabsList>
 
@@ -205,24 +225,22 @@ export default function AdminDashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">New user registered</p>
-                      <p className="text-xs text-muted-foreground">2 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">Interview completed</p>
-                      <p className="text-xs text-muted-foreground">5 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">New practice job created</p>
-                      <p className="text-xs text-muted-foreground">1 day ago</p>
-                    </div>
-                  </div>
+                  {recentActivity.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No recent activity</p>
+                  ) : (
+                    recentActivity.map((item, index) => (
+                      <div key={item.id ?? index} className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {item.message ?? item.type ?? "Activity"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatRelativeTime(item.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -368,24 +386,31 @@ export default function AdminDashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users?.map((user : UserDetails) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{user.tier}</Badge>
-                      </TableCell>
-                      <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
-                       <TableCell>{user.interviewsCompleted || 0}</TableCell>
-                      <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                      {/*<TableCell>{user.joinedDate}</TableCell> */}
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
+                  {!users?.length ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                        No users found
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    users.map((user: UserDetails) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{user.tier}</Badge>
+                        </TableCell>
+                        <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
+                        <TableCell>{user.interviewsCompleted ?? 0}</TableCell>
+                        <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -428,24 +453,43 @@ export default function AdminDashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {interviews.map((interview) => (
-                    <TableRow key={interview.id}>
-                      <TableCell className="font-medium">
-                        {interview.userName}
-                      </TableCell>
-                      <TableCell>{interview.jobTitle}</TableCell>
-                      <TableCell>{interview.duration}</TableCell>
-                      <TableCell>{interview.completedAt}</TableCell>
-                      <TableCell>
-                        <Badge variant="default">{interview.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
+                  {interviews.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        No interviews yet
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    interviews.map((interview) => (
+                      <TableRow key={interview.id ?? interview.userId ?? Math.random()}>
+                        <TableCell className="font-medium">
+                          {interview.userName ?? interview.user?.name ?? "—"}
+                        </TableCell>
+                        <TableCell>{interview.jobTitle ?? "—"}</TableCell>
+                        <TableCell>
+                          {interview.duration ??
+                            (interview.durationMinutes != null
+                              ? `${interview.durationMinutes} min`
+                              : "—")}
+                        </TableCell>
+                        <TableCell>
+                          {interview.completedAt
+                            ? new Date(interview.completedAt).toLocaleDateString()
+                            : "—"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="default">
+                            {interview.status ?? "—"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

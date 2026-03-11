@@ -20,6 +20,7 @@ export default function VideoSessionPage({
         jobInfoId,
         sessionId,
         interviewId: configurationId ?? "",
+        videoRoute: true,
       }),
     [jobInfoId, sessionId, configurationId]
   );

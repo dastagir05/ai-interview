@@ -1,8 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -22,6 +22,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRouteProps";
+import { useQuery } from "@tanstack/react-query";
+import { adminApi } from "@/lib/admin";
+
+export type AnalyticsTimeRange = "7d" | "30d" | "90d" | "1y";
 
 export default function AdminAnalyticsPage() {
   return (
@@ -31,58 +35,60 @@ export default function AdminAnalyticsPage() {
   );
 }
 
+interface AnalyticsMetrics {
+  userGrowth?: { current?: number; previous?: number; change?: number; trend?: string };
+  interviewGrowth?: { current?: number; previous?: number; change?: number; trend?: string };
+  jobUsage?: { current?: number; previous?: number; change?: number; trend?: string };
+  avgInterviewDuration?: { current?: number; previous?: number; change?: number; trend?: string };
+}
+
+interface TopJobItem {
+  title?: string;
+  jobTitle?: string;
+  count?: number;
+  interviews?: number;
+  growth?: number;
+}
+
+interface DailyActivityItem {
+  date?: string;
+  users?: number;
+  interviews?: number;
+}
+
+interface CategoryItem {
+  category?: string;
+  count?: number;
+  percentage?: number;
+}
+
 function AdminAnalyticsContent() {
-  // Mock data - replace with actual API calls
-  const timeRange = "30d"; // This would come from state
+  const [timeRange, setTimeRange] = useState<AnalyticsTimeRange>("30d");
 
-  const metrics = {
-    userGrowth: {
-      current: 1250,
-      previous: 1100,
-      change: 13.6,
-      trend: "up",
-    },
-    interviewGrowth: {
-      current: 3420,
-      previous: 2980,
-      change: 14.8,
-      trend: "up",
-    },
-    jobUsage: {
-      current: 45,
-      previous: 38,
-      change: 18.4,
-      trend: "up",
-    },
-    avgInterviewDuration: {
-      current: 28,
-      previous: 25,
-      change: 12,
-      trend: "up",
-    },
-  };
+  const { data: metricsData, isLoading: metricsLoading } = useQuery({
+    queryKey: ["admin-analytics-metrics", timeRange],
+    queryFn: () => adminApi.getAnalyticsMetrics(timeRange),
+  });
 
-  const topJobs = [
-    { title: "Senior Full Stack Developer", count: 234, growth: 15 },
-    { title: "React Developer", count: 189, growth: 8 },
-    { title: "Data Scientist", count: 67, growth: -5 },
-    { title: "Python Developer", count: 145, growth: 22 },
-  ];
+  const { data: topJobsData } = useQuery({
+    queryKey: ["admin-analytics-top-jobs", timeRange],
+    queryFn: () => adminApi.getAnalyticsTopJobs(timeRange, 10),
+  });
 
-  const userActivity = [
-    { date: "2024-03-01", users: 120, interviews: 45 },
-    { date: "2024-03-02", users: 135, interviews: 52 },
-    { date: "2024-03-03", users: 150, interviews: 60 },
-    { date: "2024-03-04", users: 145, interviews: 58 },
-    { date: "2024-03-05", users: 160, interviews: 65 },
-  ];
+  const { data: dailyActivityData } = useQuery({
+    queryKey: ["admin-analytics-daily-activity", timeRange],
+    queryFn: () => adminApi.getAnalyticsDailyActivity(timeRange),
+  });
 
-  const categoryDistribution = [
-    { category: "PROGRAMING", count: 1250, percentage: 45 },
-    { category: "DATA_SCIENCE", count: 890, percentage: 32 },
-    { category: "DESIGN", count: 450, percentage: 16 },
-    { category: "OTHER", count: 230, percentage: 7 },
-  ];
+  const { data: categoryData } = useQuery({
+    queryKey: ["admin-analytics-category-distribution", timeRange],
+    queryFn: () => adminApi.getAnalyticsCategoryDistribution(timeRange),
+  });
+
+  const metrics = (metricsData ?? {}) as AnalyticsMetrics;
+  const topJobs = (Array.isArray(topJobsData) ? topJobsData : []) as TopJobItem[];
+  const userActivity = (Array.isArray(dailyActivityData) ? dailyActivityData : []) as DailyActivityItem[];
+  const categoryDistribution = (Array.isArray(categoryData) ? categoryData : []) as CategoryItem[];
 
   return (
     <div className="container my-6 space-y-6">
@@ -101,7 +107,7 @@ function AdminAnalyticsContent() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Select defaultValue={timeRange}>
+          <Select value={timeRange} onValueChange={(v) => setTimeRange(v as AnalyticsTimeRange)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select time range" />
             </SelectTrigger>
@@ -119,6 +125,12 @@ function AdminAnalyticsContent() {
         </div>
       </div>
 
+      {metricsLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+      <>
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="pb-4">
@@ -127,21 +139,21 @@ function AdminAnalyticsContent() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.userGrowth.current}</div>
+            <div className="text-2xl font-bold">{metrics.userGrowth?.current ?? 0}</div>
             <div className="flex items-center gap-1 text-xs">
-              {metrics.userGrowth.trend === "up" ? (
+              {(metrics.userGrowth?.trend ?? "up") === "up" ? (
                 <TrendingUp className="h-3 w-3 text-green-600" />
               ) : (
                 <TrendingDown className="h-3 w-3 text-red-600" />
               )}
               <span
                 className={
-                  metrics.userGrowth.trend === "up"
+                  (metrics.userGrowth?.trend ?? "up") === "up"
                     ? "text-green-600"
                     : "text-red-600"
                 }
               >
-                {metrics.userGrowth.change}%
+                {metrics.userGrowth?.change ?? 0}%
               </span>
               <span className="text-muted-foreground">vs previous period</span>
             </div>
@@ -155,22 +167,22 @@ function AdminAnalyticsContent() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {metrics.interviewGrowth.current}
+              {metrics.interviewGrowth?.current ?? 0}
             </div>
             <div className="flex items-center gap-1 text-xs">
-              {metrics.interviewGrowth.trend === "up" ? (
+              {(metrics.interviewGrowth?.trend ?? "up") === "up" ? (
                 <TrendingUp className="h-3 w-3 text-green-600" />
               ) : (
                 <TrendingDown className="h-3 w-3 text-red-600" />
               )}
               <span
                 className={
-                  metrics.interviewGrowth.trend === "up"
+                  (metrics.interviewGrowth?.trend ?? "up") === "up"
                     ? "text-green-600"
                     : "text-red-600"
                 }
               >
-                {metrics.interviewGrowth.change}%
+                {metrics.interviewGrowth?.change ?? 0}%
               </span>
               <span className="text-muted-foreground">vs previous period</span>
             </div>
@@ -183,21 +195,21 @@ function AdminAnalyticsContent() {
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.jobUsage.current}</div>
+            <div className="text-2xl font-bold">{metrics.jobUsage?.current ?? 0}</div>
             <div className="flex items-center gap-1 text-xs">
-              {metrics.jobUsage.trend === "up" ? (
+              {(metrics.jobUsage?.trend ?? "up") === "up" ? (
                 <TrendingUp className="h-3 w-3 text-green-600" />
               ) : (
                 <TrendingDown className="h-3 w-3 text-red-600" />
               )}
               <span
                 className={
-                  metrics.jobUsage.trend === "up"
+                  (metrics.jobUsage?.trend ?? "up") === "up"
                     ? "text-green-600"
                     : "text-red-600"
                 }
               >
-                {metrics.jobUsage.change}%
+                {metrics.jobUsage?.change ?? 0}%
               </span>
               <span className="text-muted-foreground">vs previous period</span>
             </div>
@@ -211,22 +223,22 @@ function AdminAnalyticsContent() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {metrics.avgInterviewDuration.current} min
+              {metrics.avgInterviewDuration?.current ?? 0} min
             </div>
             <div className="flex items-center gap-1 text-xs">
-              {metrics.avgInterviewDuration.trend === "up" ? (
+              {(metrics.avgInterviewDuration?.trend ?? "up") === "up" ? (
                 <TrendingUp className="h-3 w-3 text-green-600" />
               ) : (
                 <TrendingDown className="h-3 w-3 text-red-600" />
               )}
               <span
                 className={
-                  metrics.avgInterviewDuration.trend === "up"
+                  (metrics.avgInterviewDuration?.trend ?? "up") === "up"
                     ? "text-green-600"
                     : "text-red-600"
                 }
               >
-                {metrics.avgInterviewDuration.change}%
+                {metrics.avgInterviewDuration?.change ?? 0}%
               </span>
               <span className="text-muted-foreground">vs previous period</span>
             </div>
@@ -242,33 +254,41 @@ function AdminAnalyticsContent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topJobs.map((job, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium">{job.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {job.count} interviews
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {job.growth > 0 ? (
-                      <TrendingUp className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4 text-red-600" />
-                    )}
-                    <span
-                      className={
-                        job.growth > 0 ? "text-green-600" : "text-red-600"
-                      }
+              {topJobs.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No job data for this period</p>
+              ) : (
+                topJobs.map((job, index) => {
+                  const count = job.count ?? job.interviews ?? 0;
+                  const growth = job.growth ?? 0;
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 border rounded-lg"
                     >
-                      {Math.abs(job.growth)}%
-                    </span>
-                  </div>
-                </div>
-              ))}
+                      <div className="flex-1">
+                        <p className="font-medium">{job.title ?? job.jobTitle ?? "—"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {count} interviews
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {growth > 0 ? (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-600" />
+                        )}
+                        <span
+                          className={
+                            growth > 0 ? "text-green-600" : "text-red-600"
+                          }
+                        >
+                          {Math.abs(growth)}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </CardContent>
         </Card>
@@ -280,22 +300,26 @@ function AdminAnalyticsContent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {categoryDistribution.map((item, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{item.category}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {item.count} ({item.percentage}%)
-                    </span>
+              {categoryDistribution.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No category data for this period</p>
+              ) : (
+                categoryDistribution.map((item, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{item.category ?? "—"}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {item.count ?? 0} ({(item.percentage ?? 0)}%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div
+                        className="bg-primary h-2 rounded-full"
+                        style={{ width: `${item.percentage ?? 0}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: `${item.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -308,32 +332,38 @@ function AdminAnalyticsContent() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {userActivity.map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 border rounded-lg"
-              >
-                <div className="flex items-center gap-4">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{activity.date}</span>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{activity.users} users</span>
+            {userActivity.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No activity for this period</p>
+            ) : (
+              userActivity.map((activity, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
+                  <div className="flex items-center gap-4">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">{activity.date ?? "—"}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      {activity.interviews} interviews
-                    </span>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{activity.users ?? 0} users</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">
+                        {activity.interviews ?? 0} interviews
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
+      </>
+      )}
     </div>
   );
 }
