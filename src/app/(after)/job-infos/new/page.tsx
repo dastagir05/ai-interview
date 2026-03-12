@@ -9,7 +9,7 @@ export default function JobInfoNewPage() {
 
       <h1 className="text-3xl md:text-4xl">Create New Job Description</h1>
 
-      <Card>
+      <Card className="pb-4">
         <CardContent>
             <PersonalJobInfoForm
               jobInfo={{

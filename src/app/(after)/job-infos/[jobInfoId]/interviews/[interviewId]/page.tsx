@@ -32,6 +32,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { JobInfoBackLink } from "@/features/jobInfos/components/JobInfoBackLink";
 
 export default function InterviewSessionsPage({
   params,
@@ -198,7 +199,9 @@ export default function InterviewSessionsPage({
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-3xl font-bold">Interview Sessions</h1>
+          <h1 className="text-3xl font-bold">
+            <JobInfoBackLink jobInfoId={jobInfoId} />
+            Interview Sessions</h1>
           <p className="text-muted-foreground mt-2">
             Practice and track your interview progress
           </p>

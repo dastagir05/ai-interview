@@ -40,7 +40,14 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="icon" aria-hidden className="pointer-events-none">
+        <Sun className="size-[1.125rem]" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>

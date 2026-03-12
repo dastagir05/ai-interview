@@ -256,20 +256,6 @@ const Login: React.FC<LoginProps> = ({ openDialog, closeDialog }) => {
               </div>
 
               <button
-                onClick={() => {
-                  window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/github`;
-                }}
-                className="flex items-center justify-center w-full border border-border bg-background hover:bg-muted rounded-lg px-4 py-3 transition-colors text-foreground font-medium"
-              >
-                <img
-                  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
-                  alt="GitHub"
-                  className="w-5 h-5 mr-3 dark:invert"
-                />
-                Continue with GitHub
-              </button>
-
-              <button
                 onClick={() => setMode("email-input")}
                 className="flex items-center justify-center w-full border-2 border-primary bg-primary/5 hover:bg-primary/10 text-primary rounded-lg px-4 py-3 transition-colors font-medium"
               >

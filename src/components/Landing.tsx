@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   TrendingUp,
   Award,
+  BarChart3,
+  Target,
 } from "lucide-react";
 import Link from "next/link";
 import { UserAvatar } from "@/features/users/components/UserAvatar";
@@ -91,61 +93,102 @@ function Navbar() {
   );
 }
 
+const FALLING_PARTICLES = [
+  { left: "5%", duration: 14, delay: 0 },
+  { left: "12%", duration: 18, delay: 2 },
+  { left: "22%", duration: 12, delay: 5 },
+  { left: "35%", duration: 16, delay: 1 },
+  { left: "48%", duration: 20, delay: 8 },
+  { left: "55%", duration: 13, delay: 3 },
+  { left: "68%", duration: 15, delay: 6 },
+  { left: "78%", duration: 17, delay: 4 },
+  { left: "88%", duration: 11, delay: 7 },
+  { left: "95%", duration: 19, delay: 2 },
+  { left: "18%", duration: 21, delay: 10 },
+  { left: "42%", duration: 14, delay: 1 },
+  { left: "62%", duration: 16, delay: 5 },
+  { left: "72%", duration: 12, delay: 9 },
+  { left: "28%", duration: 18, delay: 3 },
+] as const;
+
 function Hero() {
   const [openDialog, setOpenDialog] = useState(false);
 
   return (
     <section className="relative overflow-hidden py-24 sm:py-36">
-      <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-5 hero-grid-animate" />
+      <div className="hero-ambient-light" aria-hidden />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+        {FALLING_PARTICLES.map((p, i) => (
+          <span
+            key={i}
+            className="hero-falling-particle text-primary/40 dark:text-primary/60"
+            style={{
+              ["--fall-left" as string]: p.left,
+              ["--fall-duration" as string]: `${p.duration}s`,
+              ["--fall-delay" as string]: `-${p.delay}s`,
+            }}
+          >
+            {i % 3 === 0 ? (
+              <span className="block w-1 h-1 rounded-full bg-current" />
+            ) : i % 3 === 1 ? (
+              <span className="block w-0.5 h-3 rounded-full bg-current" />
+            ) : (
+              <span className="block w-1.5 h-1.5 rounded-sm bg-current opacity-70 dark:opacity-80" />
+            )}
+          </span>
+        ))}
+      </div>
       <div className="container relative">
         <div className="text-center max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 hero-fade-up"
+            style={{ animationDelay: "0ms" }}
+          >
             <TrendingUp className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-primary">
               Join 10,000+ professionals advancing their careers
             </span>
           </div>
-          
-          <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight">
+
+          <h2
+            className="text-4xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight hero-fade-up"
+            style={{ animationDelay: "120ms" }}
+          >
             Master interviews with{" "}
-            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent hero-gradient-text">
               AI-powered
             </span>{" "}
             precision
           </h2>
-          
-          <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-            Transform interview anxiety into confidence. Get personalized AI coaching, 
+
+          <p
+            className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed hero-fade-up"
+            style={{ animationDelay: "240ms" }}
+          >
+            Transform interview anxiety into confidence. Get personalized AI coaching,
             optimize your resume for recruiters, and master technical challenges—all in one platform.
           </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              size="lg" 
+
+          <div
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 hero-fade-up"
+            style={{ animationDelay: "380ms" }}
+          >
+            <Button
+              size="lg"
               className="h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
               onClick={() => setOpenDialog(true)}
             >
               Start Free Today
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
               className="h-12 px-8 text-base font-semibold"
               asChild
             >
               <Link href="#features">See How It Works</Link>
             </Button>
-          </div>
-          
-          <div className="flex items-center justify-center gap-8 mt-12 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span>No credit card required</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span>7-day money-back guarantee</span>
-            </div>
           </div>
         </div>
       </div>
@@ -179,7 +222,19 @@ function Features() {
       Icon: FileSlidersIcon,
       description:
         "Beat ATS systems and impress recruiters. Get AI-powered suggestions that transform your resume into a callback magnet.",
-    }
+    },
+    {
+      title: "Analytics",
+      Icon: BarChart3,
+      description:
+        "Track your performance with detailed analytics. See trends, weak spots, and improvement over time so you know exactly where to focus.",
+    },
+    {
+      title: "Progress & Goals",
+      Icon: Target,
+      description:
+        "Set goals and track your journey. See how you improve across interviews and quizzes, and get AI-powered recommendations to hit your targets.",
+    },
   ];
 
   return (
@@ -194,7 +249,7 @@ function Features() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {features.map((feature, index) => (
             <Card
               key={feature.title}
@@ -721,9 +776,6 @@ function Pricing() {
         <div className="max-w-5xl mx-auto">{/* <PricingTable /> */}</div>
 
         <div className="text-center mt-12 space-y-4">
-          <p className="text-sm text-muted-foreground">
-            All plans include a 7-day money-back guarantee. Cancel anytime, no questions asked.
-          </p>
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />

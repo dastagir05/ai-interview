@@ -931,7 +931,7 @@ export default function AIInterviewSessionPage({
 
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-1.5">
-                <span className="text-xs text-muted-foreground">Time</span>
+                <span className="text-xs text-muted-foreground">Time Remaining</span>
                 <span className="text-sm font-medium tabular-nums">{timeRemaining.toFixed(0)} m</span>
               </div>
               <div className="h-6 w-px bg-border hidden sm:block" />
